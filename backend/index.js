@@ -317,6 +317,95 @@ app.post('/api/feedback/like', async (req, res) => {
   }
 });
 
+// Crear respuesta a feedback
+app.post('/api/feedback/reply', async (req, res) => {
+  const { user_id, feedback_id, content } = req.body;
+  if (!user_id || !feedback_id || !content) {
+    return res.status(400).json({ error: 'Faltan campos requeridos.' });
+  }
+  try {
+    const { data, error } = await supabase
+      .from('feedback_replies')
+      .insert({ user_id, feedback_id, content })
+      .select();
+    if (error) {
+      console.error('Supabase error al crear reply:', error);
+      return res.status(500).json({ error: 'Error al crear la respuesta.', details: error.message });
+    }
+    res.status(201).json(data);
+  } catch (e) {
+    console.error('Error inesperado en /api/feedback/reply:', e);
+    return res.status(500).json({ error: 'Error inesperado en el servidor.', details: e.message });
+  }
+});
+
+// Editar feedback principal
+app.put('/api/feedback/:id', async (req, res) => {
+  const { id } = req.params;
+  const { user_id, content, title } = req.body;
+  if (!user_id || (!content && !title)) {
+    return res.status(400).json({ error: 'Faltan campos requeridos.' });
+  }
+  // Verificar si es autor o admin
+  const { data: profile } = await supabase.from('profiles').select('id, is_admin').eq('id', user_id).maybeSingle();
+  const { data: feedback } = await supabase.from('feedback').select('user_id').eq('id', id).maybeSingle();
+  if (!profile || !feedback) return res.status(404).json({ error: 'No encontrado.' });
+  if (profile.id !== feedback.user_id && !profile.is_admin) return res.status(403).json({ error: 'No autorizado.' });
+  const { data, error } = await supabase
+    .from('feedback')
+    .update({ content, title })
+    .eq('id', id)
+    .select();
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
+});
+
+// Eliminar feedback principal
+app.delete('/api/feedback/:id', async (req, res) => {
+  const { id } = req.params;
+  const { user_id } = req.body;
+  if (!user_id) return res.status(400).json({ error: 'Falta user_id.' });
+  const { data: profile } = await supabase.from('profiles').select('id, is_admin').eq('id', user_id).maybeSingle();
+  const { data: feedback } = await supabase.from('feedback').select('user_id').eq('id', id).maybeSingle();
+  if (!profile || !feedback) return res.status(404).json({ error: 'No encontrado.' });
+  if (profile.id !== feedback.user_id && !profile.is_admin) return res.status(403).json({ error: 'No autorizado.' });
+  const { error } = await supabase.from('feedback').delete().eq('id', id);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ message: 'Eliminado' });
+});
+
+// Editar reply
+app.put('/api/feedback/reply/:id', async (req, res) => {
+  const { id } = req.params;
+  const { user_id, content } = req.body;
+  if (!user_id || !content) return res.status(400).json({ error: 'Faltan campos requeridos.' });
+  const { data: profile } = await supabase.from('profiles').select('id, is_admin').eq('id', user_id).maybeSingle();
+  const { data: reply } = await supabase.from('feedback_replies').select('user_id').eq('id', id).maybeSingle();
+  if (!profile || !reply) return res.status(404).json({ error: 'No encontrado.' });
+  if (profile.id !== reply.user_id && !profile.is_admin) return res.status(403).json({ error: 'No autorizado.' });
+  const { data, error } = await supabase
+    .from('feedback_replies')
+    .update({ content })
+    .eq('id', id)
+    .select();
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
+});
+
+// Eliminar reply
+app.delete('/api/feedback/reply/:id', async (req, res) => {
+  const { id } = req.params;
+  const { user_id } = req.body;
+  if (!user_id) return res.status(400).json({ error: 'Falta user_id.' });
+  const { data: profile } = await supabase.from('profiles').select('id, is_admin').eq('id', user_id).maybeSingle();
+  const { data: reply } = await supabase.from('feedback_replies').select('user_id').eq('id', id).maybeSingle();
+  if (!profile || !reply) return res.status(404).json({ error: 'No encontrado.' });
+  if (profile.id !== reply.user_id && !profile.is_admin) return res.status(403).json({ error: 'No autorizado.' });
+  const { error } = await supabase.from('feedback_replies').delete().eq('id', id);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ message: 'Eliminado' });
+});
+
 app.listen(PORT, () => {
   console.log(`Servidor escuchando en http://localhost:${PORT}`);
 });

@@ -1,229 +1,168 @@
 'use client';
-import { useState } from 'react';
+import { useState, FC, InputHTMLAttributes, ElementType } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { Mail, Lock, User, UserCheck, AlertCircle, CheckCircle } from 'lucide-react';
-import type { Database } from '@/lib/database.types';
+
+// Define InputField props interface
+interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
+  icon: ElementType;
+}
+
+// Define InputField component outside AuthForm to prevent re-renders on state change
+const InputField: FC<InputFieldProps> = ({ icon: Icon, ...props }) => (
+  <div className="relative">
+    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+      <Icon className="text-gray-400" size={20} />
+    </div>
+    <input
+      {...props}
+      className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+    />
+  </div>
+);
 
 export default function AuthForm() {
   const router = useRouter();
   const [isSignUp, setIsSignUp] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [username, setUsername] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  
-  const [formData, setFormData] = useState({
-    full_name: '',
-    email: '',
-    password: '',
-    username: ''
-  });
-
-  const supabase = createClientComponentClient<Database>();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setIsLoading(true);
     setError(null);
     setSuccess(null);
 
     try {
       if (isSignUp) {
-        // Registro personalizado
         const response = await fetch('http://localhost:3001/api/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: formData.email,
-            username: formData.username,
-            password: formData.password,
-            full_name: formData.full_name
-          })
+          body: JSON.stringify({ full_name: fullName, email, password, username }),
         });
         const result = await response.json();
         if (!response.ok) throw new Error(result.error || 'Error al registrar usuario.');
+        
         setSuccess('¡Registro exitoso! Ahora puedes iniciar sesión.');
-        setFormData({ full_name: '', email: '', password: '', username: '' });
+        setIsSignUp(false); // Switch to login view
+        setFullName('');
+        setPassword('');
+        setUsername('');
+        // Keep email for user convenience
       } else {
-        // Login personalizado
         const response = await fetch('http://localhost:3001/api/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            emailOrUsername: formData.email,
-            password: formData.password
-          })
+          body: JSON.stringify({ emailOrUsername: email, password }),
         });
         const result = await response.json();
         if (!response.ok) throw new Error(result.error || 'Credenciales incorrectas.');
-        
-        // Guardar usuario en localStorage para persistir la sesión
-        localStorage.setItem('user', JSON.stringify(result.user));
 
-        setSuccess('¡Bienvenido!');
-        // Redirigir a la página principal después de un login exitoso
-        router.push('/');
+        localStorage.setItem('user', JSON.stringify(result.user));
+        if (result.token) {
+          localStorage.setItem('token', result.token);
+        }
+        router.push('/dashboard');
       }
     } catch (error: any) {
-      console.error('Error:', error);
       setError(error.message || 'Ocurrió un error. Inténtalo de nuevo.');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
   return (
-    <div className="w-full max-w-md">
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-emerald-400 mb-2">
-          {isSignUp ? 'Crear Cuenta' : 'Iniciar Sesión'}
-        </h2>
-        <p className="text-gray-400">
-          {isSignUp 
-            ? 'Únete a Timumachtikan Nawatl' 
-            : 'Bienvenido de vuelta'
-          }
-        </p>
-      </div>
-
+    <div className="w-full">
       {error && (
-        <div className="mb-6 p-4 bg-red-900/20 border border-red-500/30 rounded-lg flex items-center gap-3">
-          <AlertCircle className="text-red-400" size={20} />
-          <p className="text-red-400 text-sm">{error}</p>
+        <div className="mb-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg flex items-center">
+          <AlertCircle className="mr-3" size={20}/>
+          <span>{error}</span>
         </div>
       )}
-
       {success && (
-        <div className="mb-6 p-4 bg-green-900/20 border border-green-500/30 rounded-lg flex items-center gap-3">
-          <CheckCircle className="text-green-400" size={20} />
-          <p className="text-green-400 text-sm">{success}</p>
+        <div className="mb-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-lg flex items-center">
+          <CheckCircle className="mr-3" size={20}/>
+          <span>{success}</span>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-5">
         {isSignUp && (
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Nombre Completo *
-            </label>
-            <div className="relative">
-              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-              <input
-                type="text"
-                name="full_name"
-                value={formData.full_name}
-                onChange={handleInputChange}
-                className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors"
-                placeholder="Tu nombre completo"
-                required={isSignUp}
-              />
-            </div>
-          </div>
-        )}
-
-        {isSignUp && (
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Nombre de Usuario (opcional)
-            </label>
-            <div className="relative">
-              <UserCheck className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-              <input
-                type="text"
-                name="username"
-                value={formData.username}
-                onChange={handleInputChange}
-                className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors"
-                placeholder="usuario123"
-              />
-            </div>
-          </div>
-        )}
-
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Correo Electrónico *
-          </label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors"
-              placeholder="tu@email.com"
+          <>
+            <InputField
+              id="fullName"
+              icon={User}
+              type="text"
+              placeholder="Nombre Completo"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              autoComplete="name"
               required
             />
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Contraseña *
-          </label>
-          <div className="relative">
-            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors"
-              placeholder="••••••••"
-              required
-              minLength={6}
+            <InputField
+              id="username"
+              icon={UserCheck}
+              type="text"
+              placeholder="Nombre de Usuario (opcional)"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
             />
-          </div>
-        </div>
+          </>
+        )}
+
+        <InputField
+          id="email"
+          icon={Mail}
+          type="email"
+          placeholder="correo@ejemplo.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          autoComplete="email"
+          required
+        />
+
+        <InputField
+          id="password"
+          icon={Lock}
+          type="password"
+          placeholder="Contraseña"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          autoComplete={isSignUp ? 'new-password' : 'current-password'}
+          required
+        />
 
         <button
           type="submit"
-          disabled={loading}
-          className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:bg-gray-600 text-white font-bold py-3 px-4 rounded-lg transition-colors disabled:cursor-not-allowed"
+          disabled={isLoading}
+          className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-400 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 disabled:cursor-not-allowed shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
         >
-          {loading ? (
-            <div className="flex items-center justify-center gap-2">
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              {isSignUp ? 'Creando cuenta...' : 'Iniciando sesión...'}
-            </div>
+          {isLoading ? (
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mx-auto"></div>
           ) : (
             isSignUp ? 'Crear Cuenta' : 'Iniciar Sesión'
           )}
         </button>
-      </form>
 
-      <div className="mt-6 text-center">
-        <button
-          onClick={() => {
-            setIsSignUp(!isSignUp);
-            setError(null);
-            setSuccess(null);
-            setFormData({ full_name: '', email: '', password: '', username: '' });
-          }}
-          className="text-emerald-400 hover:text-emerald-300 text-sm font-medium transition-colors"
-        >
-          {isSignUp 
-            ? '¿Ya tienes cuenta? Inicia sesión' 
-            : '¿No tienes cuenta? Regístrate'
-          }
-        </button>
-      </div>
-
-      {isSignUp && (
-        <div className="mt-6 p-4 bg-amber-900/20 border border-amber-500/30 rounded-lg">
-          <p className="text-amber-200 text-sm">
-            💡 <strong>Importante:</strong> Después del registro, revisa tu correo electrónico para confirmar tu cuenta antes de iniciar sesión.
-          </p>
+        <div className="text-center">
+          <button
+            type="button"
+            onClick={() => {
+              setIsSignUp(!isSignUp);
+              setError(null);
+              setSuccess(null);
+            }}
+            className="text-emerald-600 hover:text-emerald-700 text-sm font-medium transition-colors"
+          >
+            {isSignUp ? '¿Ya tienes una cuenta? Inicia sesión' : '¿No tienes cuenta? Regístrate'}
+          </button>
         </div>
-      )}
+      </form>
     </div>
   );
 }
