@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { AlertTriangle, BookText, GraduationCap, Lightbulb } from 'lucide-react';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import Header from '@/components/Header';
 
 interface User {
