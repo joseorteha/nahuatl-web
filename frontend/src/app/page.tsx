@@ -40,14 +40,10 @@ export default function LandingPage() {
           Únete a la beta de Timumachtikan Nawatl: una plataforma moderna para aprender, practicar y preservar una de las lenguas más ricas de nuestra historia.
         </motion.p>
         <motion.div variants={item} className="mt-10">
-          <Link href="/login" passHref>
-            <motion.a 
-              className="inline-block bg-emerald-600 text-white font-bold py-3 px-8 rounded-lg text-lg shadow-lg hover:bg-emerald-700 transition-colors duration-300"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
+          <Link href="/login" className="inline-block bg-emerald-600 text-white font-bold py-3 px-8 rounded-lg text-lg shadow-lg hover:bg-emerald-700 transition-colors duration-300">
+            <motion.span whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               ¡Empieza a aprender ahora!
-            </motion.a>
+            </motion.span>
           </Link>
         </motion.div>
       </motion.section>
