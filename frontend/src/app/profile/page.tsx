@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { User, Mail, AtSign, LogOut } from 'lucide-react';
+import { User, Mail, AtSign, LogOut, LucideIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface UserData {
@@ -10,6 +10,24 @@ interface UserData {
   full_name?: string;
   username?: string;
 }
+
+type InfoCardProps = {
+  icon: LucideIcon;
+  label: string;
+  value?: string;
+};
+
+const InfoCard = ({ icon: Icon, label, value }: InfoCardProps) => (
+  <div className="flex items-start space-x-4">
+    <div className="flex-shrink-0 w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
+      <Icon className="w-6 h-6 text-emerald-600" />
+    </div>
+    <div>
+      <p className="text-sm font-medium text-gray-500">{label}</p>
+      <p className="text-lg font-semibold text-gray-900">{value || 'No especificado'}</p>
+    </div>
+  </div>
+);
 
 export default function ProfilePage() {
   const [user, setUser] = useState<UserData | null>(null);
@@ -39,18 +57,6 @@ export default function ProfilePage() {
       </div>
     );
   }
-
-  const InfoCard = ({ icon: Icon, label, value }) => (
-    <div className="flex items-start space-x-4">
-      <div className="flex-shrink-0 w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
-        <Icon className="w-6 h-6 text-emerald-600" />
-      </div>
-      <div>
-        <p className="text-sm font-medium text-gray-500">{label}</p>
-        <p className="text-lg font-semibold text-gray-900">{value || 'No especificado'}</p>
-      </div>
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-gray-50">
