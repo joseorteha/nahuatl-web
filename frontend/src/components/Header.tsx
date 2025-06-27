@@ -62,7 +62,7 @@ export default function Header() {
           {/* Logo and brand name */}
           <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-2">
             <Image src="/logo.png" alt="Nawatlajtol Logo" width={40} height={40} className="rounded-lg"/>
-            <span className="font-bold text-xl text-gray-800">Nawatlajtol</span>
+            <span className="font-bold text-xl text-gray-800">Nawatlahtol</span>
           </Link>
 
           {/* Desktop Navigation */}
