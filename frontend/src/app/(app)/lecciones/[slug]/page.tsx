@@ -72,8 +72,15 @@ function ContentRenderer({ content }: { content: LessonContent }) {
   }
 }
 
+// --- Tipos de Props de la Página ---
+interface LessonPageProps {
+  params: {
+    slug: string;
+  };
+}
+
 // --- Página Principal de la Lección ---
-export default async function LessonPage({ params }: { params: { slug: string } }) {
+export default async function LessonPage({ params }: LessonPageProps) {
   if (process.env.NEXT_PUBLIC_LAUNCH_MODE === 'preview') {
     return <ComingSoon />;
   }
