@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import debounce from 'lodash.debounce';
 import { Search, BookOpen, AlertCircle, Bot } from 'lucide-react';
 
@@ -53,7 +53,7 @@ export default function DictionaryPage() {
     }
   }, []);
 
-  const debouncedFetchResults = useCallback(debounce(fetchResults, 350), []);
+    const debouncedFetchResults = useMemo(() => debounce(fetchResults, 350), [fetchResults]);
 
   useEffect(() => {
     debouncedFetchResults(searchTerm);
