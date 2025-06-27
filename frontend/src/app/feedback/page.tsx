@@ -366,7 +366,7 @@ export default function FeedbackPage() {
                   {fb.profiles?.full_name?.[0] || 'U'}
                 </div>
                 <div>
-                  <div className="font-semibold text-[#2C3E50]">{fb.profiles?.full_name || 'Usuario'}</div>
+                  <div className="font-semibold text-[#2C3E50]">{fb.profiles?.full_name || fb.profiles?.username || 'Usuario'}</div>
                   <div className="text-xs text-gray-400">{formatDistanceToNow(new Date(fb.created_at), { addSuffix: true, locale: es })}</div>
                 </div>
                 <div className="ml-auto flex items-center gap-2">
