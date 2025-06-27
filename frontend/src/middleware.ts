@@ -8,7 +8,7 @@ export function middleware(request: NextRequest) {
   const protectedRoutes = ['/dashboard', '/diccionario', '/lecciones', '/practica', '/feedback'];
   
   // Verificar si la ruta actual requiere autenticación
-  const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
+  // const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
   
   // Por ahora, permitimos acceso a todas las rutas
   // La autenticación se manejará en el lado del cliente

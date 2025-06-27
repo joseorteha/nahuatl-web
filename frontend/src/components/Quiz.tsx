@@ -113,7 +113,7 @@ export default function Quiz({ leccionId }: QuizProps) {
       </div>
       
       <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center">
-        ¿Cuál es la traducción de "<span className='text-blue-600'>{currentQuestion.question}</span>"?
+        ¿Cuál es la traducción de &quot;<span className='text-blue-600'>{currentQuestion.question}</span>&quot;?
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

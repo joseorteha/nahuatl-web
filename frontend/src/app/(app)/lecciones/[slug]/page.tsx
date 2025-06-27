@@ -1,7 +1,7 @@
 import ComingSoon from '@/components/ComingSoon';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ArrowLeft, BookText, Mic } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 // --- Tipos de Datos ---
 interface VocabularyItem {

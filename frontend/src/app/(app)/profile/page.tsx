@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { User, Mail, AtSign, LogOut, ShieldCheck } from 'lucide-react';
+import { User, Mail, AtSign, LogOut } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface UserData {

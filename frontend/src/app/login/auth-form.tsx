@@ -69,8 +69,8 @@ export default function AuthForm() {
         }
         router.push('/dashboard');
       }
-    } catch (error: any) {
-      setError(error.message || 'Ocurrió un error. Inténtalo de nuevo.');
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : 'Ocurrió un error. Inténtalo de nuevo.');
     } finally {
       setIsLoading(false);
     }

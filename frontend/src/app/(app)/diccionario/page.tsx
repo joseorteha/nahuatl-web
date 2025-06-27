@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import debounce from 'lodash.debounce';
-import { Search, BookOpen, AlertCircle, Bot, Languages, Sprout, TestTubeDiagonal, BookMarked, HelpingHand, FileText, NotebookText } from 'lucide-react';
+import { Search, BookOpen, AlertCircle, Bot } from 'lucide-react';
 
 interface DictionaryEntry {
   word: string;
@@ -131,7 +131,7 @@ export default function DictionaryPage() {
                           {entry.examples.map((ex, i) => (
                             <li key={i} className="bg-[#5DADE2]/10 rounded p-2">
                               <span className="text-[#2C3E50]">{ex.nahuatl}</span>
-                              <span className="block text-[#5DADE2] italic">“{ex.espanol}”</span>
+                              <span className="block text-[#5DADE2] italic">"{ex.espanol}"</span>
                             </li>
                           ))}
                         </ul>

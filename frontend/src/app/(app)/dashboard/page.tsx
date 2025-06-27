@@ -49,11 +49,6 @@ export default function Dashboard() {
     return null; // or redirect, which is already handled in useEffect
   }
 
-  const getFirstName = (fullName: string | undefined) => {
-    if (!fullName) return 'usuario';
-    return fullName.split(' ')[0];
-  };
-
   // Animation Variants sin tipado explícito
   const containerVariants = {
     hidden: { opacity: 0 },

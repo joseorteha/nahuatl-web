@@ -34,8 +34,6 @@ interface AuthenticatedUser {
 
 export default function FeedbackPage() {
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -67,7 +65,6 @@ export default function FeedbackPage() {
   }, [router]);
 
   const fetchFeedbacks = async () => {
-    setLoading(true);
     try {
       const { data, error } = await supabase
         .from('feedback')
@@ -87,10 +84,8 @@ export default function FeedbackPage() {
 
       if (error) throw error;
       setFeedbacks(data || []);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching feedbacks:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -127,7 +122,7 @@ export default function FeedbackPage() {
       setSubmitStatus('success');
       setFormData({ name: '', email: '', type: 'suggestion', subject: '', message: '' });
       fetchFeedbacks(); // refresca la lista
-    } catch (error) {
+    } catch (error: unknown) {
       setSubmitStatus('error');
       alert('Hubo un error al enviar el feedback.');
     } finally {
@@ -164,9 +159,9 @@ export default function FeedbackPage() {
       }
 
       fetchFeedbacks();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error toggling like:', error);
-      alert('Hubo un error al votar: ' + error.message);
+      alert('Hubo un error al votar: ' + (error instanceof Error ? error.message : ''));
     }
   };
 
@@ -193,8 +188,8 @@ export default function FeedbackPage() {
       setReplyContent('');
       setReplyingTo(null);
       fetchFeedbacks();
-    } catch (error: any) {
-      alert('Hubo un error al responder: ' + error.message);
+    } catch (error: unknown) {
+      alert('Hubo un error al responder: ' + (error instanceof Error ? error.message : ''));
     }
   };
 

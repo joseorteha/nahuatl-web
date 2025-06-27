@@ -11,9 +11,6 @@ interface QuizQuestion {
   answer: string;
 }
 
-// --- Constantes ---
-const TOTAL_QUESTIONS = 10;
-
 // --- Componente Principal del Quiz ---
 export default function PracticePage() {
   if (process.env.NEXT_PUBLIC_LAUNCH_MODE === 'preview') {
