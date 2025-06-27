@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { MessageSquare, Plus, ThumbsUp, Clock, CheckCircle, AlertCircle, Star } from 'lucide-react';
+import { ThumbsUp } from 'lucide-react';
 import type { Database } from '@/lib/database.types';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';

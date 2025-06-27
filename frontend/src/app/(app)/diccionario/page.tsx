@@ -53,7 +53,7 @@ export default function DictionaryPage() {
     }
   };
 
-  const debouncedFetchResults = useCallback(debounce(fetchResults, 350), []);
+  const debouncedFetchResults = useCallback(debounce(fetchResults, 350), [fetchResults]);
 
   useEffect(() => {
     debouncedFetchResults(searchTerm);
@@ -72,7 +72,7 @@ export default function DictionaryPage() {
     <div className="text-center text-gray-500 mt-16 flex flex-col items-center">
       <AlertCircle size={64} className="mb-4 text-amber-500" />
       <h2 className="text-2xl font-semibold text-gray-300">Sin Resultados</h2>
-      <p className="mt-2 max-w-md">{error || `No hemos encontrado coincidencias para "${searchTerm}".`}</p>
+      <p className="mt-2 max-w-md">{error || `No hemos encontrado coincidencias para &quot;${searchTerm}&quot;.`}</p>
       <p className="text-sm mt-1">Intenta con otra palabra o revisa la ortografía.</p>
     </div>
   );
