@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { MessageSquare, Plus, ThumbsUp, Clock, CheckCircle, AlertCircle, Star, User } from 'lucide-react';
+import { MessageSquare, Plus, ThumbsUp, Clock, CheckCircle, AlertCircle, Star } from 'lucide-react';
 import type { Database } from '@/lib/database.types';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -190,26 +190,6 @@ export default function FeedbackPage() {
       fetchFeedbacks();
     } catch (error: unknown) {
       alert('Hubo un error al responder: ' + (error instanceof Error ? error.message : ''));
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'pending': return <Clock className="w-4 h-4 text-yellow-500" />;
-      case 'reviewed': return <CheckCircle className="w-4 h-4 text-blue-500" />;
-      case 'implemented': return <Star className="w-4 h-4 text-green-500" />;
-      case 'declined': return <AlertCircle className="w-4 h-4 text-red-500" />;
-      default: return <Clock className="w-4 h-4 text-gray-500" />;
-    }
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'low': return 'bg-green-100 text-green-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'high': return 'bg-orange-100 text-orange-800';
-      case 'critical': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -414,12 +394,12 @@ export default function FeedbackPage() {
                 </div>
               ) : (
                 <div className="mb-2">
-                  <div className="font-bold text-lg text-[#2C3E50]">{fb.title || fb.subject}</div>
-                  <div className="text-[#2C3E50] mt-1 whitespace-pre-line">{fb.content || fb.message}</div>
+                  <div className="font-bold text-lg text-[#2C3E50]">{fb.title}</div>
+                  <div className="text-[#2C3E50] mt-1 whitespace-pre-line">{fb.content}</div>
                   {(user?.id === fb.user_id || isAdmin) && (
                     <div className="flex gap-2 mt-2">
                       <button
-                        onClick={() => { setEditingId(fb.id); setEditContent(fb.content || fb.message || ''); }}
+                        onClick={() => { setEditingId(fb.id); setEditContent(fb.content || ''); }}
                         className="text-[#5DADE2] hover:underline text-xs font-semibold"
                       >Editar</button>
                       <button
@@ -462,7 +442,7 @@ export default function FeedbackPage() {
                       ) : (
                         <div>
                           <div className="text-[#2C3E50] mt-1 whitespace-pre-line">{reply.content}</div>
-                          {(user?.id === reply.profiles?.id || isAdmin) && (
+                          {(isAdmin || reply.is_admin_reply) && (
                             <div className="flex gap-2 mt-1">
                               <button
                                 onClick={() => { setEditingId(reply.id); setEditContent(reply.content); }}
