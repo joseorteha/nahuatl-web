@@ -360,21 +360,23 @@ export default function FeedbackPage() {
             <div className="text-center text-gray-400">Aún no hay comentarios. ¡Sé el primero en participar!</div>
           )}
           {feedbacks.map((fb) => (
-            <div key={fb.id} className="bg-white rounded-2xl shadow-md p-6 border border-[#F5F6FA]">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-full bg-[#5DADE2] flex items-center justify-center text-white font-bold text-lg">
-                  {fb.profiles?.full_name?.[0] || 'U'}
+            <div key={fb.id} className="bg-white rounded-2xl shadow-md p-4 sm:p-6 border border-[#F5F6FA]">
+              <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#5DADE2] flex items-center justify-center text-white font-bold text-base sm:text-lg">
+                  {fb.profiles?.full_name?.[0] || (user && user.id === fb.user_id && (user.full_name?.[0] || user.username?.[0])) || 'U'}
                 </div>
                 <div>
-                  <div className="font-semibold text-[#2C3E50]">{fb.profiles?.full_name || fb.profiles?.username || 'Usuario'}</div>
+                  <div className="font-semibold text-[#2C3E50] text-sm sm:text-base">
+                    {fb.profiles?.full_name || (user && user.id === fb.user_id && (user.full_name || user.username)) || 'Usuario'}
+                  </div>
                   <div className="text-xs text-gray-400">{formatDistanceToNow(new Date(fb.created_at), { addSuffix: true, locale: es })}</div>
                 </div>
                 <div className="ml-auto flex items-center gap-2">
                   <button
                     onClick={() => handleLike(fb.id)}
-                    className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold transition-colors ${fb.feedback_likes.some(l => l.user_id === user?.id) ? 'bg-[#2ECC71] text-white' : 'bg-gray-100 text-[#2C3E50]'}`}
+                    className={`flex items-center gap-1 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold transition-colors ${fb.feedback_likes.some(l => l.user_id === user?.id) ? 'bg-[#2ECC71] text-white' : 'bg-gray-100 text-[#2C3E50]'}`}
                   >
-                    <ThumbsUp size={16} /> {fb.feedback_likes.length}
+                    <ThumbsUp size={14} className="sm:w-4 sm:h-4" /> {fb.feedback_likes.length}
                   </button>
                 </div>
               </div>
