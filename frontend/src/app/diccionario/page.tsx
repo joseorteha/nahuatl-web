@@ -36,7 +36,7 @@ export default function DictionaryPage() {
     setError(null);
     setHasSearched(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web.onrender.com';
       const response = await fetch(`${apiUrl}/api/dictionary/search?q=${encodeURIComponent(query)}`);
       if (!response.ok) throw new Error('La respuesta de la red no fue correcta');
       const data = await response.json();

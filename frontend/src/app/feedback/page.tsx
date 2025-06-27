@@ -102,7 +102,7 @@ export default function FeedbackPage() {
     }
 
     try {
-      const response = await fetch('http://localhost:3001/api/feedback', {
+      const response = await fetch('https://nahuatl-web.onrender.com/api/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -145,7 +145,7 @@ export default function FeedbackPage() {
     }
 
     try {
-      const response = await fetch('http://localhost:3001/api/feedback/like', {
+      const response = await fetch('https://nahuatl-web.onrender.com/api/feedback/like', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -173,7 +173,7 @@ export default function FeedbackPage() {
     }
     if (!replyContent.trim()) return;
     try {
-      const response = await fetch('http://localhost:3001/api/feedback/reply', {
+      const response = await fetch('https://nahuatl-web.onrender.com/api/feedback/reply', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -201,7 +201,7 @@ export default function FeedbackPage() {
   const handleEditFeedback = async (id: string) => {
     if (!editContent.trim()) return;
     try {
-      const response = await fetch(`http://localhost:3001/api/feedback/${id}`, {
+      const response = await fetch(`https://nahuatl-web.onrender.com/api/feedback/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: user?.id, content: editContent }),
@@ -220,7 +220,7 @@ export default function FeedbackPage() {
   const handleDeleteFeedback = async (id: string) => {
     if (!window.confirm('¿Seguro que quieres eliminar este comentario?')) return;
     try {
-      const response = await fetch(`http://localhost:3001/api/feedback/${id}`, {
+      const response = await fetch(`https://nahuatl-web.onrender.com/api/feedback/${id}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: user?.id }),
@@ -237,7 +237,7 @@ export default function FeedbackPage() {
   const handleEditReply = async (id: string) => {
     if (!editContent.trim()) return;
     try {
-      const response = await fetch(`http://localhost:3001/api/feedback/reply/${id}`, {
+      const response = await fetch(`https://nahuatl-web.onrender.com/api/feedback/reply/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: user?.id, content: editContent }),
@@ -256,7 +256,7 @@ export default function FeedbackPage() {
   const handleDeleteReply = async (id: string) => {
     if (!window.confirm('¿Seguro que quieres eliminar esta respuesta?')) return;
     try {
-      const response = await fetch(`http://localhost:3001/api/feedback/reply/${id}`, {
+      const response = await fetch(`https://nahuatl-web.onrender.com/api/feedback/reply/${id}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: user?.id }),
