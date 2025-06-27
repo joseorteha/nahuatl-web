@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest) {
+export function middleware(_request: NextRequest) {
   // Por ahora, permitimos acceso a todas las rutas
   // La autenticación se manejará en el lado del cliente
   return NextResponse.next();

@@ -25,7 +25,7 @@ export default function DictionaryPage() {
   const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
 
-  const fetchResults = async (query: string) => {
+  const fetchResults = useCallback(async (query: string) => {
     if (query.trim().length < 2) {
       setResults([]);
       setError(null);
@@ -51,9 +51,9 @@ export default function DictionaryPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const debouncedFetchResults = useCallback(debounce(fetchResults, 350), [fetchResults]);
+  const debouncedFetchResults = useCallback(debounce(fetchResults, 350), []);
 
   useEffect(() => {
     debouncedFetchResults(searchTerm);
@@ -131,7 +131,7 @@ export default function DictionaryPage() {
                           {entry.examples.map((ex, i) => (
                             <li key={i} className="bg-[#5DADE2]/10 rounded p-2">
                               <span className="text-[#2C3E50]">{ex.nahuatl}</span>
-                              <span className="block text-[#5DADE2] italic">"{ex.espanol}"</span>
+                              <span className="block text-[#5DADE2] italic">&quot;{ex.espanol}&quot;</span>
                             </li>
                           ))}
                         </ul>

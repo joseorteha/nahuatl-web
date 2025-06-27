@@ -13,10 +13,6 @@ interface QuizQuestion {
 
 // --- Componente Principal del Quiz ---
 export default function PracticePage() {
-  if (process.env.NEXT_PUBLIC_LAUNCH_MODE === 'preview') {
-    return <ComingSoon />;
-  }
-
   const [quizState, setQuizState] = useState<'loading' | 'playing' | 'finished' | 'error'>('loading');
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -41,8 +37,15 @@ export default function PracticePage() {
   }, []);
 
   useEffect(() => {
+    if (process.env.NEXT_PUBLIC_LAUNCH_MODE === 'preview') {
+      return;
+    }
     fetchQuiz();
   }, [fetchQuiz]);
+
+  if (process.env.NEXT_PUBLIC_LAUNCH_MODE === 'preview') {
+    return <ComingSoon />;
+  }
 
   const resetQuiz = () => {
     setScore(0);

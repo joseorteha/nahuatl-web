@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { ThumbsUp } from 'lucide-react';
@@ -52,19 +52,7 @@ export default function FeedbackPage() {
   const supabase = createClientComponentClient<Database>();
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      const parsedUser: AuthenticatedUser = JSON.parse(storedUser);
-      setUser(parsedUser);
-      fetchFeedbacks();
-    } else {
-      router.push('/login');
-    }
-    setMounted(true);
-  }, [router]);
-
-  const fetchFeedbacks = async () => {
+  const fetchFeedbacks = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('feedback')
@@ -87,7 +75,19 @@ export default function FeedbackPage() {
     } catch (error: unknown) {
       console.error('Error fetching feedbacks:', error);
     }
-  };
+  }, [supabase]);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      const parsedUser: AuthenticatedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
+      fetchFeedbacks();
+    } else {
+      router.push('/login');
+    }
+    setMounted(true);
+  }, [router, fetchFeedbacks]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,6 +123,7 @@ export default function FeedbackPage() {
       setFormData({ name: '', email: '', type: 'suggestion', subject: '', message: '' });
       fetchFeedbacks(); // refresca la lista
     } catch (error: unknown) {
+      console.error('Error submitting feedback:', error);
       setSubmitStatus('error');
       alert('Hubo un error al enviar el feedback.');
     } finally {
@@ -209,7 +210,8 @@ export default function FeedbackPage() {
       setEditingId(null);
       setEditContent('');
       fetchFeedbacks();
-    } catch (e) {
+    } catch (error) {
+      console.error('Error editing feedback:', error);
       alert('No se pudo editar el comentario.');
     }
   };
@@ -225,7 +227,8 @@ export default function FeedbackPage() {
       });
       if (!response.ok) throw new Error('Error al eliminar comentario.');
       fetchFeedbacks();
-    } catch (e) {
+    } catch (error) {
+      console.error('Error deleting feedback:', error);
       alert('No se pudo eliminar el comentario.');
     }
   };
@@ -243,7 +246,8 @@ export default function FeedbackPage() {
       setEditingId(null);
       setEditContent('');
       fetchFeedbacks();
-    } catch (e) {
+    } catch (error) {
+      console.error('Error editing reply:', error);
       alert('No se pudo editar la respuesta.');
     }
   };
@@ -259,7 +263,8 @@ export default function FeedbackPage() {
       });
       if (!response.ok) throw new Error('Error al eliminar respuesta.');
       fetchFeedbacks();
-    } catch (e) {
+    } catch (error) {
+      console.error('Error deleting reply:', error);
       alert('No se pudo eliminar la respuesta.');
     }
   };
