@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { AlertTriangle, BookText, GraduationCap, Lightbulb } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import Header from '@/components/Header';
 
 interface User {
   id: string;
@@ -80,28 +81,30 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-800">
+      <Header />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <motion.div
           initial="hidden"
           animate="visible"
           variants={containerVariants}
         >
-          {/* Header */}
-          <motion.div variants={itemVariants} className="mb-12 flex flex-col items-center">
-            <Image src="/logo.png" alt="Logo Code Master tik" width={70} height={70} className="mb-4 rounded-lg shadow-md" />
-            <h1 className="text-4xl font-bold text-gray-900">Panel de Control</h1>
-            <p className="mt-2 text-lg text-gray-600">Explora las secciones disponibles y prepárate para aprender náhuatl.</p>
+          {/* Bienvenida personalizada */}
+          <motion.div variants={itemVariants} className="mb-8 flex flex-col items-center">
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">¡Hola, {user.full_name || 'Nawatlajtolista'}!</h1>
+            <p className="text-lg text-gray-600 max-w-2xl text-center">
+              Bienvenido/a a <span className="font-bold text-emerald-600">Nawatlajtol</span>, la plataforma para aprender náhuatl de Zongolica. Aquí podrás consultar el diccionario, dejar tus sugerencias y, próximamente, acceder a lecciones y ejercicios interactivos. ¡Gracias por ser parte de la comunidad!
+            </p>
           </motion.div>
 
-          {/* Beta Notice */}
+          {/* Tarjeta de sugerencias destacada */}
           <motion.div 
             variants={itemVariants} 
-            className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 rounded-r-lg mb-12 flex items-center"
+            className="bg-gradient-to-r from-yellow-200 via-yellow-100 to-yellow-50 border-l-8 border-yellow-500 text-yellow-900 p-6 rounded-2xl mb-12 flex items-center shadow-lg animate-pulse-slow"
           >
-            <AlertTriangle className="h-6 w-6 mr-3"/>
+            <AlertTriangle className="h-8 w-8 mr-4 text-yellow-600"/>
             <div>
-              <h3 className="font-bold">Estás en la Versión Beta</h3>
-              <p className="text-sm">Algunas secciones están en construcción. Agradecemos tu paciencia y <Link href="/feedback" className="underline hover:text-yellow-900">tus sugerencias</Link>.</p>
+              <h3 className="font-bold text-lg">¡Ayúdanos a mejorar!</h3>
+              <p className="text-md">Esta es una versión beta. Deja tus <Link href="/feedback" className="underline font-semibold text-emerald-700 hover:text-emerald-900">sugerencias y comentarios aquí</Link> para que juntos construyamos la mejor app de náhuatl.</p>
             </div>
           </motion.div>
 
@@ -118,7 +121,7 @@ export default function Dashboard() {
                   <h2 className="text-2xl font-bold text-gray-900">Diccionario</h2>
                 </div>
                 <p className="text-gray-600">
-                  Consulta, busca y descubre el significado de cientos de palabras. ¡Tu aventura empieza aquí!
+                  Explora cientos de palabras en náhuatl y español, con ejemplos y variantes. ¡Empieza tu viaje lingüístico!
                 </p>
               </Link>
             </motion.div>
@@ -131,7 +134,7 @@ export default function Dashboard() {
                   <h2 className="text-2xl font-bold text-gray-500">Lecciones</h2>
                 </div>
                 <p className="text-gray-500">
-                  Aprende de forma ordenada con nuestros módulos guiados. Desde saludos hasta gramática avanzada.
+                  Aprende con módulos guiados, desde saludos hasta gramática avanzada. ¡Muy pronto disponible!
                 </p>
                 <div className="absolute top-4 right-4 bg-orange-400 text-white text-xs font-bold px-2 py-1 rounded-full">
                   PRÓXIMAMENTE
@@ -147,7 +150,7 @@ export default function Dashboard() {
                   <h2 className="text-2xl font-bold text-gray-500">Práctica</h2>
                 </div>
                 <p className="text-gray-500">
-                  Pon a prueba tu conocimiento con ejercicios y quizzes interactivos para reforzar lo aprendido.
+                  Pon a prueba tu conocimiento con ejercicios y quizzes interactivos para reforzar lo aprendido. ¡Muy pronto!
                 </p>
                 <div className="absolute top-4 right-4 bg-orange-400 text-white text-xs font-bold px-2 py-1 rounded-full">
                   PRÓXIMAMENTE

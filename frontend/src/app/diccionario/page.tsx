@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import debounce from 'lodash.debounce';
 import { Search, BookOpen, AlertCircle, Bot } from 'lucide-react';
+import Header from '@/components/Header';
 
 interface DictionaryEntry {
   word: string;
@@ -86,6 +87,7 @@ export default function DictionaryPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#5DADE2]/20 via-white to-[#2ECC71]/10 py-8">
+      <Header />
       <div className="container mx-auto px-4 max-w-3xl">
         <div className="text-center mb-10">
           <h1 className="text-4xl md:text-5xl font-bold text-[#2C3E50] mb-2">Diccionario Náhuatl de Zongolica</h1>
