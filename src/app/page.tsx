@@ -2,6 +2,7 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { BookOpen, Code, Users } from 'lucide-react';
+import AnimatedBackground from '../components/AnimatedBackground';
 
 export default function LandingPage() {
   const container = {
@@ -18,7 +19,8 @@ export default function LandingPage() {
   };
 
   return (
-    <main className="flex-grow bg-gray-50">
+    <main className="flex-grow bg-gray-50 relative overflow-hidden">
+      <AnimatedBackground />
       {/* Hero Section */}
       <motion.section
         className="relative text-center py-24 px-4 sm:px-6 lg:px-8 overflow-hidden"
@@ -40,10 +42,14 @@ export default function LandingPage() {
           Únete a la beta de Timumachtikan Nawatl: una plataforma moderna para aprender, practicar y preservar una de las lenguas más ricas de nuestra historia.
         </motion.p>
         <motion.div variants={item} className="mt-10">
-          <Link href="/login" className="inline-block bg-emerald-600 text-white font-bold py-3 px-8 rounded-lg text-lg shadow-lg hover:bg-emerald-700 transition-colors duration-300">
-            <motion.span whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          <Link href="/login" passHref>
+            <motion.a 
+              className="inline-block bg-emerald-600 text-white font-bold py-3 px-8 rounded-lg text-lg shadow-lg hover:bg-emerald-700 transition-colors duration-300"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
               ¡Empieza a aprender ahora!
-            </motion.span>
+            </motion.a>
           </Link>
         </motion.div>
       </motion.section>

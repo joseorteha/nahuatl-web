@@ -1,8 +1,15 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function middleware(_request: NextRequest) {
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  
+  // Rutas que requieren autenticación
+  const protectedRoutes = ['/dashboard', '/diccionario', '/lecciones', '/practica', '/feedback'];
+  
+  // Verificar si la ruta actual requiere autenticación
+  const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
+  
   // Por ahora, permitimos acceso a todas las rutas
   // La autenticación se manejará en el lado del cliente
   return NextResponse.next();

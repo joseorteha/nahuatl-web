@@ -23,8 +23,8 @@ if (!fs.existsSync(envPath)) {
 NEXT_PUBLIC_SUPABASE_URL=https://aiqitkcpdwdbdbeavyys.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFpcWl0a2NwZHdkYmRiZWF2eXlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3OTg2MjcsImV4cCI6MjA2NjM3NDYyN30.5pJwPbtPGlGejMkmOK3uf9GLiLtVLahbaxaOVr3vQd8
 NEXT_PUBLIC_LAUNCH_MODE=preview
-NEXT_PUBLIC_SITE_URL=https://nahuatl-web.vercel.app
-NEXT_PUBLIC_API_URL=https://nahuatl-web.onrender.com
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_API_URL=http://localhost:3001
 
 # Variables para el Servidor (Mismas claves, pero sin NEXT_PUBLIC_)
 SUPABASE_URL=https://aiqitkcpdwdbdbeavyys.supabase.co

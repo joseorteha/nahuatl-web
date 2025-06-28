@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import debounce from 'lodash.debounce';
-import { Search, BookOpen, AlertCircle, Bot } from 'lucide-react';
-import Header from '@/components/Header';
+import { Search, BookOpen, AlertCircle, Bot, Languages, Sprout, TestTubeDiagonal, BookMarked, HelpingHand, FileText, NotebookText } from 'lucide-react';
 
 interface DictionaryEntry {
   word: string;
@@ -26,7 +25,7 @@ export default function DictionaryPage() {
   const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
 
-  const fetchResults = useCallback(async (query: string) => {
+  const fetchResults = async (query: string) => {
     if (query.trim().length < 2) {
       setResults([]);
       setError(null);
@@ -37,7 +36,7 @@ export default function DictionaryPage() {
     setError(null);
     setHasSearched(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web.onrender.com';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
       const response = await fetch(`${apiUrl}/api/dictionary/search?q=${encodeURIComponent(query)}`);
       if (!response.ok) throw new Error('La respuesta de la red no fue correcta');
       const data = await response.json();
@@ -52,9 +51,9 @@ export default function DictionaryPage() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  };
 
-    const debouncedFetchResults = useMemo(() => debounce(fetchResults, 350), [fetchResults]);
+  const debouncedFetchResults = useCallback(debounce(fetchResults, 350), []);
 
   useEffect(() => {
     debouncedFetchResults(searchTerm);
@@ -73,7 +72,7 @@ export default function DictionaryPage() {
     <div className="text-center text-gray-500 mt-16 flex flex-col items-center">
       <AlertCircle size={64} className="mb-4 text-amber-500" />
       <h2 className="text-2xl font-semibold text-gray-300">Sin Resultados</h2>
-      <p className="mt-2 max-w-md">{error || `No hemos encontrado coincidencias para &quot;${searchTerm}&quot;.`}</p>
+      <p className="mt-2 max-w-md">{error || `No hemos encontrado coincidencias para "${searchTerm}".`}</p>
       <p className="text-sm mt-1">Intenta con otra palabra o revisa la ortografía.</p>
     </div>
   );
@@ -87,7 +86,6 @@ export default function DictionaryPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#5DADE2]/20 via-white to-[#2ECC71]/10 py-8">
-      <Header />
       <div className="container mx-auto px-4 max-w-3xl">
         <div className="text-center mb-10">
           <h1 className="text-4xl md:text-5xl font-bold text-[#2C3E50] mb-2">Diccionario Náhuatl de Zongolica</h1>
@@ -133,7 +131,7 @@ export default function DictionaryPage() {
                           {entry.examples.map((ex, i) => (
                             <li key={i} className="bg-[#5DADE2]/10 rounded p-2">
                               <span className="text-[#2C3E50]">{ex.nahuatl}</span>
-                              <span className="block text-[#5DADE2] italic">&quot;{ex.espanol}&quot;</span>
+                              <span className="block text-[#5DADE2] italic">“{ex.espanol}”</span>
                             </li>
                           ))}
                         </ul>

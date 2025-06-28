@@ -23,7 +23,7 @@ export default function Header() {
       try {
         const userData = localStorage.getItem('user');
         setUser(userData ? JSON.parse(userData) : null);
-      } catch {
+      } catch (error) {
         setUser(null);
       }
       setIsLoading(false);
@@ -49,11 +49,14 @@ export default function Header() {
 
   const navLinks = (
     <>
-      <Link href="/diccionario" className="text-gray-600 hover:text-emerald-600 transition-colors">Diccionario</Link>
-      <span className="text-gray-400 cursor-not-allowed">Lecciones (Próximamente)</span>
-      <span className="text-gray-400 cursor-not-allowed">Práctica (Próximamente)</span>
+      <Link href="/" className="text-gray-600 hover:text-emerald-600 transition-colors">Inicio</Link>
+      <Link href="/nosotros" className="text-gray-600 hover:text-emerald-600 transition-colors">Nosotros</Link>
+      <Link href="/faq" className="text-gray-600 hover:text-emerald-600 transition-colors">FAQ</Link>
     </>
   );
+
+  // Detectar si estamos en la landing page
+  const isLanding = typeof window !== 'undefined' && window.location.pathname === '/';
 
   return (
     <header className="bg-white/80 backdrop-blur-lg sticky top-0 z-40 border-b border-gray-200">
@@ -67,7 +70,14 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-6 font-medium">
-            {navLinks}
+            {!user && isLanding && navLinks}
+            {user && (
+              <>
+                <Link href="/diccionario" className="text-gray-600 hover:text-emerald-600 transition-colors">Diccionario</Link>
+                <span className="text-gray-400 cursor-not-allowed">Lecciones (Próximamente)</span>
+                <span className="text-gray-400 cursor-not-allowed">Práctica (Próximamente)</span>
+              </>
+            )}
           </nav>
 
           {/* Right side actions */}
@@ -77,7 +87,7 @@ export default function Header() {
             ) : user ? (
               <ProfileMenu user={user} onLogout={handleLogout} getInitials={getInitials} />
             ) : (
-              <Link href="/login" className="hidden md:inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+              isLanding && <Link href="/login" className="hidden md:inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
                 Acceder
               </Link>
             )}
@@ -94,9 +104,16 @@ export default function Header() {
       {mobileMenuOpen && (
         <div className="md:hidden bg-white border-t border-gray-200">
           <nav className="container mx-auto px-4 pt-4 pb-6 flex flex-col gap-4">
-            {navLinks}
+            {!user && isLanding && navLinks}
+            {user && (
+              <>
+                <Link href="/diccionario" className="text-gray-600 hover:text-emerald-600 transition-colors">Diccionario</Link>
+                <span className="text-gray-400 cursor-not-allowed">Lecciones (Próximamente)</span>
+                <span className="text-gray-400 cursor-not-allowed">Práctica (Próximamente)</span>
+              </>
+            )}
             <hr/>
-            {!user && (
+            {!user && isLanding && (
               <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="w-full text-center px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors">
                 Acceder
               </Link>
