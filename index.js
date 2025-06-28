@@ -406,6 +406,67 @@ app.delete('/api/feedback/reply/:id', async (req, res) => {
   res.json({ message: 'Eliminado' });
 });
 
+// Guardar palabra en favoritos
+app.post('/api/dictionary/save', async (req, res) => {
+  const { user_id, dictionary_id } = req.body;
+  if (!user_id || !dictionary_id) {
+    return res.status(400).json({ error: 'Faltan datos' });
+  }
+  try {
+    await supabase
+      .from('saved_words')
+      .insert({ user_id, dictionary_id })
+      .select();
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error al guardar palabra:', err);
+    res.status(500).json({ error: 'Error al guardar palabra' });
+  }
+});
+
+// Listar palabras guardadas de un usuario
+app.get('/api/dictionary/saved/:user_id', async (req, res) => {
+  const { user_id } = req.params;
+  try {
+    const { data, error } = await supabase
+      .from('saved_words')
+      .select('dictionary_id')
+      .eq('user_id', user_id);
+    if (error) throw error;
+    const dictionaryIds = data.map(row => row.dictionary_id);
+    if (dictionaryIds.length === 0) return res.json([]);
+    // Obtener detalles de las palabras guardadas
+    const { data: words, error: dictError } = await supabase
+      .from('dictionary')
+      .select('*')
+      .in('id', dictionaryIds);
+    if (dictError) throw dictError;
+    res.json(words);
+  } catch (err) {
+    console.error('Error al obtener palabras guardadas:', err);
+    res.status(500).json({ error: 'Error al obtener palabras guardadas' });
+  }
+});
+
+// Eliminar palabra guardada
+app.delete('/api/dictionary/save', async (req, res) => {
+  const { user_id, dictionary_id } = req.body;
+  if (!user_id || !dictionary_id) {
+    return res.status(400).json({ error: 'Faltan datos' });
+  }
+  try {
+    await supabase
+      .from('saved_words')
+      .delete()
+      .eq('user_id', user_id)
+      .eq('dictionary_id', dictionary_id);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error al eliminar palabra guardada:', err);
+    res.status(500).json({ error: 'Error al eliminar palabra guardada' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Servidor escuchando en http://localhost:${PORT}`);
 });
