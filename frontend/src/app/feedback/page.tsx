@@ -278,8 +278,13 @@ export default function FeedbackPage() {
     return user && (user.id === feedback.user_id || user.is_admin);
   };
 
-  const canEditReply = (reply: { user_id: string }) => {
-    return user && (user.id === reply.user_id || user.is_admin);
+  // Type guard para reply con user_id
+  function hasUserId(reply: any): reply is { user_id: string } {
+    return typeof reply.user_id === 'string';
+  }
+
+  const canEditReply = (reply: { user_id?: string; id: string }) => {
+    return user && hasUserId(reply) && (user.id === reply.user_id || user.is_admin);
   };
 
   if (!user) {
@@ -559,7 +564,7 @@ export default function FeedbackPage() {
                   )}
 
                   {/* Replies */}
-                  {expandedFeedback === fb.id && fb.feedback_replies?.length > 0 && (
+                  {expandedFeedback === fb.id && fb.feedback_replies && fb.feedback_replies.length > 0 && (
                     <div className="mt-4 pl-14 space-y-4">
                       {fb.feedback_replies.map((reply) => (
                         <div key={reply.id} className="bg-gray-50 rounded-lg p-4">
