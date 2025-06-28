@@ -2,34 +2,44 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { ThumbsUp, MessageCircle, Send, Edit, Trash2, ChevronDown } from 'lucide-react';
-import type { Database } from '@/lib/database.types';
+import { ThumbsUp, MessageCircle, Send, Edit, Trash2, ChevronDown, X, Check } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 
-type Profile = Database['public']['Tables']['profiles']['Row'];
-
-type Feedback = Database['public']['Tables']['feedback']['Row'] & {
-  profiles: Pick<Profile, 'full_name' | 'username'> | null;
-  feedback_replies: Array<{
+interface Feedback {
+  id: string;
+  title: string;
+  content: string;
+  category: string;
+  status: string;
+  priority: string;
+  likes_count: number;
+  created_at: string;
+  user_id: string;
+  profiles?: {
+    full_name: string;
+    username?: string;
+  };
+  feedback_replies?: Array<{
     id: string;
     content: string;
     created_at: string;
     is_admin_reply: boolean;
-    profiles: Pick<Profile, 'full_name'> | null;
+    profiles?: {
+      full_name: string;
+    };
   }>;
-  feedback_likes: Array<{
+  feedback_likes?: Array<{
     user_id: string;
   }>;
-};
+}
 
 interface AuthenticatedUser {
   id: string;
   full_name: string;
   email: string;
   username?: string;
-  is_admin: boolean;
+  is_admin?: boolean;
 }
 
 export default function FeedbackPage() {
@@ -48,33 +58,17 @@ export default function FeedbackPage() {
   const [editContent, setEditContent] = useState('');
   const [expandedFeedback, setExpandedFeedback] = useState<string | null>(null);
   const router = useRouter();
-  const supabase = createClientComponentClient<Database>();
-  const [mounted, setMounted] = useState(false);
 
   const fetchFeedbacks = useCallback(async () => {
     try {
-      const { data, error } = await supabase
-        .from('feedback')
-        .select(`
-          *,
-          profiles (full_name, username),
-          feedback_replies (
-            id,
-            content,
-            created_at,
-            is_admin_reply,
-            profiles (full_name)
-          ),
-          feedback_likes (user_id)
-        `)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
+      const response = await fetch('https://nahuatl-web.onrender.com/api/feedback');
+      if (!response.ok) throw new Error('Error fetching feedbacks');
+      const data = await response.json();
       setFeedbacks(data || []);
     } catch (error: unknown) {
       console.error('Error fetching feedbacks:', error);
     }
-  }, [supabase]);
+  }, []);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -85,7 +79,6 @@ export default function FeedbackPage() {
     } else {
       router.push('/login');
     }
-    setMounted(true);
   }, [router, fetchFeedbacks]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -198,28 +191,40 @@ export default function FeedbackPage() {
       const response = await fetch(`https://nahuatl-web.onrender.com/api/feedback/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: user?.id, content: editContent }),
+        body: JSON.stringify({
+          user_id: user!.id,
+          title: editContent,
+          content: editContent,
+        }),
       });
-      if (!response.ok) throw new Error('Error al editar comentario.');
-      setEditingId(null);
+      if (!response.ok) {
+        const result = await response.json();
+        throw new Error(result.error || 'Error al editar.');
+      }
       setEditContent('');
+      setEditingId(null);
       fetchFeedbacks();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error editing feedback:', error);
     }
   };
 
   const handleDeleteFeedback = async (id: string) => {
-    if (!window.confirm('¿Seguro que quieres eliminar este comentario?')) return;
+    if (!confirm('¿Estás seguro de que quieres eliminar este feedback?')) return;
     try {
       const response = await fetch(`https://nahuatl-web.onrender.com/api/feedback/${id}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: user?.id }),
+        body: JSON.stringify({
+          user_id: user!.id,
+        }),
       });
-      if (!response.ok) throw new Error('Error al eliminar comentario.');
+      if (!response.ok) {
+        const result = await response.json();
+        throw new Error(result.error || 'Error al eliminar.');
+      }
       fetchFeedbacks();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error deleting feedback:', error);
     }
   };
@@ -230,28 +235,39 @@ export default function FeedbackPage() {
       const response = await fetch(`https://nahuatl-web.onrender.com/api/feedback/reply/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: user?.id, content: editContent }),
+        body: JSON.stringify({
+          user_id: user!.id,
+          content: editContent,
+        }),
       });
-      if (!response.ok) throw new Error('Error al editar respuesta.');
-      setEditingId(null);
+      if (!response.ok) {
+        const result = await response.json();
+        throw new Error(result.error || 'Error al editar respuesta.');
+      }
       setEditContent('');
+      setEditingId(null);
       fetchFeedbacks();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error editing reply:', error);
     }
   };
 
   const handleDeleteReply = async (id: string) => {
-    if (!window.confirm('¿Seguro que quieres eliminar esta respuesta?')) return;
+    if (!confirm('¿Estás seguro de que quieres eliminar esta respuesta?')) return;
     try {
       const response = await fetch(`https://nahuatl-web.onrender.com/api/feedback/reply/${id}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: user?.id }),
+        body: JSON.stringify({
+          user_id: user!.id,
+        }),
       });
-      if (!response.ok) throw new Error('Error al eliminar respuesta.');
+      if (!response.ok) {
+        const result = await response.json();
+        throw new Error(result.error || 'Error al eliminar respuesta.');
+      }
       fetchFeedbacks();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error deleting reply:', error);
     }
   };
@@ -260,7 +276,15 @@ export default function FeedbackPage() {
     setExpandedFeedback(expandedFeedback === id ? null : id);
   };
 
-  if (!mounted) {
+  const canEditFeedback = (feedback: Feedback) => {
+    return user && (user.id === feedback.user_id || user.is_admin);
+  };
+
+  const canEditReply = (reply: any) => {
+    return user && (user.id === reply.user_id || user.is_admin);
+  };
+
+  if (!user) {
     return <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center">
       <div className="animate-pulse text-gray-400">Cargando...</div>
     </div>;
@@ -315,14 +339,14 @@ export default function FeedbackPage() {
         )}
 
         {/* New Feedback Form */}
-        <div className="mb-10 bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+        <div className="mb-10 bg-white rounded-xl shadow-lg p-4 sm:p-6 border border-gray-100">
           <h2 className="text-xl font-bold text-gray-800 mb-4">Titlaniliztli (Tu opinión)</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="flex gap-4 items-start">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-lg">
+            <div className="flex flex-col sm:flex-row gap-4 items-start">
+              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-lg">
                 {user?.full_name?.[0] || 'U'}
               </div>
-              <div className="flex-1">
+              <div className="flex-1 w-full">
                 <input
                   type="text"
                   name="subject"
@@ -343,12 +367,12 @@ export default function FeedbackPage() {
               rows={4}
               required
             />
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <select
                 name="type"
                 value={formData.type}
                 onChange={handleInputChange}
-                className="px-4 py-2 rounded-lg border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 text-gray-800 text-sm"
+                className="w-full sm:w-auto px-4 py-2 rounded-lg border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 text-gray-800 text-sm"
               >
                 <option value="suggestion">Sugerencia</option>
                 <option value="question">Pregunta</option>
@@ -358,7 +382,7 @@ export default function FeedbackPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-indigo-600 transition-colors disabled:opacity-70 flex items-center gap-2"
+                className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-indigo-600 transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
                   <>
@@ -392,16 +416,16 @@ export default function FeedbackPage() {
           ) : (
             feedbacks.map((fb) => (
               <div key={fb.id} className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
-                <div className="p-6">
+                <div className="p-4 sm:p-6">
                   {/* Feedback Header */}
-                  <div className="flex items-start gap-4 mb-4">
+                  <div className="flex flex-col sm:flex-row sm:items-start gap-4 mb-4">
                     <div className="flex-shrink-0">
                       <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-400 to-indigo-400 flex items-center justify-center text-white font-bold">
                         {fb.profiles?.full_name?.[0] || (user && user.id === fb.user_id && (user.full_name?.[0] || user.username?.[0])) || 'U'}
                       </div>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 flex-wrap">
                         <h3 className="font-semibold text-gray-800 truncate">
                           {fb.profiles?.full_name || (user && user.id === fb.user_id && (user.full_name || user.username)) || 'Usuario'}
                         </h3>
@@ -415,19 +439,19 @@ export default function FeedbackPage() {
                       <button
                         onClick={() => handleLike(fb.id)}
                         className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                          fb.feedback_likes.some(l => l.user_id === user?.id) 
+                          fb.feedback_likes?.some(l => l.user_id === user?.id) 
                             ? 'bg-blue-100 text-blue-600' 
                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                         }`}
                       >
                         <ThumbsUp size={16} className="mt-0.5" />
-                        <span>{fb.feedback_likes.length}</span>
+                        <span>{fb.feedback_likes?.length || 0}</span>
                       </button>
                     </div>
                   </div>
 
                   {/* Feedback Content */}
-                  <div className="mb-4 pl-14">
+                  <div className="mb-4 pl-0 sm:pl-14">
                     {editingId === fb.id ? (
                       <div className="space-y-2">
                         <textarea
@@ -436,17 +460,19 @@ export default function FeedbackPage() {
                           onChange={(e) => setEditContent(e.target.value)}
                           rows={3}
                         />
-                        <div className="flex gap-2">
+                        <div className="flex flex-col sm:flex-row gap-2">
                           <button
                             onClick={() => handleEditFeedback(fb.id)}
-                            className="px-4 py-2 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors"
+                            className="px-4 py-2 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
                           >
+                            <Check size={16} />
                             Guardar
                           </button>
                           <button
                             onClick={() => { setEditingId(null); setEditContent(''); }}
-                            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+                            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors flex items-center justify-center gap-2"
                           >
+                            <X size={16} />
                             Cancelar
                           </button>
                         </div>
@@ -457,8 +483,8 @@ export default function FeedbackPage() {
                   </div>
 
                   {/* Feedback Actions */}
-                  <div className="flex justify-between items-center pl-14">
-                    <div className="flex gap-4">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pl-0 sm:pl-14">
+                    <div className="flex flex-wrap gap-4">
                       <button
                         onClick={() => setReplyingTo(replyingTo === fb.id ? null : fb.id)}
                         className="text-sm text-blue-500 hover:text-blue-600 font-medium flex items-center gap-1"
@@ -466,7 +492,7 @@ export default function FeedbackPage() {
                         <MessageCircle size={16} />
                         Responder
                       </button>
-                      {(user?.id === fb.user_id || isAdmin) && (
+                      {canEditFeedback(fb) && (
                         <>
                           <button
                             onClick={() => { setEditingId(fb.id); setEditContent(fb.content || ''); }}
@@ -477,7 +503,7 @@ export default function FeedbackPage() {
                           </button>
                           <button
                             onClick={() => handleDeleteFeedback(fb.id)}
-                            className="text-sm text-red-500 hover:text-red-600 font-medium flex items-center gap-1"
+                            className="text-sm text-red-500 hover:text-red-700 font-medium flex items-center gap-1"
                           >
                             <Trash2 size={16} />
                             Eliminar
@@ -485,18 +511,16 @@ export default function FeedbackPage() {
                         </>
                       )}
                     </div>
-                    {fb.feedback_replies?.length > 0 && (
-                      <button
-                        onClick={() => toggleFeedbackExpansion(fb.id)}
-                        className="text-sm text-gray-500 hover:text-gray-700 font-medium flex items-center gap-1"
-                      >
-                        {expandedFeedback === fb.id ? 'Ocultar respuestas' : `Ver respuestas (${fb.feedback_replies.length})`}
-                        <ChevronDown 
-                          size={16} 
-                          className={`transition-transform ${expandedFeedback === fb.id ? 'rotate-180' : ''}`} 
-                        />
-                      </button>
-                    )}
+                    <button
+                      onClick={() => toggleFeedbackExpansion(fb.id)}
+                      className="text-sm text-gray-500 hover:text-gray-700 font-medium flex items-center gap-1"
+                    >
+                      <ChevronDown 
+                        size={16} 
+                        className={`transition-transform ${expandedFeedback === fb.id ? 'rotate-180' : ''}`}
+                      />
+                      {expandedFeedback === fb.id ? 'Ocultar' : 'Ver'} respuestas
+                    </button>
                   </div>
 
                   {/* Reply Form */}
@@ -592,7 +616,7 @@ export default function FeedbackPage() {
                                 <div className="text-gray-700 text-sm whitespace-pre-line">{reply.content}</div>
                               )}
                             </div>
-                            {(isAdmin || (user?.id === fb.user_id && !reply.is_admin_reply)) && (
+                            {canEditReply(reply) && (
                               <div className="flex gap-2">
                                 <button
                                   onClick={() => { setEditingId(reply.id); setEditContent(reply.content); }}

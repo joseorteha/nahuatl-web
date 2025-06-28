@@ -79,7 +79,9 @@ export default function DictionaryPage() {
       const res = await fetch(`https://nahuatl-web.onrender.com/api/dictionary/saved/${uid}`);
       const data = await res.json();
       setSavedWords(data.map((w: { id: string }) => w.id));
-    } catch {}
+    } catch (error) {
+      console.error('Error fetching saved words:', error);
+    }
   };
 
   const handleSave = async (dictionary_id: string) => {

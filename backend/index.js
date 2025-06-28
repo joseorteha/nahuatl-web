@@ -264,6 +264,37 @@ app.post('/api/feedback', async (req, res) => {
   }
 });
 
+// Endpoint para obtener todos los feedbacks
+app.get('/api/feedback', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('feedback')
+      .select(`
+        *,
+        profiles (full_name, username),
+        feedback_replies (
+          id,
+          content,
+          created_at,
+          is_admin_reply,
+          profiles (full_name)
+        ),
+        feedback_likes (user_id)
+      `)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Supabase error al obtener feedbacks:', error);
+      return res.status(500).json({ error: 'Error al obtener feedbacks.', details: error.message });
+    }
+
+    res.json(data || []);
+  } catch (e) {
+    console.error('Error inesperado en /api/feedback GET:', e);
+    return res.status(500).json({ error: 'Error inesperado en el servidor.', details: e.message });
+  }
+});
+
 // Endpoint para dar/quitar like a una sugerencia
 app.post('/api/feedback/like', async (req, res) => {
   const { user_id, feedback_id } = req.body;
