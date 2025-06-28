@@ -23,7 +23,7 @@ export default function Header() {
       try {
         const userData = localStorage.getItem('user');
         setUser(userData ? JSON.parse(userData) : null);
-      } catch (error) {
+      } catch {
         setUser(null);
       }
       setIsLoading(false);

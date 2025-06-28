@@ -40,7 +40,7 @@ export default function AuthForm() {
 
     try {
       if (isSignUp) {
-        const response = await fetch('http://localhost:3001/api/register', {
+        const response = await fetch('https://nahuatl-web.onrender.com/api/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ full_name: fullName, email, password, username }),
@@ -55,7 +55,7 @@ export default function AuthForm() {
         setUsername('');
         // Keep email for user convenience
       } else {
-        const response = await fetch('http://localhost:3001/api/login', {
+        const response = await fetch('https://nahuatl-web.onrender.com/api/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ emailOrUsername: email, password }),
@@ -69,8 +69,8 @@ export default function AuthForm() {
         }
         router.push('/dashboard');
       }
-    } catch (error: any) {
-      setError(error.message || 'Ocurrió un error. Inténtalo de nuevo.');
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : 'Ocurrió un error. Inténtalo de nuevo.');
     } finally {
       setIsLoading(false);
     }

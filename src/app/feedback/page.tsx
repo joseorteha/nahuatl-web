@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { MessageSquare, Plus, ThumbsUp, Clock, CheckCircle, AlertCircle, Star, User } from 'lucide-react';
+import { ThumbsUp } from 'lucide-react';
 import type { Database } from '@/lib/database.types';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -34,8 +34,6 @@ interface AuthenticatedUser {
 
 export default function FeedbackPage() {
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -54,20 +52,7 @@ export default function FeedbackPage() {
   const supabase = createClientComponentClient<Database>();
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      const parsedUser: AuthenticatedUser = JSON.parse(storedUser);
-      setUser(parsedUser);
-      fetchFeedbacks();
-    } else {
-      router.push('/login');
-    }
-    setMounted(true);
-  }, [router]);
-
-  const fetchFeedbacks = async () => {
-    setLoading(true);
+  const fetchFeedbacks = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('feedback')
@@ -87,12 +72,22 @@ export default function FeedbackPage() {
 
       if (error) throw error;
       setFeedbacks(data || []);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching feedbacks:', error);
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [supabase]);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      const parsedUser: AuthenticatedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
+      fetchFeedbacks();
+    } else {
+      router.push('/login');
+    }
+    setMounted(true);
+  }, [router, fetchFeedbacks]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,7 +102,7 @@ export default function FeedbackPage() {
     }
 
     try {
-      const response = await fetch('http://localhost:3001/api/feedback', {
+      const response = await fetch('https://nahuatl-web.onrender.com/api/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -127,7 +122,8 @@ export default function FeedbackPage() {
       setSubmitStatus('success');
       setFormData({ name: '', email: '', type: 'suggestion', subject: '', message: '' });
       fetchFeedbacks(); // refresca la lista
-    } catch (error) {
+    } catch (error: unknown) {
+      console.error('Error submitting feedback:', error);
       setSubmitStatus('error');
       alert('Hubo un error al enviar el feedback.');
     } finally {
@@ -149,7 +145,7 @@ export default function FeedbackPage() {
     }
 
     try {
-      const response = await fetch('http://localhost:3001/api/feedback/like', {
+      const response = await fetch('https://nahuatl-web.onrender.com/api/feedback/like', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -164,9 +160,9 @@ export default function FeedbackPage() {
       }
 
       fetchFeedbacks();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error toggling like:', error);
-      alert('Hubo un error al votar: ' + error.message);
+      alert('Hubo un error al votar: ' + (error instanceof Error ? error.message : ''));
     }
   };
 
@@ -177,7 +173,7 @@ export default function FeedbackPage() {
     }
     if (!replyContent.trim()) return;
     try {
-      const response = await fetch('http://localhost:3001/api/feedback/reply', {
+      const response = await fetch('https://nahuatl-web.onrender.com/api/feedback/reply', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -193,28 +189,8 @@ export default function FeedbackPage() {
       setReplyContent('');
       setReplyingTo(null);
       fetchFeedbacks();
-    } catch (error: any) {
-      alert('Hubo un error al responder: ' + error.message);
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'pending': return <Clock className="w-4 h-4 text-yellow-500" />;
-      case 'reviewed': return <CheckCircle className="w-4 h-4 text-blue-500" />;
-      case 'implemented': return <Star className="w-4 h-4 text-green-500" />;
-      case 'declined': return <AlertCircle className="w-4 h-4 text-red-500" />;
-      default: return <Clock className="w-4 h-4 text-gray-500" />;
-    }
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'low': return 'bg-green-100 text-green-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'high': return 'bg-orange-100 text-orange-800';
-      case 'critical': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+    } catch (error: unknown) {
+      alert('Hubo un error al responder: ' + (error instanceof Error ? error.message : ''));
     }
   };
 
@@ -225,7 +201,7 @@ export default function FeedbackPage() {
   const handleEditFeedback = async (id: string) => {
     if (!editContent.trim()) return;
     try {
-      const response = await fetch(`http://localhost:3001/api/feedback/${id}`, {
+      const response = await fetch(`https://nahuatl-web.onrender.com/api/feedback/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: user?.id, content: editContent }),
@@ -234,7 +210,8 @@ export default function FeedbackPage() {
       setEditingId(null);
       setEditContent('');
       fetchFeedbacks();
-    } catch (e) {
+    } catch (error) {
+      console.error('Error editing feedback:', error);
       alert('No se pudo editar el comentario.');
     }
   };
@@ -243,14 +220,15 @@ export default function FeedbackPage() {
   const handleDeleteFeedback = async (id: string) => {
     if (!window.confirm('¿Seguro que quieres eliminar este comentario?')) return;
     try {
-      const response = await fetch(`http://localhost:3001/api/feedback/${id}`, {
+      const response = await fetch(`https://nahuatl-web.onrender.com/api/feedback/${id}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: user?.id }),
       });
       if (!response.ok) throw new Error('Error al eliminar comentario.');
       fetchFeedbacks();
-    } catch (e) {
+    } catch (error) {
+      console.error('Error deleting feedback:', error);
       alert('No se pudo eliminar el comentario.');
     }
   };
@@ -259,7 +237,7 @@ export default function FeedbackPage() {
   const handleEditReply = async (id: string) => {
     if (!editContent.trim()) return;
     try {
-      const response = await fetch(`http://localhost:3001/api/feedback/reply/${id}`, {
+      const response = await fetch(`https://nahuatl-web.onrender.com/api/feedback/reply/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: user?.id, content: editContent }),
@@ -268,7 +246,8 @@ export default function FeedbackPage() {
       setEditingId(null);
       setEditContent('');
       fetchFeedbacks();
-    } catch (e) {
+    } catch (error) {
+      console.error('Error editing reply:', error);
       alert('No se pudo editar la respuesta.');
     }
   };
@@ -277,14 +256,15 @@ export default function FeedbackPage() {
   const handleDeleteReply = async (id: string) => {
     if (!window.confirm('¿Seguro que quieres eliminar esta respuesta?')) return;
     try {
-      const response = await fetch(`http://localhost:3001/api/feedback/reply/${id}`, {
+      const response = await fetch(`https://nahuatl-web.onrender.com/api/feedback/reply/${id}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: user?.id }),
       });
       if (!response.ok) throw new Error('Error al eliminar respuesta.');
       fetchFeedbacks();
-    } catch (e) {
+    } catch (error) {
+      console.error('Error deleting reply:', error);
       alert('No se pudo eliminar la respuesta.');
     }
   };
@@ -380,21 +360,23 @@ export default function FeedbackPage() {
             <div className="text-center text-gray-400">Aún no hay comentarios. ¡Sé el primero en participar!</div>
           )}
           {feedbacks.map((fb) => (
-            <div key={fb.id} className="bg-white rounded-2xl shadow-md p-6 border border-[#F5F6FA]">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-full bg-[#5DADE2] flex items-center justify-center text-white font-bold text-lg">
-                  {fb.profiles?.full_name?.[0] || 'U'}
+            <div key={fb.id} className="bg-white rounded-2xl shadow-md p-4 sm:p-6 border border-[#F5F6FA]">
+              <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#5DADE2] flex items-center justify-center text-white font-bold text-base sm:text-lg">
+                  {fb.profiles?.full_name?.[0] || (user && user.id === fb.user_id && (user.full_name?.[0] || user.username?.[0])) || 'U'}
                 </div>
                 <div>
-                  <div className="font-semibold text-[#2C3E50]">{fb.profiles?.full_name || 'Usuario'}</div>
+                  <div className="font-semibold text-[#2C3E50] text-sm sm:text-base">
+                    {fb.profiles?.full_name || (user && user.id === fb.user_id && (user.full_name || user.username)) || 'Usuario'}
+                  </div>
                   <div className="text-xs text-gray-400">{formatDistanceToNow(new Date(fb.created_at), { addSuffix: true, locale: es })}</div>
                 </div>
                 <div className="ml-auto flex items-center gap-2">
                   <button
                     onClick={() => handleLike(fb.id)}
-                    className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold transition-colors ${fb.feedback_likes.some(l => l.user_id === user?.id) ? 'bg-[#2ECC71] text-white' : 'bg-gray-100 text-[#2C3E50]'}`}
+                    className={`flex items-center gap-1 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold transition-colors ${fb.feedback_likes.some(l => l.user_id === user?.id) ? 'bg-[#2ECC71] text-white' : 'bg-gray-100 text-[#2C3E50]'}`}
                   >
-                    <ThumbsUp size={16} /> {fb.feedback_likes.length}
+                    <ThumbsUp size={14} className="sm:w-4 sm:h-4" /> {fb.feedback_likes.length}
                   </button>
                 </div>
               </div>
@@ -419,12 +401,12 @@ export default function FeedbackPage() {
                 </div>
               ) : (
                 <div className="mb-2">
-                  <div className="font-bold text-lg text-[#2C3E50]">{fb.title || fb.subject}</div>
-                  <div className="text-[#2C3E50] mt-1 whitespace-pre-line">{fb.content || fb.message}</div>
+                  <div className="font-bold text-lg text-[#2C3E50]">{fb.title}</div>
+                  <div className="text-[#2C3E50] mt-1 whitespace-pre-line">{fb.content}</div>
                   {(user?.id === fb.user_id || isAdmin) && (
                     <div className="flex gap-2 mt-2">
                       <button
-                        onClick={() => { setEditingId(fb.id); setEditContent(fb.content || fb.message || ''); }}
+                        onClick={() => { setEditingId(fb.id); setEditContent(fb.content || ''); }}
                         className="text-[#5DADE2] hover:underline text-xs font-semibold"
                       >Editar</button>
                       <button
@@ -467,7 +449,7 @@ export default function FeedbackPage() {
                       ) : (
                         <div>
                           <div className="text-[#2C3E50] mt-1 whitespace-pre-line">{reply.content}</div>
-                          {(user?.id === reply.profiles?.id || isAdmin) && (
+                          {(isAdmin || reply.is_admin_reply) && (
                             <div className="flex gap-2 mt-1">
                               <button
                                 onClick={() => { setEditingId(reply.id); setEditContent(reply.content); }}
