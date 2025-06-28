@@ -279,7 +279,7 @@ export default function FeedbackPage() {
   };
 
   // Type guard para reply con user_id
-  function hasUserId(reply: any): reply is { user_id: string } {
+  function hasUserId(reply: { [key: string]: unknown }): reply is { user_id: string } {
     return typeof reply.user_id === 'string';
   }
 
