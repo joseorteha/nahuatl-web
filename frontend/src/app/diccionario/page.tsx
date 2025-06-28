@@ -26,7 +26,6 @@ export default function DictionaryPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
-  const [selectedWord, setSelectedWord] = useState<DictionaryEntry | null>(null);
   const [savedWords, setSavedWords] = useState<string[]>([]);
   const [saving, setSaving] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
@@ -79,7 +78,7 @@ export default function DictionaryPage() {
     try {
       const res = await fetch(`https://nahuatl-web.onrender.com/api/dictionary/saved/${uid}`);
       const data = await res.json();
-      setSavedWords(data.map((w: any) => w.id));
+      setSavedWords(data.map((w: { id: string }) => w.id));
     } catch {}
   };
 

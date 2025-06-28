@@ -12,6 +12,13 @@ interface UserData {
   username?: string;
 }
 
+interface SavedWord {
+  id: string;
+  word: string;
+  definition: string;
+  variants?: string[];
+}
+
 type InfoCardProps = {
   icon: LucideIcon;
   label: string;
@@ -34,7 +41,7 @@ export default function ProfilePage() {
   const [user, setUser] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  const [savedWords, setSavedWords] = useState<any[]>([]);
+  const [savedWords, setSavedWords] = useState<SavedWord[]>([]);
   const [removing, setRemoving] = useState<string | null>(null);
 
   useEffect(() => {
@@ -138,7 +145,7 @@ export default function ProfilePage() {
                     <div>
                       <h4 className="text-xl font-bold text-emerald-700">{word.word}</h4>
                       <p className="text-gray-700 mb-1">{word.definition}</p>
-                      {word.variants?.length > 0 && (
+                      {word.variants && word.variants.length > 0 && (
                         <span className="text-sm text-amber-600 bg-amber-50 px-2 py-1 rounded-full mr-2">{word.variants.join(', ')}</span>
                       )}
                     </div>
