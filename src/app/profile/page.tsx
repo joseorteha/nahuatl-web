@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { User, Mail, AtSign, LogOut, LucideIcon } from 'lucide-react';
+import { User, Mail, AtSign, LogOut, LucideIcon, BookmarkCheck, Bookmark } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Header from '@/components/Header';
 
@@ -34,16 +34,43 @@ export default function ProfilePage() {
   const [user, setUser] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const [savedWords, setSavedWords] = useState<any[]>([]);
+  const [removing, setRemoving] = useState<string | null>(null);
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
     if (userData) {
       setUser(JSON.parse(userData));
+      fetchSaved(JSON.parse(userData).id);
     } else {
       router.push('/login');
     }
     setIsLoading(false);
   }, [router]);
+
+  const fetchSaved = async (uid: string) => {
+    try {
+      const res = await fetch(`https://nahuatl-web.onrender.com/api/dictionary/saved/${uid}`);
+      const data = await res.json();
+      setSavedWords(data);
+    } catch {}
+  };
+
+  const handleUnsave = async (dictionary_id: string) => {
+    const userData = localStorage.getItem('user');
+    if (!userData) return;
+    const user = JSON.parse(userData);
+    setRemoving(dictionary_id);
+    try {
+      await fetch('https://nahuatl-web.onrender.com/api/dictionary/save', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: user.id, dictionary_id })
+      });
+      setSavedWords(prev => prev.filter(w => w.id !== dictionary_id));
+    } catch {}
+    setRemoving(null);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('user');
@@ -99,6 +126,34 @@ export default function ProfilePage() {
               </button>
             </div>
           </div>
+
+          {savedWords.length > 0 && (
+            <div className="max-w-2xl mx-auto mt-12">
+              <h3 className="text-2xl font-bold text-emerald-700 mb-6 flex items-center gap-2">
+                <BookmarkCheck className="inline-block" /> Palabras guardadas
+              </h3>
+              <div className="grid gap-6">
+                {savedWords.map(word => (
+                  <div key={word.id} className="bg-white rounded-xl shadow border border-emerald-100 p-6 flex flex-col sm:flex-row sm:items-center justify-between">
+                    <div>
+                      <h4 className="text-xl font-bold text-emerald-700">{word.word}</h4>
+                      <p className="text-gray-700 mb-1">{word.definition}</p>
+                      {word.variants?.length > 0 && (
+                        <span className="text-sm text-amber-600 bg-amber-50 px-2 py-1 rounded-full mr-2">{word.variants.join(', ')}</span>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => handleUnsave(word.id)}
+                      className={`mt-4 sm:mt-0 p-2 text-red-500 hover:text-white hover:bg-red-500 rounded-full border border-red-200 transition-colors ${removing === word.id ? 'opacity-50 pointer-events-none' : ''}`}
+                      aria-label="Quitar de guardados"
+                    >
+                      <Bookmark className="w-6 h-6" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </motion.div>
       </main>
     </div>

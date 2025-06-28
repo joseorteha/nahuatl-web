@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Menu, Transition } from '@headlessui/react';
-import { User as UserIcon, LogOut, LayoutDashboard, Menu as MenuIcon, X } from 'lucide-react';
+import { User as UserIcon, LogOut, LayoutDashboard, Menu as MenuIcon, X, BookOpen, Users, MessageCircle } from 'lucide-react';
 
 interface User {
   id: string;
@@ -49,41 +49,56 @@ export default function Header() {
 
   const navLinks = (
     <>
-      <Link href="/diccionario" className="text-gray-600 hover:text-emerald-600 transition-colors">Diccionario</Link>
-      <span className="text-gray-400 cursor-not-allowed">Lecciones (Próximamente)</span>
-      <span className="text-gray-400 cursor-not-allowed">Práctica (Próximamente)</span>
+      <Link href="/diccionario" className="flex items-center gap-2 text-gray-700 hover:text-emerald-600 transition-colors duration-200 font-medium">
+        <BookOpen size={18} />
+        <span>Diccionario</span>
+      </Link>
+      <Link href="/feedback" className="flex items-center gap-2 text-gray-700 hover:text-emerald-600 transition-colors duration-200 font-medium">
+        <MessageCircle size={18} />
+        <span>Comunidad</span>
+      </Link>
+      <span className="flex items-center gap-2 text-gray-400 cursor-not-allowed font-medium">
+        <Users size={18} />
+        <span>Lecciones (Próximamente)</span>
+      </span>
     </>
   );
 
   return (
-    <header className="bg-white/80 backdrop-blur-lg sticky top-0 z-40 border-b border-gray-200">
+    <header className="bg-white/90 backdrop-blur-xl sticky top-0 z-50 border-b border-gray-200/50 shadow-sm">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo and brand name */}
-          <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-2">
-            <Image src="/logo.png" alt="Nawatlajtol Logo" width={40} height={40} className="rounded-lg"/>
-            <span className="font-bold text-xl text-gray-800">Nawatlahtol</span>
+          <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-3 group">
+            <div className="relative">
+              <Image src="/logo.png" alt="Nawatlajtol Logo" width={40} height={40} className="rounded-xl shadow-sm group-hover:shadow-md transition-shadow duration-200"/>
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/20 to-amber-400/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+            </div>
+            <span className="font-bold text-xl text-gray-800 group-hover:text-emerald-700 transition-colors duration-200">Nawatlahtol</span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-6 font-medium">
+          <nav className="hidden md:flex items-center gap-8 font-medium">
             {navLinks}
           </nav>
 
           {/* Right side actions */}
           <div className="flex items-center gap-4">
             {isLoading ? (
-              <div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse"></div>
+              <div className="w-10 h-10 bg-gradient-to-r from-emerald-200 to-amber-200 rounded-full animate-pulse"></div>
             ) : user ? (
               <ProfileMenu user={user} onLogout={handleLogout} getInitials={getInitials} />
             ) : (
-              <Link href="/login" className="hidden md:inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+              <Link href="/login" className="hidden md:inline-flex items-center justify-center px-6 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transform hover:scale-105">
                 Acceder
               </Link>
             )}
             
             {/* Mobile Menu Button */}
-            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-md">
+            <button 
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)} 
+              className="md:hidden p-2.5 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all duration-200"
+            >
               {mobileMenuOpen ? <X size={24} /> : <MenuIcon size={24} />}
             </button>
           </div>
@@ -91,19 +106,31 @@ export default function Header() {
       </div>
 
       {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-200">
-          <nav className="container mx-auto px-4 pt-4 pb-6 flex flex-col gap-4">
+      <Transition
+        show={mobileMenuOpen}
+        enter="transition ease-out duration-200"
+        enterFrom="opacity-0 -translate-y-2"
+        enterTo="opacity-100 translate-y-0"
+        leave="transition ease-in duration-150"
+        leaveFrom="opacity-100 translate-y-0"
+        leaveTo="opacity-0 -translate-y-2"
+      >
+        <div className="md:hidden bg-white/95 backdrop-blur-xl border-t border-gray-200/50 shadow-lg">
+          <nav className="container mx-auto px-4 pt-4 pb-6 flex flex-col gap-3">
             {navLinks}
-            <hr/>
+            <hr className="my-2 border-gray-200"/>
             {!user && (
-              <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="w-full text-center px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors">
+              <Link 
+                href="/login" 
+                onClick={() => setMobileMenuOpen(false)} 
+                className="w-full text-center px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 shadow-md"
+              >
                 Acceder
               </Link>
             )}
           </nav>
         </div>
-      )}
+      </Transition>
     </header>
   );
 }
@@ -116,44 +143,50 @@ interface ProfileMenuProps {
 
 const ProfileMenu: React.FC<ProfileMenuProps> = ({ user, onLogout, getInitials }) => (
   <Menu as="div" className="relative">
-    <Menu.Button className="flex items-center justify-center w-10 h-10 bg-emerald-500 text-white rounded-full font-bold text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+    <Menu.Button className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-full font-bold text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105">
       {getInitials(user.full_name)}
     </Menu.Button>
     <Transition
       as={Fragment}
-      enter="transition ease-out duration-100"
+      enter="transition ease-out duration-200"
       enterFrom="transform opacity-0 scale-95"
       enterTo="transform opacity-100 scale-100"
-      leave="transition ease-in duration-75"
+      leave="transition ease-in duration-150"
       leaveFrom="transform opacity-100 scale-100"
       leaveTo="transform opacity-0 scale-95"
     >
-      <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-        <div className="px-1 py-1">
-          <div className="px-4 py-3 border-b border-gray-200">
+      <Menu.Items className="absolute right-0 mt-3 w-64 origin-top-right bg-white/95 backdrop-blur-xl divide-y divide-gray-100 rounded-2xl shadow-xl ring-1 ring-black/5 focus:outline-none border border-gray-200/50">
+        <div className="px-1 py-2">
+          <div className="px-4 py-4 border-b border-gray-100">
             <p className="text-sm text-gray-900 font-semibold truncate">{user.full_name || 'Usuario'}</p>
             <p className="text-sm text-gray-500 truncate">{user.email}</p>
           </div>
           <Menu.Item>
             {({ active }) => (
-              <Link href="/profile" className={`${active ? 'bg-emerald-50 text-emerald-700' : 'text-gray-700'} group flex rounded-md items-center w-full px-3 py-2 text-sm font-medium`}>
-                <UserIcon className="mr-2 h-5 w-5" />Mi Perfil
+              <Link href="/profile" className={`${active ? 'bg-emerald-50 text-emerald-700' : 'text-gray-700'} group flex rounded-xl items-center w-full px-4 py-3 text-sm font-medium transition-all duration-200`}>
+                <UserIcon className="mr-3 h-5 w-5" />
+                Mi Perfil
               </Link>
             )}
           </Menu.Item>
           <Menu.Item>
             {({ active }) => (
-              <Link href="/dashboard" className={`${active ? 'bg-emerald-50 text-emerald-700' : 'text-gray-700'} group flex rounded-md items-center w-full px-3 py-2 text-sm font-medium`}>
-                <LayoutDashboard className="mr-2 h-5 w-5" />Dashboard
+              <Link href="/dashboard" className={`${active ? 'bg-emerald-50 text-emerald-700' : 'text-gray-700'} group flex rounded-xl items-center w-full px-4 py-3 text-sm font-medium transition-all duration-200`}>
+                <LayoutDashboard className="mr-3 h-5 w-5" />
+                Dashboard
               </Link>
             )}
           </Menu.Item>
         </div>
-        <div className="px-1 py-1">
+        <div className="px-1 py-2">
           <Menu.Item>
             {({ active }) => (
-              <button onClick={onLogout} className={`${active ? 'bg-red-50 text-red-700' : 'text-gray-700'} group flex rounded-md items-center w-full px-3 py-2 text-sm font-medium`}>
-                <LogOut className="mr-2 h-5 w-5" />Cerrar Sesión
+              <button 
+                onClick={onLogout} 
+                className={`${active ? 'bg-red-50 text-red-700' : 'text-gray-700'} group flex rounded-xl items-center w-full px-4 py-3 text-sm font-medium transition-all duration-200`}
+              >
+                <LogOut className="mr-3 h-5 w-5" />
+                Cerrar Sesión
               </button>
             )}
           </Menu.Item>

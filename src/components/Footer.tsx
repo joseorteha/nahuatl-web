@@ -12,12 +12,15 @@ const Footer = () => {
         <div className="flex space-x-5 mt-4 sm:mt-0">
           <a href="https://cybercodigo-seven.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800" title="Página personal">
             <Globe className="h-5 w-5" />
+
           </a>
           <a href="https://www.facebook.com/joseortega.exe1" target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:text-blue-900" title="Facebook">
             <Facebook className="h-5 w-5" />
+
           </a>
           <a href="https://www.instagram.com/mr.orteg4/?utm_source=qr&r=nametag" target="_blank" rel="noopener noreferrer" className="text-pink-500 hover:text-pink-700" title="Instagram">
             <Instagram className="h-5 w-5" />
+
           </a>
         </div>
       </div>

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "check-env": "node scripts/check-env.js",
-    "predev": "npm run check-env",
+     "predev": "npm run check-env",
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",

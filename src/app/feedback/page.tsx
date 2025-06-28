@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { ThumbsUp } from 'lucide-react';
+import { ThumbsUp, MessageCircle, Send, Edit, Trash2, ChevronDown } from 'lucide-react';
 import type { Database } from '@/lib/database.types';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -35,11 +35,9 @@ interface AuthenticatedUser {
 export default function FeedbackPage() {
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    type: 'suggestion',
     subject: '',
-    message: ''
+    message: '',
+    type: 'suggestion'
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -48,6 +46,7 @@ export default function FeedbackPage() {
   const [replyContent, setReplyContent] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState('');
+  const [expandedFeedback, setExpandedFeedback] = useState<string | null>(null);
   const router = useRouter();
   const supabase = createClientComponentClient<Database>();
   const [mounted, setMounted] = useState(false);
@@ -109,8 +108,7 @@ export default function FeedbackPage() {
           user_id: user.id,
           title: formData.subject,
           content: formData.message,
-          category: formData.type, // o 'general' si no usas el select
-          // priority: 'medium', // puedes agregarlo si quieres
+          category: formData.type,
         }),
       });
 
@@ -120,12 +118,11 @@ export default function FeedbackPage() {
       }
 
       setSubmitStatus('success');
-      setFormData({ name: '', email: '', type: 'suggestion', subject: '', message: '' });
-      fetchFeedbacks(); // refresca la lista
+      setFormData({ subject: '', message: '', type: 'suggestion' });
+      fetchFeedbacks();
     } catch (error: unknown) {
       console.error('Error submitting feedback:', error);
       setSubmitStatus('error');
-      alert('Hubo un error al enviar el feedback.');
     } finally {
       setIsSubmitting(false);
     }
@@ -162,7 +159,6 @@ export default function FeedbackPage() {
       fetchFeedbacks();
     } catch (error: unknown) {
       console.error('Error toggling like:', error);
-      alert('Hubo un error al votar: ' + (error instanceof Error ? error.message : ''));
     }
   };
 
@@ -190,14 +186,12 @@ export default function FeedbackPage() {
       setReplyingTo(null);
       fetchFeedbacks();
     } catch (error: unknown) {
-      alert('Hubo un error al responder: ' + (error instanceof Error ? error.message : ''));
+      console.error('Error replying:', error);
     }
   };
 
-  // Verifica si el usuario es admin
   const isAdmin = user?.is_admin;
 
-  // Editar feedback principal
   const handleEditFeedback = async (id: string) => {
     if (!editContent.trim()) return;
     try {
@@ -212,11 +206,9 @@ export default function FeedbackPage() {
       fetchFeedbacks();
     } catch (error) {
       console.error('Error editing feedback:', error);
-      alert('No se pudo editar el comentario.');
     }
   };
 
-  // Eliminar feedback principal
   const handleDeleteFeedback = async (id: string) => {
     if (!window.confirm('¿Seguro que quieres eliminar este comentario?')) return;
     try {
@@ -229,11 +221,9 @@ export default function FeedbackPage() {
       fetchFeedbacks();
     } catch (error) {
       console.error('Error deleting feedback:', error);
-      alert('No se pudo eliminar el comentario.');
     }
   };
 
-  // Editar reply
   const handleEditReply = async (id: string) => {
     if (!editContent.trim()) return;
     try {
@@ -248,11 +238,9 @@ export default function FeedbackPage() {
       fetchFeedbacks();
     } catch (error) {
       console.error('Error editing reply:', error);
-      alert('No se pudo editar la respuesta.');
     }
   };
 
-  // Eliminar reply
   const handleDeleteReply = async (id: string) => {
     if (!window.confirm('¿Seguro que quieres eliminar esta respuesta?')) return;
     try {
@@ -265,245 +253,372 @@ export default function FeedbackPage() {
       fetchFeedbacks();
     } catch (error) {
       console.error('Error deleting reply:', error);
-      alert('No se pudo eliminar la respuesta.');
     }
   };
 
+  const toggleFeedbackExpansion = (id: string) => {
+    setExpandedFeedback(expandedFeedback === id ? null : id);
+  };
+
   if (!mounted) {
-    return <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center text-gray-400">Cargando...</div>;
+    return <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center">
+      <div className="animate-pulse text-gray-400">Cargando...</div>
+    </div>;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8">
-      <div className="container mx-auto px-4 max-w-4xl">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+      <div className="container mx-auto px-4 max-w-4xl py-8">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Foro de la Comunidad
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
+              Tlahtolnamiquiliztli
+            </span>
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Comparte tus ideas, reporta errores, sugiere mejoras y conversa con otros usuarios. ¡Tu voz ayuda a mejorar Nawatlajtol!
+            Espacio comunitario para compartir ideas y sugerencias
           </p>
         </div>
 
-        {/* Success/Error Messages */}
+        {/* Status Messages */}
         {submitStatus === 'success' && (
-          <div className="mb-8 p-6 bg-green-50 border border-green-200 rounded-2xl">
-            <div className="flex items-center">
-              <svg className="w-6 h-6 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <div>
-                <h3 className="text-lg font-semibold text-green-800">¡Gracias por tu feedback!</h3>
-                <p className="text-green-700">Hemos recibido tu mensaje y lo revisaremos pronto.</p>
+          <div className="mb-8 p-6 bg-green-50 rounded-xl border border-green-200 shadow-sm">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-6 w-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-lg font-semibold text-green-800">¡Tlazocamati! (¡Gracias!)</h3>
+                <p className="text-green-700">Tu mensaje ha sido enviado y será revisado pronto.</p>
               </div>
             </div>
           </div>
         )}
 
         {submitStatus === 'error' && (
-          <div className="mb-8 p-6 bg-red-50 border border-red-200 rounded-2xl">
-            <div className="flex items-center">
-              <svg className="w-6 h-6 text-red-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <div>
-                <h3 className="text-lg font-semibold text-red-800">Error al enviar</h3>
-                <p className="text-red-700">Hubo un problema al enviar tu mensaje. Por favor, inténtalo de nuevo.</p>
+          <div className="mb-8 p-6 bg-red-50 rounded-xl border border-red-200 shadow-sm">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-6 w-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-lg font-semibold text-red-800">Ahtle tlenon (Algo salió mal)</h3>
+                <p className="text-red-700">No pudimos enviar tu mensaje. Por favor, inténtalo de nuevo.</p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Formulario de nuevo comentario */}
-        <div className="mb-10 bg-white rounded-2xl shadow-lg p-6 border border-[#F5F6FA]">
-          <h2 className="text-lg font-bold text-[#2C3E50] mb-2">Deja tu comentario o sugerencia</h2>
+        {/* New Feedback Form */}
+        <div className="mb-10 bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+          <h2 className="text-xl font-bold text-gray-800 mb-4">Titlaniliztli (Tu opinión)</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="flex gap-4 items-center">
-              <div className="w-10 h-10 rounded-full bg-[#5DADE2] flex items-center justify-center text-white font-bold text-lg">
+            <div className="flex gap-4 items-start">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-lg">
                 {user?.full_name?.[0] || 'U'}
               </div>
-              <input
-                type="text"
-                name="subject"
-                value={formData.subject}
-                onChange={handleInputChange}
-                className="flex-1 px-4 py-2 rounded-lg border border-[#2ECC71]/30 bg-[#F5F6FA] focus:outline-none focus:border-[#2ECC71] text-[#2C3E50]"
-                placeholder="Título o resumen breve"
-                required
-              />
+              <div className="flex-1">
+                <input
+                  type="text"
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 text-gray-800"
+                  placeholder="Título de tu mensaje"
+                  required
+                />
+              </div>
             </div>
             <textarea
               name="message"
               value={formData.message}
               onChange={handleInputChange}
-              className="w-full px-4 py-3 rounded-lg border border-[#5DADE2]/30 bg-[#F5F6FA] focus:outline-none focus:border-[#2ECC71] text-[#2C3E50]"
+              className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 text-gray-800"
               placeholder="Escribe tu comentario, sugerencia o pregunta..."
-              rows={3}
+              rows={4}
               required
             />
-            <div className="flex justify-end">
+            <div className="flex justify-between items-center">
+              <select
+                name="type"
+                value={formData.type}
+                onChange={handleInputChange}
+                className="px-4 py-2 rounded-lg border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 text-gray-800 text-sm"
+              >
+                <option value="suggestion">Sugerencia</option>
+                <option value="question">Pregunta</option>
+                <option value="issue">Reporte de problema</option>
+                <option value="other">Otro</option>
+              </select>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-6 py-2 bg-[#2ECC71] text-white rounded-lg font-semibold hover:bg-[#27ae60] transition-colors disabled:bg-gray-300"
+                className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-indigo-600 transition-colors disabled:opacity-70 flex items-center gap-2"
               >
-                {isSubmitting ? 'Enviando...' : 'Publicar'}
+                {isSubmitting ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Enviando...
+                  </>
+                ) : (
+                  <>
+                    <Send size={18} />
+                    Publicar
+                  </>
+                )}
               </button>
             </div>
           </form>
         </div>
 
-        {/* Muro de comentarios */}
-        <div className="space-y-8">
-          {feedbacks.length === 0 && (
-            <div className="text-center text-gray-400">Aún no hay comentarios. ¡Sé el primero en participar!</div>
-          )}
-          {feedbacks.map((fb) => (
-            <div key={fb.id} className="bg-white rounded-2xl shadow-md p-4 sm:p-6 border border-[#F5F6FA]">
-              <div className="flex items-center gap-2 sm:gap-3 mb-2">
-                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#5DADE2] flex items-center justify-center text-white font-bold text-base sm:text-lg">
-                  {fb.profiles?.full_name?.[0] || (user && user.id === fb.user_id && (user.full_name?.[0] || user.username?.[0])) || 'U'}
-                </div>
-                <div>
-                  <div className="font-semibold text-[#2C3E50] text-sm sm:text-base">
-                    {fb.profiles?.full_name || (user && user.id === fb.user_id && (user.full_name || user.username)) || 'Usuario'}
-                  </div>
-                  <div className="text-xs text-gray-400">{formatDistanceToNow(new Date(fb.created_at), { addSuffix: true, locale: es })}</div>
-                </div>
-                <div className="ml-auto flex items-center gap-2">
-                  <button
-                    onClick={() => handleLike(fb.id)}
-                    className={`flex items-center gap-1 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold transition-colors ${fb.feedback_likes.some(l => l.user_id === user?.id) ? 'bg-[#2ECC71] text-white' : 'bg-gray-100 text-[#2C3E50]'}`}
-                  >
-                    <ThumbsUp size={14} className="sm:w-4 sm:h-4" /> {fb.feedback_likes.length}
-                  </button>
-                </div>
+        {/* Feedback List */}
+        <div className="space-y-6">
+          {feedbacks.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="mx-auto w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mb-4">
+                <MessageCircle className="text-blue-400" size={40} />
               </div>
-              {editingId === fb.id ? (
-                <div className="mb-2">
-                  <textarea
-                    className="w-full px-4 py-2 rounded-lg border border-[#2ECC71]/30 bg-[#F5F6FA] focus:outline-none focus:border-[#2ECC71] text-[#2C3E50] mb-2"
-                    value={editContent}
-                    onChange={e => setEditContent(e.target.value)}
-                    rows={3}
-                  />
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleEditFeedback(fb.id)}
-                      className="px-4 py-1 bg-[#2ECC71] text-white rounded-lg font-semibold hover:bg-[#27ae60] transition-colors"
-                    >Guardar</button>
-                    <button
-                      onClick={() => { setEditingId(null); setEditContent(''); }}
-                      className="px-4 py-1 bg-gray-200 text-[#2C3E50] rounded-lg font-semibold hover:bg-gray-300 transition-colors"
-                    >Cancelar</button>
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">Axcanah tlahtolli (Aún no hay mensajes)</h3>
+              <p className="text-gray-500">Sé el primero en compartir tus ideas con la comunidad.</p>
+            </div>
+          ) : (
+            feedbacks.map((fb) => (
+              <div key={fb.id} className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+                <div className="p-6">
+                  {/* Feedback Header */}
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className="flex-shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-400 to-indigo-400 flex items-center justify-center text-white font-bold">
+                        {fb.profiles?.full_name?.[0] || (user && user.id === fb.user_id && (user.full_name?.[0] || user.username?.[0])) || 'U'}
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="font-semibold text-gray-800 truncate">
+                          {fb.profiles?.full_name || (user && user.id === fb.user_id && (user.full_name || user.username)) || 'Usuario'}
+                        </h3>
+                        <span className="text-xs text-gray-400">
+                          {formatDistanceToNow(new Date(fb.created_at), { addSuffix: true, locale: es })}
+                        </span>
+                      </div>
+                      <h4 className="text-lg font-bold text-gray-900 mt-1">{fb.title}</h4>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleLike(fb.id)}
+                        className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                          fb.feedback_likes.some(l => l.user_id === user?.id) 
+                            ? 'bg-blue-100 text-blue-600' 
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }`}
+                      >
+                        <ThumbsUp size={16} className="mt-0.5" />
+                        <span>{fb.feedback_likes.length}</span>
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <div className="mb-2">
-                  <div className="font-bold text-lg text-[#2C3E50]">{fb.title}</div>
-                  <div className="text-[#2C3E50] mt-1 whitespace-pre-line">{fb.content}</div>
-                  {(user?.id === fb.user_id || isAdmin) && (
-                    <div className="flex gap-2 mt-2">
+
+                  {/* Feedback Content */}
+                  <div className="mb-4 pl-14">
+                    {editingId === fb.id ? (
+                      <div className="space-y-2">
+                        <textarea
+                          className="w-full px-4 py-2 rounded-lg border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 text-gray-800"
+                          value={editContent}
+                          onChange={(e) => setEditContent(e.target.value)}
+                          rows={3}
+                        />
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleEditFeedback(fb.id)}
+                            className="px-4 py-2 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors"
+                          >
+                            Guardar
+                          </button>
+                          <button
+                            onClick={() => { setEditingId(null); setEditContent(''); }}
+                            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+                          >
+                            Cancelar
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-gray-700 whitespace-pre-line">{fb.content}</div>
+                    )}
+                  </div>
+
+                  {/* Feedback Actions */}
+                  <div className="flex justify-between items-center pl-14">
+                    <div className="flex gap-4">
                       <button
-                        onClick={() => { setEditingId(fb.id); setEditContent(fb.content || ''); }}
-                        className="text-[#5DADE2] hover:underline text-xs font-semibold"
-                      >Editar</button>
+                        onClick={() => setReplyingTo(replyingTo === fb.id ? null : fb.id)}
+                        className="text-sm text-blue-500 hover:text-blue-600 font-medium flex items-center gap-1"
+                      >
+                        <MessageCircle size={16} />
+                        Responder
+                      </button>
+                      {(user?.id === fb.user_id || isAdmin) && (
+                        <>
+                          <button
+                            onClick={() => { setEditingId(fb.id); setEditContent(fb.content || ''); }}
+                            className="text-sm text-gray-500 hover:text-gray-700 font-medium flex items-center gap-1"
+                          >
+                            <Edit size={16} />
+                            Editar
+                          </button>
+                          <button
+                            onClick={() => handleDeleteFeedback(fb.id)}
+                            className="text-sm text-red-500 hover:text-red-600 font-medium flex items-center gap-1"
+                          >
+                            <Trash2 size={16} />
+                            Eliminar
+                          </button>
+                        </>
+                      )}
+                    </div>
+                    {fb.feedback_replies?.length > 0 && (
                       <button
-                        onClick={() => handleDeleteFeedback(fb.id)}
-                        className="text-[#E74C3C] hover:underline text-xs font-semibold"
-                      >Eliminar</button>
+                        onClick={() => toggleFeedbackExpansion(fb.id)}
+                        className="text-sm text-gray-500 hover:text-gray-700 font-medium flex items-center gap-1"
+                      >
+                        {expandedFeedback === fb.id ? 'Ocultar respuestas' : `Ver respuestas (${fb.feedback_replies.length})`}
+                        <ChevronDown 
+                          size={16} 
+                          className={`transition-transform ${expandedFeedback === fb.id ? 'rotate-180' : ''}`} 
+                        />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Reply Form */}
+                  {replyingTo === fb.id && (
+                    <div className="mt-4 pl-14">
+                      <div className="flex gap-3">
+                        <div className="flex-shrink-0">
+                          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 font-bold text-sm">
+                            {user?.full_name?.[0] || 'T'}
+                          </div>
+                        </div>
+                        <div className="flex-1">
+                          <textarea
+                            className="w-full px-4 py-2 rounded-lg border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 text-gray-800"
+                            placeholder="Escribe tu respuesta..."
+                            value={replyContent}
+                            onChange={(e) => setReplyContent(e.target.value)}
+                            rows={2}
+                          />
+                          <div className="flex justify-end gap-2 mt-2">
+                            <button
+                              onClick={() => { setReplyingTo(null); setReplyContent(''); }}
+                              className="px-3 py-1 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors text-sm"
+                            >
+                              Cancelar
+                            </button>
+                            <button
+                              onClick={() => handleReply(fb.id)}
+                              className="px-3 py-1 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors text-sm flex items-center gap-1"
+                            >
+                              <Send size={14} />
+                              Enviar
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Replies */}
+                  {expandedFeedback === fb.id && fb.feedback_replies?.length > 0 && (
+                    <div className="mt-4 pl-14 space-y-4">
+                      {fb.feedback_replies.map((reply) => (
+                        <div key={reply.id} className="bg-gray-50 rounded-lg p-4">
+                          <div className="flex items-start gap-3">
+                            <div className="flex-shrink-0">
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm ${
+                                reply.is_admin_reply 
+                                  ? 'bg-gradient-to-r from-indigo-500 to-purple-500' 
+                                  : 'bg-gradient-to-r from-blue-400 to-indigo-400'
+                              }`}>
+                                {reply.profiles?.full_name?.[0] || 'A'}
+                              </div>
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="font-medium text-gray-800">
+                                  {reply.profiles?.full_name || (reply.is_admin_reply ? 'Equipo Nawatlajtol' : 'Usuario')}
+                                </span>
+                                <span className="text-xs text-gray-400">
+                                  {formatDistanceToNow(new Date(reply.created_at), { addSuffix: true, locale: es })}
+                                </span>
+                                {reply.is_admin_reply && (
+                                  <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">
+                                    Oficial
+                                  </span>
+                                )}
+                              </div>
+                              {editingId === reply.id ? (
+                                <div className="space-y-2">
+                                  <textarea
+                                    className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 text-gray-800 text-sm"
+                                    value={editContent}
+                                    onChange={(e) => setEditContent(e.target.value)}
+                                    rows={2}
+                                  />
+                                  <div className="flex gap-2">
+                                    <button
+                                      onClick={() => handleEditReply(reply.id)}
+                                      className="px-3 py-1 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors text-sm"
+                                    >
+                                      Guardar
+                                    </button>
+                                    <button
+                                      onClick={() => { setEditingId(null); setEditContent(''); }}
+                                      className="px-3 py-1 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors text-sm"
+                                    >
+                                      Cancelar
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="text-gray-700 text-sm whitespace-pre-line">{reply.content}</div>
+                              )}
+                            </div>
+                            {(isAdmin || (user?.id === fb.user_id && !reply.is_admin_reply)) && (
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => { setEditingId(reply.id); setEditContent(reply.content); }}
+                                  className="text-gray-400 hover:text-blue-500"
+                                >
+                                  <Edit size={16} />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteReply(reply.id)}
+                                  className="text-gray-400 hover:text-red-500"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
-              )}
-              {/* Respuestas */}
-              <div className="mt-4 space-y-3">
-                {fb.feedback_replies?.map((reply) => (
-                  <div key={reply.id} className="flex items-start gap-2 ml-8">
-                    <div className="w-8 h-8 rounded-full bg-[#2ECC71] flex items-center justify-center text-white font-bold text-sm mt-1">
-                      {reply.profiles?.full_name?.[0] || 'A'}
-                    </div>
-                    <div>
-                      <div className="font-semibold text-[#2C3E50]">{reply.profiles?.full_name || 'Admin'}</div>
-                      <div className="text-xs text-gray-400">{formatDistanceToNow(new Date(reply.created_at), { addSuffix: true, locale: es })}</div>
-                      {editingId === reply.id ? (
-                        <div className="w-full">
-                          <textarea
-                            className="w-full px-3 py-2 rounded-lg border border-[#2ECC71]/30 bg-[#F5F6FA] focus:outline-none focus:border-[#2ECC71] text-[#2C3E50] mb-2"
-                            value={editContent}
-                            onChange={e => setEditContent(e.target.value)}
-                            rows={2}
-                          />
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => handleEditReply(reply.id)}
-                              className="px-4 py-1 bg-[#2ECC71] text-white rounded-lg font-semibold hover:bg-[#27ae60] transition-colors"
-                            >Guardar</button>
-                            <button
-                              onClick={() => { setEditingId(null); setEditContent(''); }}
-                              className="px-4 py-1 bg-gray-200 text-[#2C3E50] rounded-lg font-semibold hover:bg-gray-300 transition-colors"
-                            >Cancelar</button>
-                          </div>
-                        </div>
-                      ) : (
-                        <div>
-                          <div className="text-[#2C3E50] mt-1 whitespace-pre-line">{reply.content}</div>
-                          {(isAdmin || reply.is_admin_reply) && (
-                            <div className="flex gap-2 mt-1">
-                              <button
-                                onClick={() => { setEditingId(reply.id); setEditContent(reply.content); }}
-                                className="text-[#5DADE2] hover:underline text-xs font-semibold"
-                              >Editar</button>
-                              <button
-                                onClick={() => handleDeleteReply(reply.id)}
-                                className="text-[#E74C3C] hover:underline text-xs font-semibold"
-                              >Eliminar</button>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-                {/* Formulario de respuesta */}
-                {replyingTo === fb.id ? (
-                  <div className="ml-8 mt-2">
-                    <textarea
-                      className="w-full px-3 py-2 rounded-lg border border-[#5DADE2]/30 bg-[#F5F6FA] focus:outline-none focus:border-[#2ECC71] text-[#2C3E50] mb-2"
-                      placeholder="Escribe tu respuesta..."
-                      value={replyContent}
-                      onChange={e => setReplyContent(e.target.value)}
-                      rows={2}
-                    />
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleReply(fb.id)}
-                        className="px-4 py-1 bg-[#2ECC71] text-white rounded-lg font-semibold hover:bg-[#27ae60] transition-colors"
-                      >
-                        Responder
-                      </button>
-                      <button
-                        onClick={() => { setReplyingTo(null); setReplyContent(''); }}
-                        className="px-4 py-1 bg-gray-200 text-[#2C3E50] rounded-lg font-semibold hover:bg-gray-300 transition-colors"
-                      >
-                        Cancelar
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => setReplyingTo(fb.id)}
-                    className="ml-8 mt-2 text-[#5DADE2] hover:underline text-sm font-semibold"
-                  >
-                    Responder
-                  </button>
-                )}
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </div>
   );
-} 
+}
