@@ -183,8 +183,6 @@ export default function FeedbackPage() {
     }
   };
 
-  const isAdmin = user?.is_admin;
-
   const handleEditFeedback = async (id: string) => {
     if (!editContent.trim()) return;
     try {
@@ -280,7 +278,7 @@ export default function FeedbackPage() {
     return user && (user.id === feedback.user_id || user.is_admin);
   };
 
-  const canEditReply = (reply: any) => {
+  const canEditReply = (reply: { user_id: string }) => {
     return user && (user.id === reply.user_id || user.is_admin);
   };
 
