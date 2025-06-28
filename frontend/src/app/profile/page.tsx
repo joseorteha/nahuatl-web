@@ -348,7 +348,7 @@ export default function ProfilePage() {
                     <Search size={48} className="text-gray-400 mx-auto mb-4" />
                     <h4 className="text-xl font-semibold text-gray-800 mb-2">No se encontraron resultados</h4>
                     <p className="text-gray-600">
-                      No hay palabras guardadas que coincidan con "{searchTerm}"
+                      No hay palabras guardadas que coincidan con &quot;{searchTerm}&quot;
                     </p>
                   </div>
                 )}
