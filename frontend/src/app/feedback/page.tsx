@@ -61,12 +61,21 @@ export default function FeedbackPage() {
 
   const fetchFeedbacks = useCallback(async () => {
     try {
+      console.log('Fetching feedbacks...');
       const response = await fetch('https://nahuatl-web.onrender.com/api/feedback');
-      if (!response.ok) throw new Error('Error fetching feedbacks');
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', response.status, errorText);
+        throw new Error(`Error fetching feedbacks: ${response.status} ${errorText}`);
+      }
+      
       const data = await response.json();
+      console.log('Feedbacks fetched successfully:', data?.length || 0, 'items');
       setFeedbacks(data || []);
     } catch (error: unknown) {
       console.error('Error fetching feedbacks:', error);
+      // No mostrar alerta aquí para evitar spam, solo log
     }
   }, []);
 

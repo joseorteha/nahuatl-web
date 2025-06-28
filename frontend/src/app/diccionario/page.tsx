@@ -68,25 +68,46 @@ export default function DictionaryPage() {
   useEffect(() => {
     const userData = localStorage.getItem('user');
     if (userData) {
-      const user = JSON.parse(userData);
-      setUserId(user.id);
-      fetchSaved(user.id);
+      try {
+        const user = JSON.parse(userData);
+        console.log('Usuario cargado en diccionario:', user);
+        setUserId(user.id);
+        fetchSaved(user.id);
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        setUserId(null);
+      }
+    } else {
+      console.log('No hay usuario en localStorage');
+      setUserId(null);
     }
   }, []);
 
   const fetchSaved = async (uid: string) => {
     try {
+      console.log('Fetching saved words for user:', uid);
       const res = await fetch(`https://nahuatl-web.onrender.com/api/dictionary/saved/${uid}`);
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      }
       const data = await res.json();
+      console.log('Saved words fetched:', data?.length || 0, 'items');
       setSavedWords(data.map((w: { id: string }) => w.id));
     } catch (error) {
       console.error('Error fetching saved words:', error);
+      setSavedWords([]);
     }
   };
 
   const handleSave = async (dictionary_id: string) => {
-    if (!userId) return alert('Debes iniciar sesión para guardar palabras.');
+    if (!userId) {
+      alert('Debes iniciar sesión para guardar palabras.');
+      return;
+    }
+    
+    console.log('Attempting to save word:', { userId, dictionary_id });
     setSaving(dictionary_id);
+    
     try {
       const response = await fetch('https://nahuatl-web.onrender.com/api/dictionary/save', {
         method: 'POST',
@@ -94,8 +115,12 @@ export default function DictionaryPage() {
         body: JSON.stringify({ user_id: userId, dictionary_id })
       });
       
+      console.log('Save response status:', response.status);
+      
       if (!response.ok) {
         const errorData = await response.json();
+        console.log('Save error response:', errorData);
+        
         if (response.status === 400 && errorData.error === 'La palabra ya está guardada') {
           // Si ya está guardada, la quitamos
           await handleUnsave(dictionary_id);
@@ -104,6 +129,8 @@ export default function DictionaryPage() {
         throw new Error(errorData.error || 'Error al guardar palabra');
       }
       
+      const result = await response.json();
+      console.log('Save successful:', result);
       setSavedWords(prev => [...prev, dictionary_id]);
     } catch (error) {
       console.error('Error al guardar palabra:', error);

@@ -88,7 +88,7 @@ export default function Dashboard() {
               ¡Bienvenido a tu espacio de aprendizaje!
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-amber-800 mb-4">
-              ¡Niltze, <span className="text-emerald-700">{user?.full_name || 'Amigo'}!</span>
+              ¡Bienvenido, <span className="text-emerald-700">{user?.full_name || 'Amigo'}!</span>
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Bienvenido a <span className="font-bold text-emerald-600">Nawatlahtol</span>, tu plataforma para aprender y preservar la lengua náhuatl. 
