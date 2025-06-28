@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "leccionId": 1,
+    "nahuatl": "Pialli",
+    "espanol": "Hola"
+  },
+  {
+    "id": 2,
+    "leccionId": 1,
+    "nahuatl": "Niltze",
+    "espanol": "Hola (con reverencia)"
+  },
+  {
+    "id": 3,
+    "leccionId": 1,
+    "nahuatl": "¿Quen tinemi?",
+    "espanol": "¿Cómo estás?"
+  },
+  {
+    "id": 4,
+    "leccionId": 1,
+    "nahuatl": "Cualli, tlazohcamati",
+    "espanol": "Bien, gracias"
+  },
+  {
+    "id": 5,
+    "leccionId": 1,
+    "nahuatl": "Timoittazque",
+    "espanol": "Nos vemos / Adiós"
+  },
+  {
+    "id": 6,
+    "leccionId": 2,
+    "nahuatl": "Ce",
+    "espanol": "Uno"
+  },
+  {
+    "id": 7,
+    "leccionId": 2,
+    "nahuatl": "Ome",
+    "espanol": "Dos"
+  },
+  {
+    "id": 8,
+    "leccionId": 2,
+    "nahuatl": "Yei",
+    "espanol": "Tres"
+  }
+]
