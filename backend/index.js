@@ -267,6 +267,8 @@ app.post('/api/feedback', async (req, res) => {
 // Endpoint para obtener todos los feedbacks
 app.get('/api/feedback', async (req, res) => {
   try {
+    console.log('Obteniendo feedbacks...');
+    
     const { data, error } = await supabase
       .from('feedback')
       .select(`
@@ -288,6 +290,7 @@ app.get('/api/feedback', async (req, res) => {
       return res.status(500).json({ error: 'Error al obtener feedbacks.', details: error.message });
     }
 
+    console.log(`Feedbacks obtenidos exitosamente: ${data?.length || 0} items`);
     res.json(data || []);
   } catch (e) {
     console.error('Error inesperado en /api/feedback GET:', e);
@@ -440,10 +443,49 @@ app.delete('/api/feedback/reply/:id', async (req, res) => {
 // Guardar palabra en favoritos
 app.post('/api/dictionary/save', async (req, res) => {
   const { user_id, dictionary_id } = req.body;
+  
+  console.log('Datos recibidos en /api/dictionary/save:', { user_id, dictionary_id });
+  
   if (!user_id || !dictionary_id) {
+    console.log('Faltan datos:', { user_id: !!user_id, dictionary_id: !!dictionary_id });
     return res.status(400).json({ error: 'Faltan datos' });
   }
+  
   try {
+    // Verificar que el usuario existe
+    const { data: user, error: userError } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', user_id)
+      .maybeSingle();
+      
+    if (userError) {
+      console.error('Error al verificar usuario:', userError);
+      return res.status(500).json({ error: 'Error al verificar usuario' });
+    }
+    
+    if (!user) {
+      console.log('Usuario no encontrado:', user_id);
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+    
+    // Verificar que la palabra existe
+    const { data: word, error: wordError } = await supabase
+      .from('dictionary')
+      .select('id')
+      .eq('id', dictionary_id)
+      .maybeSingle();
+      
+    if (wordError) {
+      console.error('Error al verificar palabra:', wordError);
+      return res.status(500).json({ error: 'Error al verificar palabra' });
+    }
+    
+    if (!word) {
+      console.log('Palabra no encontrada:', dictionary_id);
+      return res.status(404).json({ error: 'Palabra no encontrada' });
+    }
+    
     // Verificar si ya existe
     const { data: existing, error: checkError } = await supabase
       .from('saved_words')
@@ -458,6 +500,7 @@ app.post('/api/dictionary/save', async (req, res) => {
     }
 
     if (existing) {
+      console.log('Palabra ya guardada:', { user_id, dictionary_id });
       return res.status(400).json({ error: 'La palabra ya está guardada' });
     }
 
@@ -471,6 +514,7 @@ app.post('/api/dictionary/save', async (req, res) => {
       return res.status(500).json({ error: 'Error al guardar palabra' });
     }
 
+    console.log('Palabra guardada exitosamente:', data);
     res.json({ success: true, data });
   } catch (err) {
     console.error('Error inesperado al guardar palabra:', err);
