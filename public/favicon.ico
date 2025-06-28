@@ -1,5 +1,0 @@
-<!-- Este es un favicon básico en formato SVG que se puede convertir a ICO -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" fill="#10b981"/>
-  <text x="16" y="22" text-anchor="middle" fill="white" font-family="Arial" font-size="20" font-weight="bold">N</text>
-</svg> 
