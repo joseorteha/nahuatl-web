@@ -444,14 +444,37 @@ app.post('/api/dictionary/save', async (req, res) => {
     return res.status(400).json({ error: 'Faltan datos' });
   }
   try {
-    await supabase
+    // Verificar si ya existe
+    const { data: existing, error: checkError } = await supabase
+      .from('saved_words')
+      .select('id')
+      .eq('user_id', user_id)
+      .eq('dictionary_id', dictionary_id)
+      .maybeSingle();
+
+    if (checkError) {
+      console.error('Error al verificar palabra guardada:', checkError);
+      return res.status(500).json({ error: 'Error al verificar palabra guardada' });
+    }
+
+    if (existing) {
+      return res.status(400).json({ error: 'La palabra ya está guardada' });
+    }
+
+    const { data, error } = await supabase
       .from('saved_words')
       .insert({ user_id, dictionary_id })
       .select();
-    res.json({ success: true });
+
+    if (error) {
+      console.error('Error al guardar palabra:', error);
+      return res.status(500).json({ error: 'Error al guardar palabra' });
+    }
+
+    res.json({ success: true, data });
   } catch (err) {
-    console.error('Error al guardar palabra:', err);
-    res.status(500).json({ error: 'Error al guardar palabra' });
+    console.error('Error inesperado al guardar palabra:', err);
+    res.status(500).json({ error: 'Error inesperado al guardar palabra' });
   }
 });
 

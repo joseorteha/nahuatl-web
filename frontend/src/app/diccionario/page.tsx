@@ -88,28 +88,53 @@ export default function DictionaryPage() {
     if (!userId) return alert('Debes iniciar sesión para guardar palabras.');
     setSaving(dictionary_id);
     try {
-      await fetch('https://nahuatl-web.onrender.com/api/dictionary/save', {
+      const response = await fetch('https://nahuatl-web.onrender.com/api/dictionary/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: userId, dictionary_id })
       });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        if (response.status === 400 && errorData.error === 'La palabra ya está guardada') {
+          // Si ya está guardada, la quitamos
+          await handleUnsave(dictionary_id);
+          return;
+        }
+        throw new Error(errorData.error || 'Error al guardar palabra');
+      }
+      
       setSavedWords(prev => [...prev, dictionary_id]);
-    } catch {}
-    setSaving(null);
+    } catch (error) {
+      console.error('Error al guardar palabra:', error);
+      alert(error instanceof Error ? error.message : 'Error al guardar palabra');
+    } finally {
+      setSaving(null);
+    }
   };
 
   const handleUnsave = async (dictionary_id: string) => {
     if (!userId) return alert('Debes iniciar sesión para quitar palabras guardadas.');
     setSaving(dictionary_id);
     try {
-      await fetch('https://nahuatl-web.onrender.com/api/dictionary/save', {
+      const response = await fetch('https://nahuatl-web.onrender.com/api/dictionary/save', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: userId, dictionary_id })
       });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al quitar palabra guardada');
+      }
+      
       setSavedWords(prev => prev.filter(id => id !== dictionary_id));
-    } catch {}
-    setSaving(null);
+    } catch (error) {
+      console.error('Error al quitar palabra guardada:', error);
+      alert(error instanceof Error ? error.message : 'Error al quitar palabra guardada');
+    } finally {
+      setSaving(null);
+    }
   };
 
   const renderInitialState = () => (

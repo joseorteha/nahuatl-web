@@ -191,12 +191,17 @@ export default function FeedbackPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           user_id: user!.id,
-          title: editContent,
           content: editContent,
+          title: editContent.split('\n')[0] || editContent,
         }),
       });
       if (!response.ok) {
         const result = await response.json();
+        if (response.status === 404) {
+          alert('El feedback no fue encontrado. Puede que haya sido eliminado.');
+          fetchFeedbacks(); // Recargar la lista
+          return;
+        }
         throw new Error(result.error || 'Error al editar.');
       }
       setEditContent('');
@@ -204,6 +209,7 @@ export default function FeedbackPage() {
       fetchFeedbacks();
     } catch (error: unknown) {
       console.error('Error editing feedback:', error);
+      alert(error instanceof Error ? error.message : 'Error al editar feedback');
     }
   };
 
@@ -219,11 +225,17 @@ export default function FeedbackPage() {
       });
       if (!response.ok) {
         const result = await response.json();
+        if (response.status === 404) {
+          alert('El feedback no fue encontrado. Puede que ya haya sido eliminado.');
+          fetchFeedbacks(); // Recargar la lista
+          return;
+        }
         throw new Error(result.error || 'Error al eliminar.');
       }
       fetchFeedbacks();
     } catch (error: unknown) {
       console.error('Error deleting feedback:', error);
+      alert(error instanceof Error ? error.message : 'Error al eliminar feedback');
     }
   };
 
@@ -240,6 +252,11 @@ export default function FeedbackPage() {
       });
       if (!response.ok) {
         const result = await response.json();
+        if (response.status === 404) {
+          alert('La respuesta no fue encontrada. Puede que haya sido eliminada.');
+          fetchFeedbacks(); // Recargar la lista
+          return;
+        }
         throw new Error(result.error || 'Error al editar respuesta.');
       }
       setEditContent('');
@@ -247,6 +264,7 @@ export default function FeedbackPage() {
       fetchFeedbacks();
     } catch (error: unknown) {
       console.error('Error editing reply:', error);
+      alert(error instanceof Error ? error.message : 'Error al editar respuesta');
     }
   };
 
@@ -262,11 +280,17 @@ export default function FeedbackPage() {
       });
       if (!response.ok) {
         const result = await response.json();
+        if (response.status === 404) {
+          alert('La respuesta no fue encontrada. Puede que ya haya sido eliminada.');
+          fetchFeedbacks(); // Recargar la lista
+          return;
+        }
         throw new Error(result.error || 'Error al eliminar respuesta.');
       }
       fetchFeedbacks();
     } catch (error: unknown) {
       console.error('Error deleting reply:', error);
+      alert(error instanceof Error ? error.message : 'Error al eliminar respuesta');
     }
   };
 
