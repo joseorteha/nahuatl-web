@@ -1,0 +1,13 @@
+{
+  "name": "nahuatl-app",
+  "version": "1.0.0",
+  "description": "Aplicación para aprender Náhuatl",
+  "scripts": {
+    "dev": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "start": "cd frontend && npm start",
+    "lint": "cd frontend && npm run lint"
+  },
+  "author": "",
+  "license": "ISC"
+}
