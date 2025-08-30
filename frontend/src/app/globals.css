@@ -2,6 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --color-primary: #f97316;
+  --color-primary-hover: #ea580c;
+  --color-primary-light: #fff7ed;
+  --color-primary-dark: #9a3412;
+  --color-secondary: #6d28d9;
+  --color-secondary-hover: #5b21b6;
+  --color-secondary-light: #f5f3ff;
+  --color-text: #1e293b;
+  --color-text-secondary: #64748b;
+  --color-background: #fafafa;
+  --color-surface: #ffffff;
+  --color-border: #e2e8f0;
+  --color-border-hover: #cbd5e1;
+  --color-success: #10b981;
+  --color-error: #ef4444;
+  --color-warning: #f59e0b;
+  --color-info: #3b82f6;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -13,28 +33,95 @@
       sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    @apply bg-slate-50 text-slate-800;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-medium tracking-tight text-slate-900;
+  }
+
+  p {
+    @apply leading-relaxed text-slate-700;
   }
 }
 
 @layer components {
-  .gradient-text {
-    @apply bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent;
+  /* Tipografía */
+  .title-xl {
+    @apply text-4xl md:text-5xl font-medium tracking-tight text-slate-900;
   }
   
-  .glass-effect {
-    @apply bg-white/95 backdrop-blur-md border border-gray-200/50;
+  .title-lg {
+    @apply text-3xl md:text-4xl font-medium tracking-tight text-slate-900;
   }
   
-  .hover-lift {
-    @apply transition-all duration-300 transform hover:-translate-y-2 hover:shadow-xl;
+  .title-md {
+    @apply text-2xl md:text-3xl font-medium tracking-tight text-slate-900;
   }
   
+  .title-sm {
+    @apply text-xl md:text-2xl font-medium tracking-tight text-slate-900;
+  }
+  
+  .subtitle {
+    @apply text-lg text-slate-600;
+  }
+
+  /* Contenedores */
+  .container-narrow {
+    @apply max-w-3xl mx-auto px-4 sm:px-6;
+  }
+  
+  .container-wide {
+    @apply max-w-7xl mx-auto px-4 sm:px-6;
+  }
+  
+  .container-full {
+    @apply w-full px-4 sm:px-6;
+  }
+  
+  /* Efectos y componentes */
+  .card {
+    @apply bg-white p-6 rounded-lg border border-slate-200 transition-all shadow-sm;
+  }
+  
+  .card-hover {
+    @apply hover:border-slate-300 hover:shadow-md transition-all duration-200;
+  }
+  
+  /* Botones */
   .button-primary {
-    @apply px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl;
+    @apply px-5 py-2.5 bg-orange-500 text-white rounded-md font-medium hover:bg-orange-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 shadow-sm;
   }
   
   .button-secondary {
-    @apply px-6 py-3 bg-white border-2 border-blue-600 text-blue-600 rounded-xl font-semibold hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-lg;
+    @apply px-5 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-md font-medium hover:bg-slate-50 hover:border-slate-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 shadow-sm;
+  }
+  
+  .button-accent {
+    @apply px-5 py-2.5 bg-violet-600 text-white rounded-md font-medium hover:bg-violet-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 shadow-sm;
+  }
+  
+  .button-text {
+    @apply px-2 py-1 text-orange-600 hover:text-orange-800 font-medium transition-colors duration-200 rounded focus:outline-none focus:ring-2 focus:ring-orange-400;
+  }
+
+  /* Links */
+  .link-primary {
+    @apply text-orange-600 hover:text-orange-700 transition-colors duration-200 border-b border-transparent hover:border-orange-600;
+  }
+  
+  .link-secondary {
+    @apply text-violet-600 hover:text-violet-700 transition-colors duration-200 border-b border-transparent hover:border-violet-600;
+  }
+  
+  /* Inputs y Forms */
+  .input-modern {
+    @apply w-full px-3 py-2.5 bg-white border border-slate-300 rounded-md text-slate-700 shadow-sm focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200;
+  }
+  
+  .label-modern {
+    @apply block text-sm font-medium text-slate-700 mb-1;
   }
 }
 
@@ -43,34 +130,67 @@
     text-wrap: balance;
   }
   
-  .animate-fade-in {
-    animation: fadeIn 0.6s ease-out;
+  /* Animaciones */
+  .fade-in {
+    animation: fadeIn 0.4s ease-out;
   }
   
-  .animate-slide-up {
-    animation: slideUp 0.6s ease-out;
+  .slide-up {
+    animation: slideUp 0.4s ease-out;
   }
   
-  .animate-scale-in {
-    animation: scaleIn 0.4s ease-out;
+  .scale-in {
+    animation: scaleIn 0.3s ease-out;
+  }
+  
+  /* Espaciado */
+  .section-spacing {
+    @apply py-12 md:py-16;
+  }
+  
+  .section-spacing-sm {
+    @apply py-8 md:py-10;
+  }
+  
+  /* Tags y badges */
+  .tag {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-slate-100 text-slate-800;
+  }
+  
+  .tag-orange {
+    @apply bg-orange-50 text-orange-800;
+  }
+  
+  .tag-violet {
+    @apply bg-violet-50 text-violet-800;
+  }
+  
+  .tag-teal {
+    @apply bg-teal-50 text-teal-800;
+  }
+  
+  /* Glassmorphism */
+  .glass {
+    @apply bg-white/80 backdrop-blur-sm border border-white/20;
+  }
+  
+  .glass-dark {
+    @apply bg-slate-900/80 backdrop-blur-sm border border-slate-700/20;
   }
 }
 
+/* Animaciones modernas */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes slideUp {
-  from {
+  from { 
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(12px);
   }
-  to {
+  to { 
     opacity: 1;
     transform: translateY(0);
   }
@@ -79,7 +199,7 @@
 @keyframes scaleIn {
   from {
     opacity: 0;
-    transform: scale(0.9);
+    transform: scale(0.97);
   }
   to {
     opacity: 1;
@@ -87,33 +207,141 @@
   }
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar estilizado */
 ::-webkit-scrollbar {
   width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #f8fafc;
 }
 
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
-  border-radius: 4px;
+  border-radius: 8px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
 
-/* Focus styles */
-*:focus {
-  outline: 2px solid #3b82f6;
+/* Focus styles mejorados */
+*:focus-visible {
+  outline: 2px solid #f97316;
   outline-offset: 2px;
 }
 
 /* Selection styles */
 ::selection {
-  background-color: #3b82f6;
+  background-color: #f97316;
+  color: white;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  /* Animaciones */
+  .fade-in {
+    animation: fadeIn 0.4s ease-out;
+  }
+  
+  .slide-up {
+    animation: slideUp 0.4s ease-out;
+  }
+  
+  .scale-in {
+    animation: scaleIn 0.3s ease-out;
+  }
+  
+  /* Espaciado */
+  .section-spacing {
+    @apply py-12 md:py-16;
+  }
+  
+  .section-spacing-sm {
+    @apply py-8 md:py-10;
+  }
+  
+  /* Inputs */
+  .input-minimal {
+    @apply w-full px-3 py-2 bg-white border border-neutral-300 rounded-md focus:outline-none focus:ring-1 focus:ring-amber-500 focus:border-amber-500 transition-colors duration-200;
+  }
+  
+  /* Tags y badges */
+  .tag {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-neutral-100 text-neutral-800;
+  }
+  
+  .tag-amber {
+    @apply bg-amber-50 text-amber-800;
+  }
+  
+  .tag-green {
+    @apply bg-green-50 text-green-800;
+  }
+  
+  .tag-blue {
+    @apply bg-blue-50 text-blue-800;
+  }
+}
+
+/* Animaciones sutiles */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Custom scrollbar minimalista */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f5f5f5;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d4d4d4;
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a3a3a3;
+}
+
+/* Focus styles mejorados */
+*:focus-visible {
+  outline: 2px solid #f59e0b;
+  outline-offset: 2px;
+}
+
+/* Selection styles */
+::selection {
+  background-color: #f59e0b;
   color: white;
 }
 

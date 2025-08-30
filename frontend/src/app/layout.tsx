@@ -3,7 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import Footer from '@/components/Footer';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
   title: 'Nawatlajtol - Aprende Náhuatl',
@@ -16,8 +16,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" suppressHydrationWarning>
-      <body className={`${inter.className} bg-white text-gray-900 min-h-screen font-sans`}>
+    <html lang="es" suppressHydrationWarning className={inter.variable}>
+      <body className="bg-neutral-50 text-neutral-800 min-h-screen font-sans">
         <div className="flex-1 flex flex-col">
           {children}
         </div>

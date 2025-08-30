@@ -12,11 +12,11 @@ interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
 const InputField: FC<InputFieldProps> = ({ icon: Icon, ...props }) => (
   <div className="relative">
     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-      <Icon className="text-gray-400" size={20} />
+      <Icon className="text-neutral-400" size={18} />
     </div>
     <input
       {...props}
-      className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+      className="w-full pl-10 pr-3 py-2 border border-neutral-300 rounded-md text-neutral-800 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors duration-200 text-sm"
     />
   </div>
 );
@@ -79,19 +79,19 @@ export default function AuthForm() {
   return (
     <div className="w-full">
       {error && (
-        <div className="mb-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg flex items-center">
-          <AlertCircle className="mr-3" size={20}/>
+        <div className="mb-4 bg-red-50 border-l-4 border-red-500 text-red-700 p-3 rounded-md flex items-center text-sm">
+          <AlertCircle className="mr-2" size={16}/>
           <span>{error}</span>
         </div>
       )}
       {success && (
-        <div className="mb-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-lg flex items-center">
-          <CheckCircle className="mr-3" size={20}/>
+        <div className="mb-4 bg-green-50 border-l-4 border-green-500 text-green-700 p-3 rounded-md flex items-center text-sm">
+          <CheckCircle className="mr-2" size={16}/>
           <span>{success}</span>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-4">
         {isSignUp && (
           <>
             <InputField
@@ -140,10 +140,10 @@ export default function AuthForm() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-400 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 disabled:cursor-not-allowed shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+          className="w-full bg-amber-600 hover:bg-amber-700 disabled:bg-neutral-400 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
         >
           {isLoading ? (
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mx-auto"></div>
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mx-auto"></div>
           ) : (
             isSignUp ? 'Crear Cuenta' : 'Iniciar Sesión'
           )}
@@ -157,7 +157,7 @@ export default function AuthForm() {
               setError(null);
               setSuccess(null);
             }}
-            className="text-emerald-600 hover:text-emerald-700 text-sm font-medium transition-colors"
+            className="text-amber-600 hover:text-amber-700 text-sm transition-colors duration-200"
           >
             {isSignUp ? '¿Ya tienes una cuenta? Inicia sesión' : '¿No tienes cuenta? Regístrate'}
           </button>
