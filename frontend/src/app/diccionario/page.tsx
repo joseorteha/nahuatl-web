@@ -8,14 +8,14 @@ import Header from '@/components/Header';
 interface DictionaryEntry {
   word: string;
   variants: string[];
-  grammar_info: string;
+  info_gramatical: string;
   definition: string;
-  scientific_name?: string;
+  nombre_cientifico?: string;
   examples?: { nahuatl: string; espanol: string }[];
   synonyms?: string[];
   roots?: string[];
-  see_also?: string[];
-  alt_spellings?: string[];
+  ver_tambien?: string[];
+  ortografias_alternativas?: string[];
   notes?: string[];
   id: string;
 }
@@ -41,8 +41,8 @@ export default function DictionaryPage() {
     setError(null);
     setHasSearched(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web.onrender.com';
-      const response = await fetch(`${apiUrl}/api/dictionary/search?q=${encodeURIComponent(query)}`);
+  const apiUrl = 'http://localhost:3001';
+      const response = await fetch(`${apiUrl}/api/dictionary/search?query=${encodeURIComponent(query)}`);
       if (!response.ok) throw new Error('La respuesta de la red no fue correcta');
       const data = await response.json();
       setResults(data);
@@ -86,7 +86,7 @@ export default function DictionaryPage() {
   const fetchSaved = async (uid: string) => {
     try {
       console.log('Fetching saved words for user:', uid);
-      const res = await fetch(`https://nahuatl-web.onrender.com/api/dictionary/saved/${uid}`);
+  const res = await fetch(`http://localhost:3001/api/dictionary/saved/${uid}`);
       if (!res.ok) {
         throw new Error(`HTTP ${res.status}: ${res.statusText}`);
       }
@@ -99,20 +99,20 @@ export default function DictionaryPage() {
     }
   };
 
-  const handleSave = async (dictionary_id: string) => {
+  const handleSave = async (diccionario_id: string) => {
     if (!userId) {
       alert('Debes iniciar sesión para guardar palabras.');
       return;
     }
     
-    console.log('Attempting to save word:', { userId, dictionary_id });
-    setSaving(dictionary_id);
+    console.log('Attempting to save word:', { userId, diccionario_id });
+    setSaving(diccionario_id);
     
     try {
-      const response = await fetch('https://nahuatl-web.onrender.com/api/dictionary/save', {
+  const response = await fetch(`http://localhost:3001/api/dictionary/save`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId, dictionary_id })
+        body: JSON.stringify({ usuario_id: userId, diccionario_id: diccionario_id })
       });
       
       console.log('Save response status:', response.status);
@@ -123,7 +123,7 @@ export default function DictionaryPage() {
         
         if (response.status === 400 && errorData.error === 'La palabra ya está guardada') {
           // Si ya está guardada, la quitamos
-          await handleUnsave(dictionary_id);
+          await handleUnsave(diccionario_id);
           return;
         }
         throw new Error(errorData.error || 'Error al guardar palabra');
@@ -131,7 +131,7 @@ export default function DictionaryPage() {
       
       const result = await response.json();
       console.log('Save successful:', result);
-      setSavedWords(prev => [...prev, dictionary_id]);
+      setSavedWords(prev => [...prev, diccionario_id]);
     } catch (error) {
       console.error('Error al guardar palabra:', error);
       alert(error instanceof Error ? error.message : 'Error al guardar palabra');
@@ -140,14 +140,14 @@ export default function DictionaryPage() {
     }
   };
 
-  const handleUnsave = async (dictionary_id: string) => {
+  const handleUnsave = async (diccionario_id: string) => {
     if (!userId) return alert('Debes iniciar sesión para quitar palabras guardadas.');
-    setSaving(dictionary_id);
+    setSaving(diccionario_id);
     try {
-      const response = await fetch('https://nahuatl-web.onrender.com/api/dictionary/save', {
+  const response = await fetch(`http://localhost:3001/api/dictionary/save`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId, dictionary_id })
+        body: JSON.stringify({ usuario_id: userId, diccionario_id: diccionario_id })
       });
       
       if (!response.ok) {
@@ -155,7 +155,7 @@ export default function DictionaryPage() {
         throw new Error(errorData.error || 'Error al quitar palabra guardada');
       }
       
-      setSavedWords(prev => prev.filter(id => id !== dictionary_id));
+      setSavedWords(prev => prev.filter(id => id !== diccionario_id));
     } catch (error) {
       console.error('Error al quitar palabra guardada:', error);
       alert(error instanceof Error ? error.message : 'Error al quitar palabra guardada');
@@ -285,7 +285,7 @@ export default function DictionaryPage() {
                           )}
                         </div>
                         <div className="sm:ml-auto flex items-center gap-2">
-                          <span className="text-sm text-gray-500 italic">{entry.grammar_info}</span>
+                          <span className="text-sm text-gray-500 italic">{entry.info_gramatical}</span>
                           <button 
                             onClick={() => playAudio(entry.word)}
                             className="p-2 text-amber-500 hover:text-amber-600 rounded-full hover:bg-amber-50"
@@ -324,9 +324,9 @@ export default function DictionaryPage() {
 
                       <div className="mb-4">
                         <p className="text-lg text-gray-800">{entry.definition}</p>
-                        {entry.scientific_name && (
+                        {entry.nombre_cientifico && (
                           <p className="text-sm text-gray-500 mt-1">
-                            <span className="font-semibold">Nombre científico:</span> {entry.scientific_name}
+                            <span className="font-semibold">Nombre científico:</span> {entry.nombre_cientifico}
                           </p>
                         )}
                       </div>
@@ -343,14 +343,14 @@ export default function DictionaryPage() {
                             <span className="font-semibold text-emerald-700">Raíces:</span> {(entry.roots ?? []).join(', ')}
                           </div>
                         )}
-                        {(entry.see_also?.length ?? 0) > 0 && (
+                        {(entry.ver_tambien?.length ?? 0) > 0 && (
                           <div className="bg-blue-50 p-3 rounded-lg">
-                            <span className="font-semibold text-blue-700">Ver también:</span> {(entry.see_also ?? []).join(', ')}
+                            <span className="font-semibold text-blue-700">Ver también:</span> {(entry.ver_tambien ?? []).join(', ')}
                           </div>
                         )}
-                        {(entry.alt_spellings?.length ?? 0) > 0 && (
+                        {(entry.ortografias_alternativas?.length ?? 0) > 0 && (
                           <div className="bg-purple-50 p-3 rounded-lg">
-                            <span className="font-semibold text-purple-700">Otras formas:</span> {(entry.alt_spellings ?? []).join(', ')}
+                            <span className="font-semibold text-purple-700">Otras formas:</span> {(entry.ortografias_alternativas ?? []).join(', ')}
                           </div>
                         )}
                       </div>

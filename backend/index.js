@@ -8,9 +8,17 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-const SUPABASE_URL = process.env.SUPABASE_URL || 'https://aiqitkcpdwdbdbeavyys.supabase.co';
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || 'TU_SERVICE_ROLE_KEY_AQUI';
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
 
+// Verificar que las variables de entorno están configuradas
+if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY || SUPABASE_SERVICE_KEY === 'TU_SERVICE_ROLE_KEY_AQUI') {
+  console.error('❌ ERROR: Variables de entorno de Supabase no configuradas correctamente');
+  console.error('Por favor, configura SUPABASE_URL y SUPABASE_SERVICE_KEY en el archivo .env');
+  process.exit(1);
+}
+
+console.log('✅ Conectando a Supabase:', SUPABASE_URL);
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
 // Middleware
@@ -112,59 +120,49 @@ app.get('/api/practice/quiz', (req, res) => {
 
 
 // Endpoint para buscar en el diccionario
-app.get('/api/dictionary/search', (req, res) => {
-  const query = req.query.q?.toLowerCase() || '';
+app.get('/api/dictionary/search', async (req, res) => {
+  const query = req.query.query?.toLowerCase() || '';
 
-  fs.readFile(dictionaryPath, 'utf8', (err, data) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).send('Error al leer los datos del diccionario.');
-    }
-    
-    const dictionary = JSON.parse(data);
+  try {
+    let data, error;
     
     if (!query) {
-      // Devuelve una pequeña parte si no hay consulta, para no enviar todo el archivo
-      return res.json(dictionary.slice(0, 20)); 
+      // Devuelve primeras 20 entradas si no hay consulta específica
+      ({ data, error } = await supabase
+        .from('diccionario')
+        .select('*')
+        .limit(20));
+    } else {
+      // Buscar por palabra o definición
+      ({ data, error } = await supabase
+        .from('diccionario')
+        .select('*')
+        .or(`word.ilike.%${query}%,definition.ilike.%${query}%`)
+        .limit(50));
     }
-
-        const lowerQuery = query.toLowerCase();
-
-    const scoredResults = dictionary
-      .map(entry => {
-        let score = 0;
-        const word = entry.word.toLowerCase();
-        
-        // Prioritize exact matches and then starting matches
-        if (word === lowerQuery) score = 100;
-        else if (word.startsWith(lowerQuery)) score = Math.max(score, 90);
-
-        // Score matches in other fields
-        if (entry.variants && entry.variants.some(v => v.toLowerCase().includes(lowerQuery))) score = Math.max(score, 80);
-        if (entry.synonyms && entry.synonyms.some(s => s.toLowerCase().includes(lowerQuery))) score = Math.max(score, 70);
-        if (entry.roots && entry.roots.some(r => r.toLowerCase().includes(lowerQuery))) score = Math.max(score, 60);
-        if (word.includes(lowerQuery)) score = Math.max(score, 50); // General inclusion has lower priority
-        if (entry.definition && entry.definition.toLowerCase().includes(lowerQuery)) score = Math.max(score, 10);
-
-        return { ...entry, score };
-      })
-      .filter(entry => entry.score > 0)
-      .sort((a, b) => b.score - a.score);
-
-    res.json(scoredResults);
-  });
+    
+    if (error) {
+      console.error('Error al buscar en diccionario:', error);
+      return res.status(500).json({ error: 'Error al buscar en el diccionario.' });
+    }
+    
+    return res.json(data || []);
+  } catch (err) {
+    console.error('Error inesperado en búsqueda de diccionario:', err);
+    return res.status(500).json({ error: 'Error interno del servidor.' });
+  }
 });
 
 // Endpoint de registro
 app.post('/api/register', async (req, res) => {
-  const { email, username, password, full_name } = req.body;
+  const { email, username, password, nombre_completo } = req.body;
   if (!email || !username || !password) {
     return res.status(400).json({ error: 'Faltan campos requeridos.' });
   }
   // Verificar si ya existe el usuario
   try {
     const { data: existing, error: findError } = await supabase
-      .from('profiles')
+      .from('perfiles')
       .select('id')
       .or(`email.eq.${email},username.eq.${username}`)
       .maybeSingle();
@@ -176,8 +174,8 @@ app.post('/api/register', async (req, res) => {
 
     // Crear usuario
     const { data, error } = await supabase
-      .from('profiles')
-      .insert([{ email, username, password, full_name }])
+      .from('perfiles')
+      .insert([{ email, username, password, nombre_completo }])
       .select()
       .maybeSingle();
     if (error) {
@@ -203,7 +201,7 @@ app.post('/api/login', async (req, res) => {
   try {
     // Buscar usuario por email o username
     const { data: user, error } = await supabase
-      .from('profiles')
+      .from('perfiles')
       .select('*')
       .or(`email.eq.${emailOrUsername},username.eq.${emailOrUsername}`)
       .maybeSingle();
@@ -240,16 +238,16 @@ app.post('/api/login', async (req, res) => {
 
 // Endpoint para crear feedback
 app.post('/api/feedback', async (req, res) => {
-  const { user_id, title, content, category, priority } = req.body;
+  const { usuario_id, titulo, contenido, categoria, prioridad } = req.body;
 
-  if (!user_id || !title || !content) {
+  if (!usuario_id || !titulo || !contenido) {
     return res.status(400).json({ error: 'Faltan campos requeridos.' });
   }
 
   try {
     const { data, error } = await supabase
-      .from('feedback')
-      .insert({ user_id, title, content, category, priority })
+      .from('retroalimentacion')
+      .insert({ usuario_id, titulo, contenido, categoria, prioridad })
       .select();
 
     if (error) {
@@ -270,20 +268,20 @@ app.get('/api/feedback', async (req, res) => {
     console.log('Obteniendo feedbacks...');
     
     const { data, error } = await supabase
-      .from('feedback')
+      .from('retroalimentacion')
       .select(`
         *,
-        profiles (full_name, username),
-        feedback_replies (
+        perfiles (nombre_completo, username),
+        retroalimentacion_respuestas (
           id,
-          content,
-          created_at,
-          is_admin_reply,
-          profiles (full_name)
+          contenido,
+          fecha_creacion,
+          es_respuesta_admin,
+          perfiles (nombre_completo)
         ),
-        feedback_likes (user_id)
+        retroalimentacion_likes (usuario_id)
       `)
-      .order('created_at', { ascending: false });
+      .order('fecha_creacion', { ascending: false });
 
     if (error) {
       console.error('Supabase error al obtener feedbacks:', error);
@@ -300,19 +298,19 @@ app.get('/api/feedback', async (req, res) => {
 
 // Endpoint para dar/quitar like a una sugerencia
 app.post('/api/feedback/like', async (req, res) => {
-  const { user_id, feedback_id } = req.body;
+  const { usuario_id, retroalimentacion_id } = req.body;
 
-  if (!user_id || !feedback_id) {
-    return res.status(400).json({ error: 'Faltan user_id o feedback_id.' });
+  if (!usuario_id || !retroalimentacion_id) {
+    return res.status(400).json({ error: 'Faltan usuario_id o retroalimentacion_id.' });
   }
 
   try {
     // Verificar si ya existe el like
     const { data: existingLike, error: findError } = await supabase
-      .from('feedback_likes')
+      .from('retroalimentacion_likes')
       .select('id')
-      .eq('user_id', user_id)
-      .eq('feedback_id', feedback_id)
+      .eq('usuario_id', usuario_id)
+      .eq('retroalimentacion_id', retroalimentacion_id)
       .maybeSingle();
 
     if (findError) {
@@ -323,7 +321,7 @@ app.post('/api/feedback/like', async (req, res) => {
     if (existingLike) {
       // Si existe, lo borramos (unlike)
       const { error: deleteError } = await supabase
-        .from('feedback_likes')
+        .from('retroalimentacion_likes')
         .delete()
         .eq('id', existingLike.id);
       
@@ -335,8 +333,8 @@ app.post('/api/feedback/like', async (req, res) => {
     } else {
       // Si no existe, lo creamos (like)
       const { data, error: insertError } = await supabase
-        .from('feedback_likes')
-        .insert({ user_id, feedback_id })
+        .from('retroalimentacion_likes')
+        .insert({ usuario_id, retroalimentacion_id })
         .select();
 
       if (insertError) {
@@ -353,14 +351,14 @@ app.post('/api/feedback/like', async (req, res) => {
 
 // Crear respuesta a feedback
 app.post('/api/feedback/reply', async (req, res) => {
-  const { user_id, feedback_id, content } = req.body;
-  if (!user_id || !feedback_id || !content) {
+  const { usuario_id, retroalimentacion_id, contenido } = req.body;
+  if (!usuario_id || !retroalimentacion_id || !contenido) {
     return res.status(400).json({ error: 'Faltan campos requeridos.' });
   }
   try {
     const { data, error } = await supabase
-      .from('feedback_replies')
-      .insert({ user_id, feedback_id, content })
+      .from('retroalimentacion_respuestas')
+      .insert({ usuario_id, retroalimentacion_id, contenido })
       .select();
     if (error) {
       console.error('Supabase error al crear reply:', error);
@@ -376,18 +374,18 @@ app.post('/api/feedback/reply', async (req, res) => {
 // Editar feedback principal
 app.put('/api/feedback/:id', async (req, res) => {
   const { id } = req.params;
-  const { user_id, content, title } = req.body;
-  if (!user_id || (!content && !title)) {
+  const { usuario_id, contenido, titulo } = req.body;
+  if (!usuario_id || (!contenido && !titulo)) {
     return res.status(400).json({ error: 'Faltan campos requeridos.' });
   }
   // Verificar si es autor o admin
-  const { data: profile } = await supabase.from('profiles').select('id, is_admin').eq('id', user_id).maybeSingle();
-  const { data: feedback } = await supabase.from('feedback').select('user_id').eq('id', id).maybeSingle();
+  const { data: profile } = await supabase.from('perfiles').select('id, is_admin').eq('id', usuario_id).maybeSingle();
+  const { data: feedback } = await supabase.from('retroalimentacion').select('usuario_id').eq('id', id).maybeSingle();
   if (!profile || !feedback) return res.status(404).json({ error: 'No encontrado.' });
-  if (profile.id !== feedback.user_id && !profile.is_admin) return res.status(403).json({ error: 'No autorizado.' });
+  if (profile.id !== feedback.usuario_id && !profile.is_admin) return res.status(403).json({ error: 'No autorizado.' });
   const { data, error } = await supabase
-    .from('feedback')
-    .update({ content, title })
+    .from('retroalimentacion')
+    .update({ contenido, titulo })
     .eq('id', id)
     .select();
   if (error) return res.status(500).json({ error: error.message });
@@ -397,13 +395,13 @@ app.put('/api/feedback/:id', async (req, res) => {
 // Eliminar feedback principal
 app.delete('/api/feedback/:id', async (req, res) => {
   const { id } = req.params;
-  const { user_id } = req.body;
-  if (!user_id) return res.status(400).json({ error: 'Falta user_id.' });
-  const { data: profile } = await supabase.from('profiles').select('id, is_admin').eq('id', user_id).maybeSingle();
-  const { data: feedback } = await supabase.from('feedback').select('user_id').eq('id', id).maybeSingle();
+  const { usuario_id } = req.body;
+  if (!usuario_id) return res.status(400).json({ error: 'Falta usuario_id.' });
+  const { data: profile } = await supabase.from('perfiles').select('id, is_admin').eq('id', usuario_id).maybeSingle();
+  const { data: feedback } = await supabase.from('retroalimentacion').select('usuario_id').eq('id', id).maybeSingle();
   if (!profile || !feedback) return res.status(404).json({ error: 'No encontrado.' });
-  if (profile.id !== feedback.user_id && !profile.is_admin) return res.status(403).json({ error: 'No autorizado.' });
-  const { error } = await supabase.from('feedback').delete().eq('id', id);
+  if (profile.id !== feedback.usuario_id && !profile.is_admin) return res.status(403).json({ error: 'No autorizado.' });
+  const { error } = await supabase.from('retroalimentacion').delete().eq('id', id);
   if (error) return res.status(500).json({ error: error.message });
   res.json({ message: 'Eliminado' });
 });
@@ -411,15 +409,15 @@ app.delete('/api/feedback/:id', async (req, res) => {
 // Editar reply
 app.put('/api/feedback/reply/:id', async (req, res) => {
   const { id } = req.params;
-  const { user_id, content } = req.body;
-  if (!user_id || !content) return res.status(400).json({ error: 'Faltan campos requeridos.' });
-  const { data: profile } = await supabase.from('profiles').select('id, is_admin').eq('id', user_id).maybeSingle();
-  const { data: reply } = await supabase.from('feedback_replies').select('user_id').eq('id', id).maybeSingle();
+  const { usuario_id, contenido } = req.body;
+  if (!usuario_id || !contenido) return res.status(400).json({ error: 'Faltan campos requeridos.' });
+  const { data: profile } = await supabase.from('perfiles').select('id, is_admin').eq('id', usuario_id).maybeSingle();
+  const { data: reply } = await supabase.from('retroalimentacion_respuestas').select('usuario_id').eq('id', id).maybeSingle();
   if (!profile || !reply) return res.status(404).json({ error: 'No encontrado.' });
-  if (profile.id !== reply.user_id && !profile.is_admin) return res.status(403).json({ error: 'No autorizado.' });
+  if (profile.id !== reply.usuario_id && !profile.is_admin) return res.status(403).json({ error: 'No autorizado.' });
   const { data, error } = await supabase
-    .from('feedback_replies')
-    .update({ content })
+    .from('retroalimentacion_respuestas')
+    .update({ contenido })
     .eq('id', id)
     .select();
   if (error) return res.status(500).json({ error: error.message });
@@ -429,34 +427,34 @@ app.put('/api/feedback/reply/:id', async (req, res) => {
 // Eliminar reply
 app.delete('/api/feedback/reply/:id', async (req, res) => {
   const { id } = req.params;
-  const { user_id } = req.body;
-  if (!user_id) return res.status(400).json({ error: 'Falta user_id.' });
-  const { data: profile } = await supabase.from('profiles').select('id, is_admin').eq('id', user_id).maybeSingle();
-  const { data: reply } = await supabase.from('feedback_replies').select('user_id').eq('id', id).maybeSingle();
+  const { usuario_id } = req.body;
+  if (!usuario_id) return res.status(400).json({ error: 'Falta usuario_id.' });
+  const { data: profile } = await supabase.from('perfiles').select('id, is_admin').eq('id', usuario_id).maybeSingle();
+  const { data: reply } = await supabase.from('retroalimentacion_respuestas').select('usuario_id').eq('id', id).maybeSingle();
   if (!profile || !reply) return res.status(404).json({ error: 'No encontrado.' });
-  if (profile.id !== reply.user_id && !profile.is_admin) return res.status(403).json({ error: 'No autorizado.' });
-  const { error } = await supabase.from('feedback_replies').delete().eq('id', id);
+  if (profile.id !== reply.usuario_id && !profile.is_admin) return res.status(403).json({ error: 'No autorizado.' });
+  const { error } = await supabase.from('retroalimentacion_respuestas').delete().eq('id', id);
   if (error) return res.status(500).json({ error: error.message });
   res.json({ message: 'Eliminado' });
 });
 
 // Guardar palabra en favoritos
 app.post('/api/dictionary/save', async (req, res) => {
-  const { user_id, dictionary_id } = req.body;
+  const { usuario_id, diccionario_id } = req.body;
   
-  console.log('Datos recibidos en /api/dictionary/save:', { user_id, dictionary_id });
+  console.log('Datos recibidos en /api/dictionary/save:', { usuario_id, diccionario_id });
   
-  if (!user_id || !dictionary_id) {
-    console.log('Faltan datos:', { user_id: !!user_id, dictionary_id: !!dictionary_id });
+  if (!usuario_id || !diccionario_id) {
+    console.log('Faltan datos:', { usuario_id: !!usuario_id, diccionario_id: !!diccionario_id });
     return res.status(400).json({ error: 'Faltan datos' });
   }
   
   try {
     // Verificar que el usuario existe
     const { data: user, error: userError } = await supabase
-      .from('profiles')
+      .from('perfiles')
       .select('id')
-      .eq('id', user_id)
+      .eq('id', usuario_id)
       .maybeSingle();
       
     if (userError) {
@@ -465,15 +463,15 @@ app.post('/api/dictionary/save', async (req, res) => {
     }
     
     if (!user) {
-      console.log('Usuario no encontrado:', user_id);
+      console.log('Usuario no encontrado:', usuario_id);
       return res.status(404).json({ error: 'Usuario no encontrado' });
     }
     
     // Verificar que la palabra existe
     const { data: word, error: wordError } = await supabase
-      .from('dictionary')
+      .from('diccionario')
       .select('id')
-      .eq('id', dictionary_id)
+      .eq('id', diccionario_id)
       .maybeSingle();
       
     if (wordError) {
@@ -482,16 +480,16 @@ app.post('/api/dictionary/save', async (req, res) => {
     }
     
     if (!word) {
-      console.log('Palabra no encontrada:', dictionary_id);
+      console.log('Palabra no encontrada:', diccionario_id);
       return res.status(404).json({ error: 'Palabra no encontrada' });
     }
     
     // Verificar si ya existe
     const { data: existing, error: checkError } = await supabase
-      .from('saved_words')
+      .from('palabras_guardadas')
       .select('id')
-      .eq('user_id', user_id)
-      .eq('dictionary_id', dictionary_id)
+      .eq('usuario_id', usuario_id)
+      .eq('diccionario_id', diccionario_id)
       .maybeSingle();
 
     if (checkError) {
@@ -500,13 +498,13 @@ app.post('/api/dictionary/save', async (req, res) => {
     }
 
     if (existing) {
-      console.log('Palabra ya guardada:', { user_id, dictionary_id });
+      console.log('Palabra ya guardada:', { usuario_id, diccionario_id });
       return res.status(400).json({ error: 'La palabra ya está guardada' });
     }
 
     const { data, error } = await supabase
-      .from('saved_words')
-      .insert({ user_id, dictionary_id })
+      .from('palabras_guardadas')
+      .insert({ usuario_id, diccionario_id })
       .select();
 
     if (error) {
@@ -527,15 +525,15 @@ app.get('/api/dictionary/saved/:user_id', async (req, res) => {
   const { user_id } = req.params;
   try {
     const { data, error } = await supabase
-      .from('saved_words')
-      .select('dictionary_id')
-      .eq('user_id', user_id);
+      .from('palabras_guardadas')
+      .select('diccionario_id')
+      .eq('usuario_id', user_id);
     if (error) throw error;
-    const dictionaryIds = data.map(row => row.dictionary_id);
+    const dictionaryIds = data.map(row => row.diccionario_id);
     if (dictionaryIds.length === 0) return res.json([]);
     // Obtener detalles de las palabras guardadas
     const { data: words, error: dictError } = await supabase
-      .from('dictionary')
+      .from('diccionario')
       .select('*')
       .in('id', dictionaryIds);
     if (dictError) throw dictError;
@@ -548,16 +546,16 @@ app.get('/api/dictionary/saved/:user_id', async (req, res) => {
 
 // Eliminar palabra guardada
 app.delete('/api/dictionary/save', async (req, res) => {
-  const { user_id, dictionary_id } = req.body;
-  if (!user_id || !dictionary_id) {
+  const { usuario_id, diccionario_id } = req.body;
+  if (!usuario_id || !diccionario_id) {
     return res.status(400).json({ error: 'Faltan datos' });
   }
   try {
     await supabase
-      .from('saved_words')
+      .from('palabras_guardadas')
       .delete()
-      .eq('user_id', user_id)
-      .eq('dictionary_id', dictionary_id);
+      .eq('usuario_id', usuario_id)
+      .eq('diccionario_id', diccionario_id);
     res.json({ success: true });
   } catch (err) {
     console.error('Error al eliminar palabra guardada:', err);

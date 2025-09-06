@@ -40,10 +40,10 @@ export default function AuthForm() {
 
     try {
       if (isSignUp) {
-        const response = await fetch('https://nahuatl-web.onrender.com/api/register', {
+        const response = await fetch(`http://localhost:3001/api/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ full_name: fullName, email, password, username }),
+          body: JSON.stringify({ nombre_completo: fullName, email, password, username }),
         });
         const result = await response.json();
         if (!response.ok) throw new Error(result.error || 'Error al registrar usuario.');
@@ -55,7 +55,7 @@ export default function AuthForm() {
         setUsername('');
         // Keep email for user convenience
       } else {
-        const response = await fetch('https://nahuatl-web.onrender.com/api/login', {
+        const response = await fetch(`http://localhost:3001/api/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ emailOrUsername: email, password }),

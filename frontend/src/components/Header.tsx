@@ -9,7 +9,7 @@ import { User as UserIcon, LogOut, LayoutDashboard, Menu as MenuIcon, X, BookOpe
 interface User {
   id: string;
   email: string;
-  full_name?: string;
+  nombre_completo?: string;
 }
 
 export default function Header() {
@@ -154,7 +154,7 @@ interface ProfileMenuProps {
 const ProfileMenu: React.FC<ProfileMenuProps> = ({ user, onLogout, getInitials }) => (
   <Menu as="div" className="relative">
     <Menu.Button className="flex items-center justify-center w-9 h-9 bg-gradient-to-br from-orange-500 to-violet-600 text-white rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-transform hover:scale-105">
-      {getInitials(user.full_name)}
+      {getInitials(user.nombre_completo)}
     </Menu.Button>
     <Transition
       as={Fragment}
@@ -168,7 +168,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ user, onLogout, getInitials }
       <Menu.Items className="absolute right-0 mt-2 w-60 origin-top-right bg-white divide-y divide-slate-100 rounded-md shadow-lg ring-1 ring-black/5 focus:outline-none border border-slate-200">
         <div className="px-1 py-1">
           <div className="px-3 py-2 border-b border-slate-100">
-            <p className="text-sm text-slate-900 font-medium truncate">{user.full_name || 'Usuario'}</p>
+            <p className="text-sm text-slate-900 font-medium truncate">{user.nombre_completo || 'Usuario'}</p>
             <p className="text-xs text-slate-500 truncate">{user.email}</p>
           </div>
           <Menu.Item>

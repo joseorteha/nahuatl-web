@@ -8,7 +8,7 @@ import Header from '@/components/Header';
 interface UserData {
   id: string;
   email: string;
-  full_name?: string;
+  nombre_completo?: string;
   username?: string;
 }
 
@@ -79,7 +79,7 @@ export default function ProfilePage() {
 
   const fetchSaved = async (uid: string) => {
     try {
-      const res = await fetch(`https://nahuatl-web.onrender.com/api/dictionary/saved/${uid}`);
+      const res = await fetch(`http://localhost:3001/api/dictionary/saved/${uid}`);
       const data = await res.json();
       setSavedWords(data);
       setFilteredWords(data);
@@ -94,7 +94,7 @@ export default function ProfilePage() {
     const user = JSON.parse(userData);
     setRemoving(dictionary_id);
     try {
-      const response = await fetch('https://nahuatl-web.onrender.com/api/dictionary/save', {
+      const response = await fetch(`http://localhost:3001/api/dictionary/save`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: user.id, dictionary_id })
@@ -156,7 +156,7 @@ export default function ProfilePage() {
         >
           {/* Bienvenida y comunidad */}
           <div className="mb-10 text-center">
-            <h1 className="text-4xl font-bold text-emerald-700 mb-2">¡Bienvenido/a, {user.full_name || 'Nawatlajtolista'}!</h1>
+            <h1 className="text-4xl font-bold text-emerald-700 mb-2">¡Bienvenido/a, {user.nombre_completo || 'Nawatlajtolista'}!</h1>
             <p className="mt-2 text-lg text-gray-600">Eres parte de la comunidad <span className="font-bold text-emerald-600">Nawatlajtol</span>. Aquí puedes ver y gestionar la información de tu cuenta.</p>
           </div>
 
@@ -164,12 +164,12 @@ export default function ProfilePage() {
           <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl border border-emerald-100 overflow-hidden mb-12">
             <div className="p-8 flex flex-col items-center">
               <div className="w-24 h-24 bg-gradient-to-br from-emerald-500 to-teal-400 rounded-full flex items-center justify-center text-white text-5xl font-bold mb-4 shadow-lg">
-                {user.full_name ? user.full_name[0].toUpperCase() : 'U'}
+                {user.nombre_completo ? user.nombre_completo[0].toUpperCase() : 'U'}
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-1">{user.full_name}</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-1">{user.nombre_completo}</h2>
               <p className="text-emerald-600 font-medium mb-4">Miembro activo de la comunidad</p>
               <div className="space-y-6 w-full mt-4">
-                <InfoCard icon={User} label="Nombre Completo" value={user.full_name} />
+                <InfoCard icon={User} label="Nombre Completo" value={user.nombre_completo} />
                 <InfoCard icon={Mail} label="Correo Electrónico" value={user.email} />
                 <InfoCard icon={AtSign} label="Nombre de Usuario" value={user.username} />
               </div>

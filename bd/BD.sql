@@ -46,8 +46,8 @@ CREATE TABLE public.feedback_likes (
   user_id uuid NOT NULL,
   created_at timestamp with time zone DEFAULT now(),
   CONSTRAINT feedback_likes_pkey PRIMARY KEY (id),
-  CONSTRAINT feedback_likes_feedback_id_fkey FOREIGN KEY (feedback_id) REFERENCES public.feedback(id),
-  CONSTRAINT feedback_likes_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id)
+  CONSTRAINT feedback_likes_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id),
+  CONSTRAINT feedback_likes_feedback_id_fkey FOREIGN KEY (feedback_id) REFERENCES public.feedback(id)
 );
 CREATE TABLE public.feedback_replies (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -80,6 +80,6 @@ CREATE TABLE public.saved_words (
   dictionary_id uuid NOT NULL,
   created_at timestamp with time zone DEFAULT now(),
   CONSTRAINT saved_words_pkey PRIMARY KEY (id),
-  CONSTRAINT saved_words_dictionary_id_fkey FOREIGN KEY (dictionary_id) REFERENCES public.dictionary(id),
-  CONSTRAINT saved_words_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id)
+  CONSTRAINT saved_words_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id),
+  CONSTRAINT saved_words_dictionary_id_fkey FOREIGN KEY (dictionary_id) REFERENCES public.dictionary(id)
 );

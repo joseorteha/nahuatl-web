@@ -265,7 +265,7 @@ frontend/
 La aplicación utiliza principalmente dos enfoques para llamadas a API:
 
 1. **Llamadas Directas a Backend Externo**:
-   - URL base: `https://nahuatl-web.onrender.com/api/`
+   - URL base: `https://nahuatl-web.vercel.app/api/`
    - Endpoints principales:
      - `dictionary/search`: Búsqueda en diccionario
      - `dictionary/save`: Guardar palabras favoritas

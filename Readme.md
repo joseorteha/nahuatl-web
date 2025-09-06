@@ -72,7 +72,7 @@ Nawatlahtol sigue una arquitectura cliente-servidor moderna con una clara separa
 
 1. **Frontend (Next.js)**:
    - Interfaz de usuario interactiva
-   - Renderizado híbrido (SSR + CSR)
+  - Renderizado híbrido (SSR + CSR)
    - Rutas y navegación
    - Componentes reutilizables
    - Gestión de estado del cliente
@@ -126,7 +126,7 @@ Nawatlahtol sigue una arquitectura cliente-servidor moderna con una clara separa
 | **Frontend** | Next.js, React, TypeScript, Tailwind CSS, Framer Motion | Interfaz de usuario, renderizado, estilos, animaciones |
 | **Backend** | Node.js, Express.js, Supabase SDK | API RESTful, lógica de negocio, acceso a datos |
 | **Base de Datos** | PostgreSQL (vía Supabase) | Almacenamiento persistente de datos |
-| **Despliegue** | Vercel (Frontend), Render (Backend) | Hosting, CI/CD, escalabilidad |
+| **Despliegue** | Vercel (Frontend y Backend) | Hosting, CI/CD, escalabilidad |
 | **Desarrollo** | Git, GitHub, VS Code | Control de versiones, colaboración, IDE |
 
 ---
@@ -570,7 +570,7 @@ const fetchResults = async (query: string) => {
   }
   setIsLoading(true);
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web.onrender.com';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web.vercel.app';
     const response = await fetch(`${apiUrl}/api/dictionary/search?q=${encodeURIComponent(query)}`);
     if (!response.ok) throw new Error('La respuesta de la red no fue correcta');
     const data = await response.json();
@@ -637,7 +637,7 @@ El flujo de autenticación entre frontend y backend:
 
 1. **Frontend solicita login**:
    ```typescript
-   const response = await fetch('https://nahuatl-web.onrender.com/api/login', {
+  const response = await fetch('https://nahuatl-web.vercel.app/api/login', {
      method: 'POST',
      headers: { 'Content-Type': 'application/json' },
      body: JSON.stringify({ emailOrUsername: email, password }),

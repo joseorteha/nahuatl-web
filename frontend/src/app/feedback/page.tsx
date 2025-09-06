@@ -62,7 +62,7 @@ export default function FeedbackPage() {
   const fetchFeedbacks = useCallback(async () => {
     try {
       console.log('Fetching feedbacks...');
-      const response = await fetch('https://nahuatl-web.onrender.com/api/feedback');
+      const response = await fetch(`http://localhost:3001/api/feedback`);
       
       if (!response.ok) {
         const errorText = await response.text();
@@ -103,7 +103,7 @@ export default function FeedbackPage() {
     }
 
     try {
-      const response = await fetch('https://nahuatl-web.onrender.com/api/feedback', {
+      const response = await fetch(`http://localhost:3001/api/feedback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -144,7 +144,7 @@ export default function FeedbackPage() {
     }
 
     try {
-      const response = await fetch('https://nahuatl-web.onrender.com/api/feedback/like', {
+      const response = await fetch(`http://localhost:3001/api/feedback/like`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -171,7 +171,7 @@ export default function FeedbackPage() {
     }
     if (!replyContent.trim()) return;
     try {
-      const response = await fetch('https://nahuatl-web.onrender.com/api/feedback/reply', {
+      const response = await fetch(`http://localhost:3001/api/feedback/reply`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
