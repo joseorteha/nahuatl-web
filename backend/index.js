@@ -563,6 +563,73 @@ app.delete('/api/dictionary/save', async (req, res) => {
   }
 });
 
+// ENDPOINT TEMPORAL PARA MIGRACIÓN EN PRODUCCIÓN
+app.post('/api/admin/migrate-dictionary', async (req, res) => {
+  try {
+    // Solo permitir en desarrollo o con una clave especial
+    const { adminKey } = req.body;
+    if (adminKey !== 'migrate-nahuatl-2025') {
+      return res.status(403).json({ error: 'No autorizado' });
+    }
+
+    const fs = require('fs');
+    const path = require('path');
+    
+    // Leer el archivo JSON
+    const dictionaryPath = path.join(__dirname, 'data', 'dictionary.json');
+    const rawData = fs.readFileSync(dictionaryPath, 'utf8');
+    const dictionaryData = JSON.parse(rawData);
+    
+    console.log(`📚 Migrando ${dictionaryData.length} entradas en producción...`);
+    
+    // Función para mapear campos
+    function mapToSpanishFields(entry) {
+      return {
+        word: entry.word || '',
+        variants: entry.variants || null,
+        info_gramatical: entry.grammar_info || '',
+        definition: entry.definition || '',
+        nombre_cientifico: entry.scientific_name || null,
+        examples: entry.examples || null,
+        synonyms: entry.synonyms || null,
+        roots: entry.roots || null,
+        ver_tambien: entry.see_also || null,
+        ortografias_alternativas: entry.alt_spellings || null,
+        notes: entry.notes || null
+      };
+    }
+    
+    // Limpiar tabla primero
+    await supabase.from('diccionario').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    
+    // Procesar en lotes
+    const batchSize = 100;
+    let totalInserted = 0;
+    
+    for (let i = 0; i < dictionaryData.length; i += batchSize) {
+      const batch = dictionaryData.slice(i, i + batchSize);
+      const mappedBatch = batch.map(mapToSpanishFields);
+      
+      const { error } = await supabase.from('diccionario').insert(mappedBatch);
+      
+      if (error) {
+        console.error(`Error en lote ${Math.floor(i/batchSize) + 1}:`, error);
+      } else {
+        totalInserted += batch.length;
+      }
+    }
+    
+    res.json({ 
+      success: true, 
+      message: `Migración completada. ${totalInserted} entradas insertadas.` 
+    });
+    
+  } catch (error) {
+    console.error('Error en migración:', error);
+    res.status(500).json({ error: 'Error en migración', details: error.message });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Servidor escuchando en http://localhost:${PORT}`);
 });

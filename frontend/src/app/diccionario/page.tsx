@@ -41,7 +41,7 @@ export default function DictionaryPage() {
     setError(null);
     setHasSearched(true);
     try {
-  const apiUrl = 'http://localhost:3001';
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web.onrender.com';
       const response = await fetch(`${apiUrl}/api/dictionary/search?query=${encodeURIComponent(query)}`);
       if (!response.ok) throw new Error('La respuesta de la red no fue correcta');
       const data = await response.json();
@@ -86,7 +86,7 @@ export default function DictionaryPage() {
   const fetchSaved = async (uid: string) => {
     try {
       console.log('Fetching saved words for user:', uid);
-  const res = await fetch(`http://localhost:3001/api/dictionary/saved/${uid}`);
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web.onrender.com'}/api/dictionary/saved/${uid}`);
       if (!res.ok) {
         throw new Error(`HTTP ${res.status}: ${res.statusText}`);
       }
@@ -109,7 +109,7 @@ export default function DictionaryPage() {
     setSaving(diccionario_id);
     
     try {
-  const response = await fetch(`http://localhost:3001/api/dictionary/save`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web.onrender.com'}/api/dictionary/save`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ usuario_id: userId, diccionario_id: diccionario_id })
@@ -144,7 +144,7 @@ export default function DictionaryPage() {
     if (!userId) return alert('Debes iniciar sesión para quitar palabras guardadas.');
     setSaving(diccionario_id);
     try {
-  const response = await fetch(`http://localhost:3001/api/dictionary/save`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web.onrender.com'}/api/dictionary/save`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ usuario_id: userId, diccionario_id: diccionario_id })

@@ -79,7 +79,7 @@ export default function ProfilePage() {
 
   const fetchSaved = async (uid: string) => {
     try {
-      const res = await fetch(`http://localhost:3001/api/dictionary/saved/${uid}`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web.onrender.com'}/api/dictionary/saved/${uid}`);
       const data = await res.json();
       setSavedWords(data);
       setFilteredWords(data);
@@ -94,7 +94,7 @@ export default function ProfilePage() {
     const user = JSON.parse(userData);
     setRemoving(dictionary_id);
     try {
-      const response = await fetch(`http://localhost:3001/api/dictionary/save`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web.onrender.com'}/api/dictionary/save`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: user.id, dictionary_id })
