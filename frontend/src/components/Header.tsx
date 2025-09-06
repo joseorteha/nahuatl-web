@@ -53,10 +53,24 @@ export default function Header() {
         <BookOpen size={18} />
         <span>Diccionario</span>
       </Link>
+      <Link href="/contribuir" className="flex items-center gap-2 text-slate-700 hover:text-orange-600 transition-colors duration-200">
+        <svg width={18} height={18} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+        <span>Contribuir</span>
+      </Link>
       <Link href="/feedback" className="flex items-center gap-2 text-slate-700 hover:text-orange-600 transition-colors duration-200">
         <MessageCircle size={18} />
         <span>Comunidad</span>
       </Link>
+      {user?.rol === 'admin' || user?.rol === 'moderador' ? (
+        <Link href="/admin" className="flex items-center gap-2 text-red-700 hover:text-red-600 transition-colors duration-200">
+          <svg width={18} height={18} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 15H12.01M9 12H15M12 3C7 3 3 7 3 12C3 17 7 21 12 21C17 21 21 17 21 12C21 7 17 3 12 3Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          <span>Admin</span>
+        </Link>
+      ) : null}
       <span className="flex items-center gap-2 text-slate-400 cursor-not-allowed">
         <Users size={18} />
         <span>Lecciones (Próximamente)</span>

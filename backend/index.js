@@ -118,7 +118,6 @@ app.get('/api/practice/quiz', (req, res) => {
 
 // --- Dictionary API ---
 
-
 // Endpoint para buscar en el diccionario
 app.get('/api/dictionary/search', async (req, res) => {
   const query = req.query.query?.toLowerCase() || '';
@@ -560,6 +559,342 @@ app.delete('/api/dictionary/save', async (req, res) => {
   } catch (err) {
     console.error('Error al eliminar palabra guardada:', err);
     res.status(500).json({ error: 'Error al eliminar palabra guardada' });
+  }
+});
+
+// --- CONTRIBUCIONES API ---
+
+// Endpoint para crear una nueva contribución
+app.post('/api/contributions', async (req, res) => {
+  const {
+    usuario_id,
+    usuario_email,
+    word,
+    variants,
+    info_gramatical,
+    definition,
+    nombre_cientifico,
+    examples,
+    synonyms,
+    roots,
+    ver_tambien,
+    ortografias_alternativas,
+    notes,
+    razon_contribucion,
+    fuente,
+    nivel_confianza
+  } = req.body;
+
+  // Validar campos requeridos
+  if (!usuario_id || !usuario_email || !word || !definition) {
+    return res.status(400).json({ 
+      error: 'Faltan campos requeridos: usuario_id, usuario_email, word, definition' 
+    });
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('contribuciones_diccionario')
+      .insert({
+        usuario_id,
+        usuario_email,
+        word,
+        variants,
+        info_gramatical,
+        definition,
+        nombre_cientifico,
+        examples,
+        synonyms,
+        roots,
+        ver_tambien,
+        ortografias_alternativas,
+        notes,
+        razon_contribucion,
+        fuente,
+        nivel_confianza: nivel_confianza || 'medio'
+      })
+      .select();
+
+    if (error) {
+      console.error('Error al crear contribución:', error);
+      return res.status(500).json({ 
+        error: 'Error al enviar la contribución', 
+        details: error.message 
+      });
+    }
+
+    res.status(201).json({
+      message: 'Contribución enviada exitosamente. Será revisada por nuestros moderadores.',
+      data: data[0]
+    });
+
+  } catch (e) {
+    console.error('Error inesperado en /api/contributions:', e);
+    return res.status(500).json({ 
+      error: 'Error inesperado en el servidor', 
+      details: e.message 
+    });
+  }
+});
+
+// Endpoint para obtener contribuciones del usuario
+app.get('/api/contributions/user/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const { data, error } = await supabase
+      .from('contribuciones_diccionario')
+      .select('*')
+      .eq('usuario_id', userId)
+      .order('fecha_creacion', { ascending: false });
+
+    if (error) {
+      console.error('Error al obtener contribuciones del usuario:', error);
+      return res.status(500).json({ 
+        error: 'Error al obtener las contribuciones', 
+        details: error.message 
+      });
+    }
+
+    // Enriquecer con datos del admin revisor si existe
+    const enrichedContributions = [];
+    for (const contribution of data || []) {
+      let adminRevisor = null;
+      if (contribution.admin_revisor_id) {
+        const { data: reviewer } = await supabase
+          .from('perfiles')
+          .select('nombre_completo')
+          .eq('id', contribution.admin_revisor_id)
+          .single();
+        adminRevisor = reviewer;
+      }
+
+      enrichedContributions.push({
+        ...contribution,
+        perfiles: adminRevisor
+      });
+    }
+
+    res.json(enrichedContributions);
+
+  } catch (e) {
+    console.error('Error inesperado en /api/contributions/user:', e);
+    return res.status(500).json({ 
+      error: 'Error inesperado en el servidor', 
+      details: e.message 
+    });
+  }
+});
+
+// Endpoint para que los admins vean todas las contribuciones pendientes
+app.get('/api/admin/contributions', async (req, res) => {
+  const { adminId } = req.query;
+
+  if (!adminId) {
+    return res.status(400).json({ error: 'Se requiere adminId' });
+  }
+
+  try {
+    // Verificar que el usuario es admin o moderador
+    const { data: admin, error: adminError } = await supabase
+      .from('perfiles')
+      .select('rol')
+      .eq('id', adminId)
+      .single();
+
+    if (adminError || !admin || !['admin', 'moderador'].includes(admin.rol)) {
+      return res.status(403).json({ error: 'No autorizado. Se requieren permisos de administrador.' });
+    }
+
+    // Obtener contribuciones sin JOINs complejos
+    const { data: contributions, error } = await supabase
+      .from('contribuciones_diccionario')
+      .select('*')
+      .in('estado', ['pendiente', 'aprobada', 'rechazada'])
+      .order('fecha_creacion', { ascending: false });
+
+    if (error) {
+      console.error('Error al obtener contribuciones para admin:', error);
+      return res.status(500).json({ 
+        error: 'Error al obtener las contribuciones', 
+        details: error.message 
+      });
+    }
+
+    // Enriquecer con datos de usuarios por separado
+    const enrichedContributions = [];
+    for (const contribution of contributions || []) {
+      // Obtener datos del usuario que contribuyó
+      const { data: user } = await supabase
+        .from('perfiles')
+        .select('nombre_completo, email, username')
+        .eq('id', contribution.usuario_id)
+        .single();
+
+      // Obtener datos del admin revisor si existe
+      let adminRevisor = null;
+      if (contribution.admin_revisor_id) {
+        const { data: reviewer } = await supabase
+          .from('perfiles')
+          .select('nombre_completo')
+          .eq('id', contribution.admin_revisor_id)
+          .single();
+        adminRevisor = reviewer;
+      }
+
+      enrichedContributions.push({
+        ...contribution,
+        perfiles: user || { nombre_completo: 'Usuario desconocido', email: contribution.usuario_email, username: '' },
+        admin_revisor: adminRevisor
+      });
+    }
+
+    res.json(enrichedContributions);
+
+  } catch (e) {
+    console.error('Error inesperado en /api/admin/contributions:', e);
+    return res.status(500).json({ 
+      error: 'Error inesperado en el servidor', 
+      details: e.message 
+    });
+  }
+});
+
+// Endpoint para que los admins revisen una contribución
+app.put('/api/admin/contributions/:id', async (req, res) => {
+  const { id } = req.params;
+  const { adminId, estado, comentarios_admin } = req.body;
+
+  if (!adminId || !estado || !['aprobada', 'rechazada'].includes(estado)) {
+    return res.status(400).json({ 
+      error: 'Se requiere adminId, estado (aprobada/rechazada)' 
+    });
+  }
+
+  try {
+    // Verificar que el usuario es admin o moderador
+    const { data: admin, error: adminError } = await supabase
+      .from('perfiles')
+      .select('rol')
+      .eq('id', adminId)
+      .single();
+
+    if (adminError || !admin || !['admin', 'moderador'].includes(admin.rol)) {
+      return res.status(403).json({ error: 'No autorizado. Se requieren permisos de administrador.' });
+    }
+
+    // Actualizar la contribución
+    const { data, error } = await supabase
+      .from('contribuciones_diccionario')
+      .update({
+        estado,
+        admin_revisor_id: adminId,
+        comentarios_admin,
+        fecha_revision: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select();
+
+    if (error) {
+      console.error('Error al actualizar contribución:', error);
+      return res.status(500).json({ 
+        error: 'Error al actualizar la contribución', 
+        details: error.message 
+      });
+    }
+
+    // Si fue aprobada, agregar al diccionario principal
+    if (estado === 'aprobada') {
+      const contribucion = data[0];
+      
+      const { error: insertError } = await supabase
+        .from('diccionario')
+        .insert({
+          word: contribucion.word,
+          variants: contribucion.variants,
+          info_gramatical: contribucion.info_gramatical,
+          definition: contribucion.definition,
+          nombre_cientifico: contribucion.nombre_cientifico,
+          examples: contribucion.examples,
+          synonyms: contribucion.synonyms,
+          roots: contribucion.roots,
+          ver_tambien: contribucion.ver_tambien,
+          ortografias_alternativas: contribucion.ortografias_alternativas,
+          notes: contribucion.notes,
+          usuario_id: contribucion.usuario_id
+        });
+
+      if (insertError) {
+        console.error('Error al agregar palabra al diccionario:', insertError);
+        return res.status(500).json({ 
+          error: 'Contribución aprobada pero error al agregar al diccionario', 
+          details: insertError.message 
+        });
+      }
+
+      // Marcar como publicada
+      await supabase
+        .from('contribuciones_diccionario')
+        .update({ estado: 'publicada' })
+        .eq('id', id);
+    }
+
+    res.json({
+      message: estado === 'aprobada' 
+        ? 'Contribución aprobada y agregada al diccionario' 
+        : 'Contribución rechazada',
+      data: data[0]
+    });
+
+  } catch (e) {
+    console.error('Error inesperado en /api/admin/contributions:', e);
+    return res.status(500).json({ 
+      error: 'Error inesperado en el servidor', 
+      details: e.message 
+    });
+  }
+});
+
+// ENDPOINT TEMPORAL PARA VER USUARIOS
+app.get('/api/admin/check-users', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('perfiles')
+      .select('id, nombre_completo, email, username, rol, password')
+      .limit(10);
+
+    if (error) {
+      return res.status(500).json({ error: error.message });
+    }
+
+    res.json(data);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ENDPOINT TEMPORAL PARA HACER ADMIN
+app.post('/api/admin/make-admin', async (req, res) => {
+  try {
+    const { email, adminKey } = req.body;
+    
+    if (adminKey !== 'make-admin-nahuatl-2025') {
+      return res.status(403).json({ error: 'No autorizado' });
+    }
+
+    const { data, error } = await supabase
+      .from('perfiles')
+      .update({ rol: 'admin' })
+      .eq('email', email)
+      .select();
+
+    if (error) {
+      return res.status(500).json({ error: error.message });
+    }
+
+    res.json({ success: true, message: `Usuario ${email} ahora es admin`, data });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
   }
 });
 
