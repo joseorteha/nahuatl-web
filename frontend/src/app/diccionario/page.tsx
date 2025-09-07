@@ -18,6 +18,7 @@ interface DictionaryEntry {
   ortografias_alternativas?: string[];
   notes?: string[];
   id: string;
+  score?: number; // Campo para el algoritmo de scoring
 }
 
 export default function DictionaryPage() {
@@ -406,16 +407,16 @@ export default function DictionaryPage() {
                         <div className="flex items-center gap-2 flex-wrap">
                           <h2 className="text-2xl font-bold text-emerald-700">{entry.word}</h2>
                           {/* Badge de relevancia */}
-                          {(entry as any).score && (
+                          {entry.score && (
                             <span className={`text-xs font-medium px-2 py-1 rounded-full ${
-                              (entry as any).score >= 95 ? 'bg-green-100 text-green-800' :
-                              (entry as any).score >= 85 ? 'bg-blue-100 text-blue-800' :
-                              (entry as any).score >= 70 ? 'bg-yellow-100 text-yellow-800' :
+                              entry.score >= 95 ? 'bg-green-100 text-green-800' :
+                              entry.score >= 85 ? 'bg-blue-100 text-blue-800' :
+                              entry.score >= 70 ? 'bg-yellow-100 text-yellow-800' :
                               'bg-gray-100 text-gray-800'
                             }`}>
-                              {(entry as any).score >= 95 ? '🎯 Coincidencia exacta' :
-                               (entry as any).score >= 85 ? '✨ Muy relevante' :
-                               (entry as any).score >= 70 ? '📝 Relevante' :
+                              {entry.score >= 95 ? '🎯 Coincidencia exacta' :
+                               entry.score >= 85 ? '✨ Muy relevante' :
+                               entry.score >= 70 ? '📝 Relevante' :
                                '🔍 Relacionado'}
                             </span>
                           )}
