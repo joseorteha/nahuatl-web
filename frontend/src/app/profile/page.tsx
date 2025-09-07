@@ -1,8 +1,10 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { User, Mail, AtSign, LogOut, LucideIcon, BookmarkCheck, Bookmark, Search, Volume2, Share2, Trash2, BookOpen } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { User, Mail, AtSign, Settings, Save, X, Edit3, RefreshCw } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { createAvatar } from '@dicebear/core';
+import { avataaars } from '@dicebear/collection';
 import Header from '@/components/Header';
 
 interface UserData {
@@ -10,124 +12,123 @@ interface UserData {
   email: string;
   nombre_completo?: string;
   username?: string;
+  url_avatar?: string;
 }
-
-interface SavedWord {
-  id: string;
-  word: string;
-  definition: string;
-  variants?: string[];
-  grammar_info?: string;
-  examples?: { nahuatl: string; espanol: string }[];
-  synonyms?: string[];
-  created_at?: string;
-}
-
-type InfoCardProps = {
-  icon: LucideIcon;
-  label: string;
-  value?: string;
-};
-
-const InfoCard = ({ icon: Icon, label, value }: InfoCardProps) => (
-  <div className="flex items-start space-x-4">
-    <div className="flex-shrink-0 w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
-      <Icon className="w-6 h-6 text-emerald-600" />
-    </div>
-    <div>
-      <p className="text-sm font-medium text-gray-500">{label}</p>
-      <p className="text-lg font-semibold text-gray-900">{value || 'No especificado'}</p>
-    </div>
-  </div>
-);
 
 export default function ProfilePage() {
   const [user, setUser] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [showAvatarSelector, setShowAvatarSelector] = useState(false);
+  const [avatarSeed, setAvatarSeed] = useState('');
+  const [generatedAvatars, setGeneratedAvatars] = useState<string[]>([]);
+  const [formData, setFormData] = useState({
+    nombre_completo: '',
+    username: '',
+    email: ''
+  });
+  const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const router = useRouter();
-  const [savedWords, setSavedWords] = useState<SavedWord[]>([]);
-  const [filteredWords, setFilteredWords] = useState<SavedWord[]>([]);
-  const [removing, setRemoving] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [expandedWord, setExpandedWord] = useState<string | null>(null);
+
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web.onrender.com';
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
-    if (userData) {
-      setUser(JSON.parse(userData));
-      fetchSaved(JSON.parse(userData).id);
-    } else {
+    if (!userData) {
       router.push('/login');
+      return;
     }
-    setIsLoading(false);
+
+    try {
+      const parsedUser = JSON.parse(userData);
+      setUser(parsedUser);
+      setFormData({
+        nombre_completo: parsedUser.nombre_completo || '',
+        username: parsedUser.username || '',
+        email: parsedUser.email || ''
+      });
+      setAvatarSeed(parsedUser.username || parsedUser.email || 'default');
+      generateAvatars(parsedUser.username || parsedUser.email || 'default');
+    } catch (error) {
+      console.error('Error parsing user data:', error);
+      router.push('/login');
+    } finally {
+      setIsLoading(false);
+    }
   }, [router]);
 
-  useEffect(() => {
-    if (searchTerm.trim() === '') {
-      setFilteredWords(savedWords);
-    } else {
-      const filtered = savedWords.filter(word => 
-        word.word.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        word.definition.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (word.variants && word.variants.some(variant => 
-          variant.toLowerCase().includes(searchTerm.toLowerCase())
-        ))
-      );
-      setFilteredWords(filtered);
-    }
-  }, [searchTerm, savedWords]);
-
-  const fetchSaved = async (uid: string) => {
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web.onrender.com'}/api/dictionary/saved/${uid}`);
-      const data = await res.json();
-      setSavedWords(data);
-      setFilteredWords(data);
-    } catch (error) {
-      console.error('Error fetching saved words:', error);
-    }
-  };
-
-  const handleUnsave = async (dictionary_id: string) => {
-    const userData = localStorage.getItem('user');
-    if (!userData) return;
-    const user = JSON.parse(userData);
-    setRemoving(dictionary_id);
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web.onrender.com'}/api/dictionary/save`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: user.id, dictionary_id })
+  const generateAvatars = (seed: string) => {
+    const seeds = [seed, seed + '1', seed + '2', seed + '3', seed + '4', seed + '5'];
+    const avatars = seeds.map(currentSeed => {
+      const avatar = createAvatar(avataaars, {
+        seed: currentSeed,
+        size: 128,
+        backgroundColor: ['transparent'],
       });
-      
+      return avatar.toDataUri();
+    });
+    setGeneratedAvatars(avatars);
+  };
+
+  const generateNewAvatars = () => {
+    const newSeed = Math.random().toString(36).substring(7);
+    setAvatarSeed(newSeed);
+    generateAvatars(newSeed);
+  };
+
+  const selectAvatar = (avatarIndex: number) => {
+    const selectedAvatar = generatedAvatars[avatarIndex];
+    setUser(prev => prev ? { ...prev, url_avatar: selectedAvatar } : null);
+    setShowAvatarSelector(false);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSave = async () => {
+    if (!user) return;
+
+    setIsSaving(true);
+    setMessage(null);
+
+    try {
+      const response = await fetch(`${API_URL}/api/auth/profile/${user.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          url_avatar: user.url_avatar
+        }),
+      });
+
+      const result = await response.json();
+
       if (!response.ok) {
-        throw new Error('Error al quitar palabra guardada');
+        throw new Error(result.error || 'Error al actualizar perfil');
       }
+
+      // Actualizar datos locales
+      const updatedUser = { ...user, ...formData, url_avatar: user.url_avatar };
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
       
-      setSavedWords(prev => prev.filter(w => w.id !== dictionary_id));
+      setMessage({ type: 'success', text: '¡Perfil actualizado exitosamente!' });
+      setIsEditing(false);
     } catch (error) {
-      console.error('Error removing saved word:', error);
-      alert('Error al quitar palabra guardada');
+      console.error('Error updating profile:', error);
+      setMessage({ 
+        type: 'error', 
+        text: error instanceof Error ? error.message : 'Error al actualizar perfil' 
+      });
     } finally {
-      setRemoving(null);
-    }
-  };
-
-  const playAudio = (word: string) => {
-    // Implementar lógica de reproducción de audio
-    console.log("Reproduciendo pronunciación de:", word);
-  };
-
-  const shareWord = (word: string) => {
-    if (navigator.share) {
-      navigator.share({
-        title: `Palabra náhuatl: ${word}`,
-        text: `Aprende sobre "${word}" en el diccionario Nawatlajtol`,
-        url: window.location.href
-      }).catch(err => console.log('Error sharing:', err));
-    } else {
-      navigator.clipboard.writeText(`${word} - ${window.location.href}`);
-      alert("¡Enlace copiado al portapapeles!");
+      setIsSaving(false);
     }
   };
 
@@ -137,226 +138,288 @@ export default function ProfilePage() {
     router.push('/');
   };
 
-  if (isLoading || !user) {
+  if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-emerald-600"></div>
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100">
+        <Header />
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+        </div>
       </div>
     );
   }
 
+  if (!user) {
+    return null;
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100">
       <Header />
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* Header con avatar */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white rounded-2xl shadow-xl overflow-hidden mb-8"
+        >
+          <div className="bg-gradient-to-r from-emerald-600 to-teal-600 px-8 py-12">
+            <div className="flex flex-col md:flex-row items-center gap-6">
+              <div className="relative">
+                <div className="w-32 h-32 rounded-full bg-white p-2 shadow-lg">
+                  {user.url_avatar ? (
+                    <img 
+                      src={user.url_avatar} 
+                      alt="Avatar" 
+                      className="w-full h-full rounded-full"
+                    />
+                  ) : (
+                    <div className="w-full h-full rounded-full bg-emerald-100 flex items-center justify-center">
+                      <User className="w-16 h-16 text-emerald-600" />
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={() => setShowAvatarSelector(true)}
+                  className="absolute -bottom-2 -right-2 bg-white rounded-full p-2 shadow-lg hover:shadow-xl transition-shadow"
+                >
+                  <Edit3 className="w-4 h-4 text-emerald-600" />
+                </button>
+              </div>
+              
+              <div className="text-center md:text-left flex-1">
+                <h1 className="text-3xl font-bold text-white mb-2">
+                  {user.nombre_completo || 'Usuario'}
+                </h1>
+                <p className="text-emerald-100 text-lg">
+                  @{user.username || 'usuario'}
+                </p>
+                <p className="text-emerald-200 mt-1">
+                  {user.email}
+                </p>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setIsEditing(!isEditing)}
+                  className="bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-xl hover:bg-white/30 transition-colors flex items-center gap-2"
+                >
+                  <Settings className="w-5 h-5" />
+                  {isEditing ? 'Cancelar' : 'Editar'}
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="bg-red-500/20 backdrop-blur-sm text-white px-6 py-3 rounded-xl hover:bg-red-500/30 transition-colors"
+                >
+                  Cerrar Sesión
+                </button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Mensajes */}
+        <AnimatePresence>
+          {message && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className={`mb-6 p-4 rounded-xl ${
+                message.type === 'success' 
+                  ? 'bg-green-50 text-green-800 border border-green-200' 
+                  : 'bg-red-50 text-red-800 border border-red-200'
+              }`}
+            >
+              {message.text}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Formulario de edición */}
+        <AnimatePresence>
+          {isEditing && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="bg-white rounded-2xl shadow-xl p-8 mb-8"
+            >
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">Editar Perfil</h2>
+              
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Nombre Completo
+                  </label>
+                  <input
+                    type="text"
+                    name="nombre_completo"
+                    value={formData.nombre_completo}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    placeholder="Tu nombre completo"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Nombre de Usuario
+                  </label>
+                  <input
+                    type="text"
+                    name="username"
+                    value={formData.username}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    placeholder="@tu_usuario"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    placeholder="tu@email.com"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-4 mt-8">
+                <button
+                  onClick={() => setIsEditing(false)}
+                  className="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleSave}
+                  disabled={isSaving}
+                  className="px-6 py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors flex items-center gap-2 disabled:opacity-50"
+                >
+                  <Save className="w-5 h-5" />
+                  {isSaving ? 'Guardando...' : 'Guardar Cambios'}
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Selector de Avatar */}
+        <AnimatePresence>
+          {showAvatarSelector && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+              onClick={() => setShowAvatarSelector(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="p-6 border-b">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-2xl font-bold text-gray-900">Elige tu Avatar</h3>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={generateNewAvatars}
+                        className="p-2 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                      >
+                        <RefreshCw className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => setShowAvatarSelector(false)}
+                        className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="p-6">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                    {generatedAvatars.map((avatar, index) => (
+                      <div key={index} className="text-center">
+                        <div 
+                          className="w-24 h-24 mx-auto mb-3 rounded-full overflow-hidden cursor-pointer hover:ring-4 hover:ring-emerald-200 transition-all transform hover:scale-105"
+                          onClick={() => selectAvatar(index)}
+                        >
+                          <img 
+                            src={avatar} 
+                            alt={`Avatar ${index + 1}`} 
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <p className="text-sm text-gray-600">
+                          Avatar {index + 1}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="mt-6 p-4 bg-emerald-50 rounded-xl">
+                    <p className="text-sm text-emerald-800 text-center">
+                      💡 Haz clic en "Generar Nuevos" para crear avatares diferentes con el mismo estilo
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Información adicional */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ delay: 0.2 }}
+          className="bg-white rounded-2xl shadow-xl p-8"
         >
-          {/* Bienvenida y comunidad */}
-          <div className="mb-10 text-center">
-            <h1 className="text-4xl font-bold text-emerald-700 mb-2">¡Bienvenido/a, {user.nombre_completo || 'Nawatlajtolista'}!</h1>
-            <p className="mt-2 text-lg text-gray-600">Eres parte de la comunidad <span className="font-bold text-emerald-600">Nawatlajtol</span>. Aquí puedes ver y gestionar la información de tu cuenta.</p>
-          </div>
-
-          {/* Profile Card Mejorada */}
-          <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl border border-emerald-100 overflow-hidden mb-12">
-            <div className="p-8 flex flex-col items-center">
-              <div className="w-24 h-24 bg-gradient-to-br from-emerald-500 to-teal-400 rounded-full flex items-center justify-center text-white text-5xl font-bold mb-4 shadow-lg">
-                {user.nombre_completo ? user.nombre_completo[0].toUpperCase() : 'U'}
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Mi Actividad</h2>
+          
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="text-center p-6 bg-emerald-50 rounded-xl">
+              <div className="w-12 h-12 bg-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                <User className="w-6 h-6 text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-1">{user.nombre_completo}</h2>
-              <p className="text-emerald-600 font-medium mb-4">Miembro activo de la comunidad</p>
-              <div className="space-y-6 w-full mt-4">
-                <InfoCard icon={User} label="Nombre Completo" value={user.nombre_completo} />
-                <InfoCard icon={Mail} label="Correo Electrónico" value={user.email} />
-                <InfoCard icon={AtSign} label="Nombre de Usuario" value={user.username} />
-              </div>
-            </div>
-            <div className="bg-gray-50 px-8 py-6 border-t border-emerald-100 flex flex-col items-center">
-              <p className="text-sm text-gray-500 mb-3">¿Quieres salir de tu cuenta?</p>
-              <button 
-                onClick={handleLogout}
-                className="w-full flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-lg transition-colors shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-              >
-                <LogOut size={20}/>
-                <span>Cerrar Sesión</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Sección de Palabras Guardadas */}
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-8">
-              <h3 className="text-3xl font-bold text-emerald-700 mb-2 flex items-center justify-center gap-3">
-                <BookmarkCheck className="inline-block" /> 
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-teal-600">
-                  Tlahtoltemachtiani (Palabras Guardadas)
-                </span>
-              </h3>
-              <p className="text-gray-600">Tus palabras favoritas del diccionario náhuatl</p>
+              <h3 className="font-semibold text-gray-900">Contribuciones</h3>
+              <p className="text-2xl font-bold text-emerald-600 mt-1">0</p>
+              <p className="text-sm text-gray-600">palabras enviadas</p>
             </div>
 
-            {savedWords.length === 0 ? (
-              <div className="text-center py-16 bg-white rounded-2xl shadow-lg border border-emerald-100">
-                <div className="relative mb-8">
-                  <BookOpen size={80} className="text-emerald-500/20 mx-auto" />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Bookmark size={48} className="text-emerald-600" />
-                  </div>
-                </div>
-                <h4 className="text-2xl font-semibold text-gray-800 mb-3">Aún no tienes palabras guardadas</h4>
-                <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                  Ve al diccionario y guarda las palabras que más te interesen para tenerlas siempre a mano.
-                </p>
-                <button
-                  onClick={() => router.push('/diccionario')}
-                  className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors shadow-sm hover:shadow-md"
-                >
-                  <BookOpen size={20} />
-                  Ir al Diccionario
-                </button>
+            <div className="text-center p-6 bg-blue-50 rounded-xl">
+              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Mail className="w-6 h-6 text-white" />
               </div>
-            ) : (
-              <>
-                {/* Barra de búsqueda */}
-                <div className="mb-8 relative max-w-md mx-auto">
-                  <div className="relative">
-                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <input
-                      type="text"
-                      placeholder="Buscar en palabras guardadas..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-12 pr-4 py-3 border border-emerald-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent shadow-sm"
-                    />
-                  </div>
-                </div>
+              <h3 className="font-semibold text-gray-900">Feedback</h3>
+              <p className="text-2xl font-bold text-blue-600 mt-1">0</p>
+              <p className="text-sm text-gray-600">mensajes enviados</p>
+            </div>
 
-                {/* Estadísticas */}
-                <div className="mb-6 text-center">
-                  <p className="text-gray-600">
-                    {filteredWords.length} de {savedWords.length} palabras guardadas
-                    {searchTerm && ` (filtradas por "${searchTerm}")`}
-                  </p>
-                </div>
-
-                {/* Lista de palabras */}
-                <div className="grid gap-6">
-                  {filteredWords.map(word => (
-                    <motion.div
-                      key={word.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="bg-white rounded-2xl shadow-lg border border-emerald-100 overflow-hidden hover:shadow-xl transition-shadow"
-                    >
-                      <div className="p-6">
-                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-3">
-                              <h4 className="text-2xl font-bold text-emerald-700">{word.word}</h4>
-                              <div className="flex gap-2">
-                                <button
-                                  onClick={() => playAudio(word.word)}
-                                  className="p-2 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-full transition-colors"
-                                  aria-label="Escuchar pronunciación"
-                                >
-                                  <Volume2 size={18} />
-                                </button>
-                                <button
-                                  onClick={() => shareWord(word.word)}
-                                  className="p-2 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-full transition-colors"
-                                  aria-label="Compartir palabra"
-                                >
-                                  <Share2 size={18} />
-                                </button>
-                              </div>
-                            </div>
-                            
-                            <p className="text-gray-700 mb-3 leading-relaxed">{word.definition}</p>
-                            
-                            {word.grammar_info && (
-                              <p className="text-sm text-amber-600 bg-amber-50 px-3 py-1 rounded-full inline-block mb-3">
-                                {word.grammar_info}
-                              </p>
-                            )}
-                            
-                            {word.variants && word.variants.length > 0 && (
-                              <div className="mb-3">
-                                <span className="text-sm font-medium text-gray-600 mr-2">Variantes:</span>
-                                <span className="text-sm text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">
-                                  {word.variants.join(', ')}
-                                </span>
-                              </div>
-                            )}
-
-                            {word.synonyms && word.synonyms.length > 0 && (
-                              <div className="mb-3">
-                                <span className="text-sm font-medium text-gray-600 mr-2">Sinónimos:</span>
-                                <span className="text-sm text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
-                                  {word.synonyms.join(', ')}
-                                </span>
-                              </div>
-                            )}
-
-                            {word.examples && word.examples.length > 0 && (
-                              <div className="mt-4">
-                                <button
-                                  onClick={() => setExpandedWord(expandedWord === word.id ? null : word.id)}
-                                  className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
-                                >
-                                  {expandedWord === word.id ? 'Ocultar ejemplos' : 'Ver ejemplos'}
-                                </button>
-                                
-                                {expandedWord === word.id && (
-                                  <div className="mt-3 space-y-2">
-                                    {word.examples.map((example, index) => (
-                                      <div key={index} className="bg-gray-50 p-3 rounded-lg">
-                                        <p className="text-sm font-medium text-emerald-700 mb-1">{example.nahuatl}</p>
-                                        <p className="text-sm text-gray-600">{example.espanol}</p>
-                                      </div>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                          
-                          <button
-                            onClick={() => handleUnsave(word.id)}
-                            disabled={removing === word.id}
-                            className={`flex-shrink-0 p-3 text-red-500 hover:text-white hover:bg-red-500 rounded-full border border-red-200 transition-all duration-200 ${
-                              removing === word.id ? 'opacity-50 pointer-events-none' : 'hover:shadow-md'
-                            }`}
-                            aria-label="Quitar de guardados"
-                          >
-                            {removing === word.id ? (
-                              <div className="animate-spin rounded-full h-5 w-5 border-2 border-red-500 border-t-transparent"></div>
-                            ) : (
-                              <Trash2 size={20} />
-                            )}
-                          </button>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-
-                {filteredWords.length === 0 && searchTerm && (
-                  <div className="text-center py-12 bg-white rounded-2xl shadow-lg border border-emerald-100">
-                    <Search size={48} className="text-gray-400 mx-auto mb-4" />
-                    <h4 className="text-xl font-semibold text-gray-800 mb-2">No se encontraron resultados</h4>
-                    <p className="text-gray-600">
-                      No hay palabras guardadas que coincidan con &quot;{searchTerm}&quot;
-                    </p>
-                  </div>
-                )}
-              </>
-            )}
+            <div className="text-center p-6 bg-purple-50 rounded-xl">
+              <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                <AtSign className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="font-semibold text-gray-900">Guardadas</h3>
+              <p className="text-2xl font-bold text-purple-600 mt-1">0</p>
+              <p className="text-sm text-gray-600">palabras guardadas</p>
+            </div>
           </div>
         </motion.div>
-      </main>
+      </div>
     </div>
   );
 }
