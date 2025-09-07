@@ -34,7 +34,8 @@ router.get('/user/:userId', async (req, res) => {
 // POST /api/contributions - Crear nueva contribución
 router.post('/', async (req, res) => {
   const { 
-    user_id, 
+    usuario_id, 
+    usuario_email,
     word, 
     definition, 
     info_gramatical, 
@@ -43,22 +44,22 @@ router.post('/', async (req, res) => {
     nivel_confianza 
   } = req.body;
 
-  if (!user_id || !word || !definition || !info_gramatical) {
-    return res.status(400).json({ error: 'Faltan campos requeridos.' });
+  if (!usuario_id || !word || !definition) {
+    return res.status(400).json({ error: 'Faltan campos requeridos: usuario_id, word, definition.' });
   }
 
   try {
     const { data, error } = await supabase
       .from('contribuciones_diccionario')
       .insert({
-        usuario_id: user_id,
-        usuario_email: '', // Necesitaremos obtener esto del perfil
+        usuario_id: usuario_id,
+        usuario_email: usuario_email || '',
         word,
         definition,
-        info_gramatical,
-        razon_contribucion,
-        fuente,
-        nivel_confianza,
+        info_gramatical: info_gramatical || null,
+        razon_contribucion: razon_contribucion || null,
+        fuente: fuente || null,
+        nivel_confianza: nivel_confianza || 'medio',
         estado: 'pendiente'
       })
       .select();
