@@ -1,85 +1,160 @@
 -- WARNING: This schema is for context only and is not meant to be run.
 -- Table order and constraints may not be valid for execution.
 
-CREATE TABLE public.debug_logs (
-  id integer NOT NULL DEFAULT nextval('debug_logs_id_seq'::regclass),
-  message text,
-  created_at timestamp without time zone DEFAULT now(),
-  CONSTRAINT debug_logs_pkey PRIMARY KEY (id)
-);
-CREATE TABLE public.dictionary (
+CREATE TABLE public.contribuciones_diccionario (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
+  usuario_id uuid NOT NULL,
+  usuario_email text NOT NULL,
   word text NOT NULL,
   variants ARRAY,
-  grammar_info text,
+  info_gramatical text,
   definition text NOT NULL,
-  scientific_name text,
+  nombre_cientifico text,
   examples jsonb,
   synonyms ARRAY,
   roots ARRAY,
-  see_also ARRAY,
-  alt_spellings ARRAY,
+  ver_tambien ARRAY,
+  ortografias_alternativas ARRAY,
   notes ARRAY,
-  created_at timestamp with time zone DEFAULT now(),
-  updated_at timestamp with time zone DEFAULT now(),
-  user_id uuid,
-  CONSTRAINT dictionary_pkey PRIMARY KEY (id),
-  CONSTRAINT dictionary_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id)
+  estado text DEFAULT 'pendiente'::text CHECK (estado = ANY (ARRAY['pendiente'::text, 'aprobada'::text, 'rechazada'::text, 'publicada'::text])),
+  admin_revisor_id uuid,
+  comentarios_admin text,
+  fecha_revision timestamp with time zone,
+  razon_contribucion text,
+  fuente text,
+  nivel_confianza text DEFAULT 'medio'::text CHECK (nivel_confianza = ANY (ARRAY['bajo'::text, 'medio'::text, 'alto'::text])),
+  fecha_creacion timestamp with time zone DEFAULT now(),
+  fecha_actualizacion timestamp with time zone DEFAULT now(),
+  CONSTRAINT contribuciones_diccionario_pkey PRIMARY KEY (id),
+  CONSTRAINT contribuciones_admin_revisor_fkey FOREIGN KEY (admin_revisor_id) REFERENCES public.perfiles(id),
+  CONSTRAINT contribuciones_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id)
 );
-CREATE TABLE public.feedback (
+CREATE TABLE public.diccionario (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL,
-  title text NOT NULL,
-  content text NOT NULL,
-  category text DEFAULT 'general'::text CHECK (category = ANY (ARRAY['suggestion'::text, 'question'::text, 'issue'::text, 'other'::text, 'bug_report'::text, 'feature_request'::text, 'general'::text])),
-  status text DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'reviewed'::text, 'implemented'::text, 'declined'::text])),
-  priority text DEFAULT 'medium'::text CHECK (priority = ANY (ARRAY['low'::text, 'medium'::text, 'high'::text, 'critical'::text])),
-  likes_count integer DEFAULT 0,
-  created_at timestamp with time zone DEFAULT now(),
-  updated_at timestamp with time zone DEFAULT now(),
-  CONSTRAINT feedback_pkey PRIMARY KEY (id),
-  CONSTRAINT feedback_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id)
+  word text NOT NULL,
+  variants ARRAY,
+  info_gramatical text,
+  definition text NOT NULL,
+  nombre_cientifico text,
+  examples jsonb,
+  synonyms ARRAY,
+  roots ARRAY,
+  ver_tambien ARRAY,
+  ortografias_alternativas ARRAY,
+  notes ARRAY,
+  fecha_creacion timestamp with time zone DEFAULT now(),
+  fecha_actualizacion timestamp with time zone DEFAULT now(),
+  usuario_id uuid,
+  CONSTRAINT diccionario_pkey PRIMARY KEY (id),
+  CONSTRAINT diccionario_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id)
 );
-CREATE TABLE public.feedback_likes (
+CREATE TABLE public.mensajes_contacto (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
-  feedback_id uuid NOT NULL,
-  user_id uuid NOT NULL,
-  created_at timestamp with time zone DEFAULT now(),
-  CONSTRAINT feedback_likes_pkey PRIMARY KEY (id),
-  CONSTRAINT feedback_likes_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id),
-  CONSTRAINT feedback_likes_feedback_id_fkey FOREIGN KEY (feedback_id) REFERENCES public.feedback(id)
+  nombre text NOT NULL,
+  email text NOT NULL,
+  telefono text,
+  asunto text NOT NULL,
+  mensaje text NOT NULL,
+  tipo_contacto text NOT NULL CHECK (tipo_contacto = ANY (ARRAY['email'::text, 'chat'::text, 'general'::text])),
+  estado text DEFAULT 'pendiente'::text CHECK (estado = ANY (ARRAY['pendiente'::text, 'leido'::text, 'respondido'::text, 'resuelto'::text, 'archivado'::text])),
+  agente_usuario text,
+  direccion_ip inet,
+  url_referencia text,
+  fecha_creacion timestamp with time zone DEFAULT now(),
+  fecha_actualizacion timestamp with time zone DEFAULT now(),
+  fecha_leido timestamp with time zone,
+  fecha_respondido timestamp with time zone,
+  CONSTRAINT mensajes_contacto_pkey PRIMARY KEY (id)
 );
-CREATE TABLE public.feedback_replies (
+CREATE TABLE public.palabras_guardadas (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
-  feedback_id uuid NOT NULL,
-  user_id uuid NOT NULL,
-  content text NOT NULL,
-  is_admin_reply boolean DEFAULT false,
-  created_at timestamp with time zone DEFAULT now(),
-  updated_at timestamp with time zone DEFAULT now(),
-  CONSTRAINT feedback_replies_pkey PRIMARY KEY (id),
-  CONSTRAINT feedback_replies_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id),
-  CONSTRAINT feedback_replies_feedback_id_fkey FOREIGN KEY (feedback_id) REFERENCES public.feedback(id)
+  usuario_id uuid NOT NULL,
+  diccionario_id uuid NOT NULL,
+  fecha_creacion timestamp with time zone DEFAULT now(),
+  CONSTRAINT palabras_guardadas_pkey PRIMARY KEY (id),
+  CONSTRAINT palabras_guardadas_diccionario_id_fkey FOREIGN KEY (diccionario_id) REFERENCES public.diccionario(id),
+  CONSTRAINT palabras_guardadas_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id)
 );
-CREATE TABLE public.profiles (
+CREATE TABLE public.perfiles (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
-  full_name text NOT NULL,
+  nombre_completo text NOT NULL,
   email text NOT NULL UNIQUE,
   username text UNIQUE,
-  avatar_url text,
-  created_at timestamp with time zone DEFAULT now(),
-  updated_at timestamp with time zone DEFAULT now(),
-  is_beta_tester boolean DEFAULT false,
-  feedback_count integer DEFAULT 0,
+  url_avatar text,
+  fecha_creacion timestamp with time zone DEFAULT now(),
+  fecha_actualizacion timestamp with time zone DEFAULT now(),
+  es_beta_tester boolean DEFAULT false,
+  contador_feedback integer DEFAULT 0,
   password text,
-  CONSTRAINT profiles_pkey PRIMARY KEY (id)
+  rol text DEFAULT 'usuario'::text CHECK (rol = ANY (ARRAY['usuario'::text, 'moderador'::text, 'admin'::text])),
+  CONSTRAINT perfiles_pkey PRIMARY KEY (id)
 );
-CREATE TABLE public.saved_words (
+CREATE TABLE public.respuestas_contacto (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL,
-  dictionary_id uuid NOT NULL,
-  created_at timestamp with time zone DEFAULT now(),
-  CONSTRAINT saved_words_pkey PRIMARY KEY (id),
-  CONSTRAINT saved_words_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id),
-  CONSTRAINT saved_words_dictionary_id_fkey FOREIGN KEY (dictionary_id) REFERENCES public.dictionary(id)
+  mensaje_contacto_id uuid NOT NULL,
+  mensaje_respuesta text NOT NULL,
+  tipo_respuesta text DEFAULT 'email'::text CHECK (tipo_respuesta = ANY (ARRAY['email'::text, 'telefono'::text, 'nota_interna'::text])),
+  admin_id uuid,
+  email_admin text NOT NULL,
+  fecha_creacion timestamp with time zone DEFAULT now(),
+  fecha_envio timestamp with time zone,
+  CONSTRAINT respuestas_contacto_pkey PRIMARY KEY (id),
+  CONSTRAINT respuestas_contacto_mensaje_fkey FOREIGN KEY (mensaje_contacto_id) REFERENCES public.mensajes_contacto(id)
+);
+CREATE TABLE public.retroalimentacion (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  usuario_id uuid NOT NULL,
+  titulo text NOT NULL,
+  contenido text NOT NULL,
+  categoria text DEFAULT 'general'::text CHECK (categoria = ANY (ARRAY['suggestion'::text, 'question'::text, 'issue'::text, 'other'::text, 'bug_report'::text, 'feature_request'::text, 'general'::text])),
+  estado text DEFAULT 'pending'::text CHECK (estado = ANY (ARRAY['pending'::text, 'reviewed'::text, 'implemented'::text, 'declined'::text])),
+  prioridad text DEFAULT 'medium'::text CHECK (prioridad = ANY (ARRAY['low'::text, 'medium'::text, 'high'::text, 'critical'::text])),
+  contador_likes integer DEFAULT 0,
+  fecha_creacion timestamp with time zone DEFAULT now(),
+  fecha_actualizacion timestamp with time zone DEFAULT now(),
+  CONSTRAINT retroalimentacion_pkey PRIMARY KEY (id),
+  CONSTRAINT retroalimentacion_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id)
+);
+CREATE TABLE public.retroalimentacion_likes (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  retroalimentacion_id uuid NOT NULL,
+  usuario_id uuid NOT NULL,
+  fecha_creacion timestamp with time zone DEFAULT now(),
+  CONSTRAINT retroalimentacion_likes_pkey PRIMARY KEY (id),
+  CONSTRAINT retroalimentacion_likes_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id),
+  CONSTRAINT retroalimentacion_likes_retroalimentacion_id_fkey FOREIGN KEY (retroalimentacion_id) REFERENCES public.retroalimentacion(id)
+);
+CREATE TABLE public.retroalimentacion_respuestas (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  retroalimentacion_id uuid NOT NULL,
+  usuario_id uuid NOT NULL,
+  contenido text NOT NULL,
+  es_respuesta_admin boolean DEFAULT false,
+  fecha_creacion timestamp with time zone DEFAULT now(),
+  fecha_actualizacion timestamp with time zone DEFAULT now(),
+  CONSTRAINT retroalimentacion_respuestas_pkey PRIMARY KEY (id),
+  CONSTRAINT retroalimentacion_respuestas_retroalimentacion_id_fkey FOREIGN KEY (retroalimentacion_id) REFERENCES public.retroalimentacion(id),
+  CONSTRAINT retroalimentacion_respuestas_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id)
+);
+CREATE TABLE public.solicitudes_union (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  nombre text NOT NULL,
+  email text NOT NULL,
+  telefono text,
+  tipo_union text NOT NULL CHECK (tipo_union = ANY (ARRAY['registro'::text, 'contribuir'::text, 'comunidad'::text, 'voluntario'::text, 'maestro'::text, 'traductor'::text])),
+  nivel_experiencia text DEFAULT 'principiante'::text CHECK (nivel_experiencia = ANY (ARRAY['principiante'::text, 'intermedio'::text, 'avanzado'::text, 'nativo'::text])),
+  motivacion text,
+  habilidades text,
+  disponibilidad text,
+  estado text DEFAULT 'pendiente'::text CHECK (estado = ANY (ARRAY['pendiente'::text, 'aprobada'::text, 'rechazada'::text, 'contactado'::text, 'completado'::text])),
+  notas_admin text,
+  fecha_seguimiento timestamp with time zone,
+  agente_usuario text,
+  direccion_ip inet,
+  url_referencia text,
+  fecha_creacion timestamp with time zone DEFAULT now(),
+  fecha_actualizacion timestamp with time zone DEFAULT now(),
+  fecha_revision timestamp with time zone,
+  fecha_contacto timestamp with time zone,
+  CONSTRAINT solicitudes_union_pkey PRIMARY KEY (id)
 );

@@ -81,6 +81,14 @@ export default function DictionaryPage() {
       console.log('No hay usuario en localStorage');
       setUserId(null);
     }
+
+    // Verificar si hay parámetro de palabra en la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const palabraParam = urlParams.get('palabra');
+    if (palabraParam) {
+      setSearchTerm(palabraParam);
+      // La búsqueda se ejecutará automáticamente por el useEffect del debounce
+    }
   }, []);
 
   const fetchSaved = async (uid: string) => {
@@ -191,14 +199,14 @@ export default function DictionaryPage() {
       <h2 className="text-2xl font-semibold text-gray-800 mb-2">Axcanah tlenon (No encontramos)</h2>
       <p className="text-gray-600 max-w-md mb-4">{error || `No hay resultados para "${searchTerm}"`}</p>
       <div className="bg-amber-50 border-l-4 border-amber-400 p-4 max-w-md text-left">
-        <p className="text-sm text-gray-700">
+        <div className="text-sm text-gray-700">
           <span className="font-semibold">Sugerencias:</span>
           <ul className="list-disc pl-5 mt-1 space-y-1">
             <li>Revisa la ortografía</li>
             <li>Intenta con palabras más cortas</li>
             <li>Busca en español o náhuatl</li>
           </ul>
-        </p>
+        </div>
       </div>
     </div>
   );
@@ -213,22 +221,141 @@ export default function DictionaryPage() {
   );
 
   const playAudio = (word: string) => {
-    // Implementar lógica de reproducción de audio
-    console.log("Reproduciendo pronunciación de:", word);
+    // Intentar diferentes enfoques para pronunciación
+    
+    // 1. Primero intentar con voces del sistema si hay alguna que pueda funcionar
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(word);
+      
+      // Buscar voces que puedan funcionar mejor para náhuatl
+      const voices = speechSynthesis.getVoices();
+      const spanishVoice = voices.find(voice => 
+        voice.lang.includes('es') || voice.lang.includes('ES')
+      );
+      
+      if (spanishVoice) {
+        utterance.voice = spanishVoice;
+      }
+      
+      // Configurar parámetros para mejor pronunciación
+      utterance.rate = 0.7; // Más lento para claridad
+      utterance.pitch = 1.0;
+      utterance.volume = 0.8;
+      
+      // Notificación visual
+      mostrarNotificacionAudio(word, 'pronunciando');
+      
+      utterance.onend = () => {
+        console.log(`Pronunciación de "${word}" completada`);
+      };
+      
+      utterance.onerror = (event) => {
+        console.error('Error en síntesis de voz:', event.error);
+        mostrarNotificacionAudio(word, 'error');
+      };
+      
+      speechSynthesis.speak(utterance);
+    } else {
+      mostrarNotificacionAudio(word, 'no_disponible');
+    }
+  };
+
+  const mostrarNotificacionAudio = (word: string, tipo: 'pronunciando' | 'error' | 'no_disponible') => {
+    const mensajes = {
+      pronunciando: `🔊 Pronunciando "${word}"`,
+      error: `⚠️ Audio no disponible para "${word}"`,
+      no_disponible: '❌ Audio no soportado en este navegador'
+    };
+    
+    const colores = {
+      pronunciando: '#059669',
+      error: '#DC2626', 
+      no_disponible: '#7C3AED'
+    };
+    
+    const notification = document.createElement('div');
+    notification.innerHTML = `
+      <div style="
+        position: fixed; 
+        top: 20px; 
+        left: 20px; 
+        background: ${colores[tipo]}; 
+        color: white; 
+        padding: 12px 20px; 
+        border-radius: 8px; 
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        font-family: system-ui;
+        animation: slideInLeft 0.3s ease-out;
+      ">
+        ${mensajes[tipo]}
+      </div>
+      <style>
+        @keyframes slideInLeft {
+          from { transform: translateX(-100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+      </style>
+    `;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.remove();
+    }, tipo === 'pronunciando' ? 2000 : 3000);
   };
 
   const shareWord = (word: string) => {
+    const url = `${window.location.origin}/diccionario?palabra=${encodeURIComponent(word)}`;
+    
     if (navigator.share) {
       navigator.share({
-        title: `Palabra náhuatl: ${word}`,
-        text: `Aprende sobre "${word}" en el diccionario Nawatlajtol`,
-        url: window.location.href
-      }).catch(err => console.log('Error sharing:', err));
+        title: `${word} - Nawatlajtol`,
+        text: `Descubre el significado de "${word}" en náhuatl`,
+        url: url
+      }).catch(err => {
+        console.log('Error al compartir:', err);
+        fallbackShare(url, word);
+      });
     } else {
-      // Fallback para navegadores que no soportan Web Share API
-      navigator.clipboard.writeText(`${word} - ${window.location.href}`);
-      alert("¡Enlace copiado al portapapeles!");
+      fallbackShare(url, word);
     }
+  };
+
+  const fallbackShare = (url: string, word: string) => {
+    navigator.clipboard.writeText(url).then(() => {
+      // Crear notificación temporal elegante
+      const notification = document.createElement('div');
+      notification.innerHTML = `
+        <div style="
+          position: fixed; 
+          top: 20px; 
+          right: 20px; 
+          background: #059669; 
+          color: white; 
+          padding: 12px 20px; 
+          border-radius: 8px; 
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+          z-index: 10000;
+          font-family: system-ui;
+          animation: slideIn 0.3s ease-out;
+        ">
+          🔗 Enlace de "${word}" copiado
+        </div>
+        <style>
+          @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+          }
+        </style>
+      `;
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.remove();
+      }, 3000);
+    }).catch(() => {
+      prompt('Copia este enlace para compartir:', url);
+    });
   };
 
   return (
@@ -276,8 +403,22 @@ export default function DictionaryPage() {
                   >
                     <div className="p-6">
                       <header className="mb-4 flex flex-col sm:flex-row sm:items-center gap-3 flex-wrap">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <h2 className="text-2xl font-bold text-emerald-700">{entry.word}</h2>
+                          {/* Badge de relevancia */}
+                          {(entry as any).score && (
+                            <span className={`text-xs font-medium px-2 py-1 rounded-full ${
+                              (entry as any).score >= 95 ? 'bg-green-100 text-green-800' :
+                              (entry as any).score >= 85 ? 'bg-blue-100 text-blue-800' :
+                              (entry as any).score >= 70 ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              {(entry as any).score >= 95 ? '🎯 Coincidencia exacta' :
+                               (entry as any).score >= 85 ? '✨ Muy relevante' :
+                               (entry as any).score >= 70 ? '📝 Relevante' :
+                               '🔍 Relacionado'}
+                            </span>
+                          )}
                           {entry.variants?.length > 0 && (
                             <span className="text-sm text-amber-600 bg-amber-50 px-2 py-1 rounded-full">
                               {entry.variants.join(', ')}
