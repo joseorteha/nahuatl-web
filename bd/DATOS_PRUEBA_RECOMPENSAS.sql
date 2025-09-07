@@ -71,10 +71,6 @@ BEGIN
     
 END $$;
 
-    RAISE NOTICE 'Datos de prueba insertados correctamente para el usuario joseortegahac@gmail.com';
-    
-END $$;
-
 -- Queries de verificación para el usuario joseortegahac@gmail.com
 SELECT 
   p.email,
