@@ -173,8 +173,35 @@ export async function marcarContactoComoLeido(mensajeId: string) {
   }
 }
 
+// Interfaces para tipificar las respuestas de la base de datos
+interface MensajeContactoDB {
+  id: string;
+  nombre: string;
+  email: string;
+  telefono?: string;
+  asunto: string;
+  mensaje: string;
+  tipo_contacto: string;
+  estado: string;
+  fecha_creacion: string;
+}
+
+interface SolicitudUnionDB {
+  id: string;
+  nombre: string;
+  email: string;
+  telefono?: string;
+  tipo_union: string;
+  nivel_experiencia: string;
+  motivacion?: string;
+  habilidades?: string;
+  disponibilidad?: string;
+  estado: string;
+  fecha_creacion: string;
+}
+
 // Función auxiliar para notificar admin de nuevo chat
-async function notificarAdminNuevoChat(mensaje: any) {
+async function notificarAdminNuevoChat(mensaje: MensajeContactoDB) {
   // Aquí puedes implementar notificación por email, webhook, etc.
   console.log('Nuevo mensaje de chat recibido:', mensaje);
   
@@ -189,18 +216,26 @@ async function notificarAdminNuevoChat(mensaje: any) {
 }
 
 // Función auxiliar para enviar email de bienvenida
-async function enviarEmailBienvenida(solicitud: any) {
+async function enviarEmailBienvenida(solicitud: SolicitudUnionDB) {
   // Aquí puedes implementar envío de email de bienvenida
   console.log('Enviando email de bienvenida:', solicitud);
   
-  const mensajesBienvenida = {
-    registro: '¡Bienvenido a Nawatlajtol! Te contactaremos pronto para completar tu registro.',
-    contribuir: '¡Gracias por querer contribuir! Revisaremos tu solicitud y te contactaremos.',
-    comunidad: '¡Bienvenido a nuestra comunidad! Te enviaremos información sobre eventos y actividades.',
-    voluntario: '¡Gracias por querer ser voluntario! Te contactaremos con información sobre oportunidades.',
-    maestro: '¡Excelente! Revisaremos tu perfil y te contactaremos sobre oportunidades de enseñanza.',
-    traductor: '¡Gracias por tu interés en traducir! Te enviaremos información sobre proyectos activos.'
+  // Mensajes de bienvenida por tipo de unión
+  const obtenerMensajeBienvenida = (tipoUnion: string): string => {
+    const mensajes: Record<string, string> = {
+      registro: '¡Bienvenido a Nawatlajtol! Te contactaremos pronto para completar tu registro.',
+      contribuir: '¡Gracias por querer contribuir! Revisaremos tu solicitud y te contactaremos.',
+      comunidad: '¡Bienvenido a nuestra comunidad! Te enviaremos información sobre eventos y actividades.',
+      voluntario: '¡Gracias por querer ser voluntario! Te contactaremos con información sobre oportunidades.',
+      maestro: '¡Excelente! Revisaremos tu perfil y te contactaremos sobre oportunidades de enseñanza.',
+      traductor: '¡Gracias por tu interés en traducir! Te enviaremos información sobre proyectos activos.'
+    };
+    
+    return mensajes[tipoUnion] || '¡Gracias por unirte a Nawatlajtol! Te contactaremos pronto.';
   };
+
+  const mensaje = obtenerMensajeBienvenida(solicitud.tipo_union);
+  console.log('Mensaje de bienvenida:', mensaje);
 
   // Aquí implementarías el envío real del email
   // Por ejemplo, usando Resend, SendGrid, etc.
