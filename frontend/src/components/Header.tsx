@@ -11,6 +11,7 @@ interface User {
   email: string;
   nombre_completo?: string;
   rol?: string;
+  url_avatar?: string;
 }
 
 export default function Header() {
@@ -168,8 +169,18 @@ interface ProfileMenuProps {
 
 const ProfileMenu: React.FC<ProfileMenuProps> = ({ user, onLogout, getInitials }) => (
   <Menu as="div" className="relative">
-    <Menu.Button className="flex items-center justify-center w-9 h-9 bg-gradient-to-br from-orange-500 to-violet-600 text-white rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-transform hover:scale-105">
-      {getInitials(user.nombre_completo)}
+    <Menu.Button className="flex items-center justify-center w-9 h-9 bg-gradient-to-br from-orange-500 to-violet-600 text-white rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-transform hover:scale-105 overflow-hidden">
+      {user.url_avatar ? (
+        <Image 
+          src={user.url_avatar} 
+          alt="Avatar" 
+          width={36} 
+          height={36} 
+          className="w-full h-full object-cover"
+        />
+      ) : (
+        getInitials(user.nombre_completo)
+      )}
     </Menu.Button>
     <Transition
       as={Fragment}

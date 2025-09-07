@@ -29,6 +29,12 @@ export default function ProfilePage() {
   });
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [stats, setStats] = useState({
+    contributions: 0,
+    feedback: 0,
+    savedWords: 0
+  });
+  const [isLoadingStats, setIsLoadingStats] = useState(true);
   const router = useRouter();
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web.onrender.com';
@@ -49,6 +55,7 @@ export default function ProfilePage() {
         email: parsedUser.email || ''
       });
       generateAvatars(parsedUser.username || parsedUser.email || 'default');
+      loadUserStats(parsedUser.id);
     } catch (error) {
       console.error('Error parsing user data:', error);
       router.push('/login');
@@ -93,6 +100,25 @@ export default function ProfilePage() {
     setGeneratedAvatars(avatars);
   };
 
+  const loadUserStats = async (userId: string) => {
+    try {
+      setIsLoadingStats(true);
+      const response = await fetch(`${API_URL}/api/auth/stats/${userId}`);
+      
+      if (!response.ok) {
+        throw new Error('Error al cargar estadísticas');
+      }
+
+      const result = await response.json();
+      setStats(result.stats || { contributions: 0, feedback: 0, savedWords: 0 });
+    } catch (error) {
+      console.error('Error loading stats:', error);
+      // Mantener valores por defecto en caso de error
+    } finally {
+      setIsLoadingStats(false);
+    }
+  };
+
   const generateNewAvatars = () => {
     const newSeed = Math.random().toString(36).substring(7);
     generateAvatars(newSeed);
@@ -100,7 +126,12 @@ export default function ProfilePage() {
 
   const selectAvatar = (avatarIndex: number) => {
     const selectedAvatar = generatedAvatars[avatarIndex];
-    setUser(prev => prev ? { ...prev, url_avatar: selectedAvatar } : null);
+    const updatedUser = { ...user!, url_avatar: selectedAvatar };
+    setUser(updatedUser);
+    // Actualizar localStorage inmediatamente para que el header se actualice
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    // Disparar evento storage para que otros componentes se actualicen
+    window.dispatchEvent(new Event('storage'));
     setShowAvatarSelector(false);
   };
 
@@ -421,8 +452,17 @@ export default function ProfilePage() {
                 <User className="w-6 h-6 text-white" />
               </div>
               <h3 className="font-semibold text-gray-900">Contribuciones</h3>
-              <p className="text-2xl font-bold text-emerald-600 mt-1">0</p>
-              <p className="text-sm text-gray-600">palabras enviadas</p>
+              {isLoadingStats ? (
+                <div className="animate-pulse">
+                  <div className="h-8 bg-gray-200 rounded mt-1 mb-1"></div>
+                  <div className="h-4 bg-gray-200 rounded"></div>
+                </div>
+              ) : (
+                <>
+                  <p className="text-2xl font-bold text-emerald-600 mt-1">{stats.contributions}</p>
+                  <p className="text-sm text-gray-600">palabras enviadas</p>
+                </>
+              )}
             </div>
 
             <div className="text-center p-6 bg-blue-50 rounded-xl">
@@ -430,8 +470,17 @@ export default function ProfilePage() {
                 <Mail className="w-6 h-6 text-white" />
               </div>
               <h3 className="font-semibold text-gray-900">Feedback</h3>
-              <p className="text-2xl font-bold text-blue-600 mt-1">0</p>
-              <p className="text-sm text-gray-600">mensajes enviados</p>
+              {isLoadingStats ? (
+                <div className="animate-pulse">
+                  <div className="h-8 bg-gray-200 rounded mt-1 mb-1"></div>
+                  <div className="h-4 bg-gray-200 rounded"></div>
+                </div>
+              ) : (
+                <>
+                  <p className="text-2xl font-bold text-blue-600 mt-1">{stats.feedback}</p>
+                  <p className="text-sm text-gray-600">mensajes enviados</p>
+                </>
+              )}
             </div>
 
             <div className="text-center p-6 bg-purple-50 rounded-xl">
@@ -439,8 +488,17 @@ export default function ProfilePage() {
                 <AtSign className="w-6 h-6 text-white" />
               </div>
               <h3 className="font-semibold text-gray-900">Guardadas</h3>
-              <p className="text-2xl font-bold text-purple-600 mt-1">0</p>
-              <p className="text-sm text-gray-600">palabras guardadas</p>
+              {isLoadingStats ? (
+                <div className="animate-pulse">
+                  <div className="h-8 bg-gray-200 rounded mt-1 mb-1"></div>
+                  <div className="h-4 bg-gray-200 rounded"></div>
+                </div>
+              ) : (
+                <>
+                  <p className="text-2xl font-bold text-purple-600 mt-1">{stats.savedWords}</p>
+                  <p className="text-sm text-gray-600">palabras guardadas</p>
+                </>
+              )}
             </div>
           </div>
         </motion.div>

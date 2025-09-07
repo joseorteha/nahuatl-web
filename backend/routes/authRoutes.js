@@ -15,4 +15,7 @@ router.get('/profile/:userId', authController.getProfile);
 // PUT /api/auth/profile/:userId - Actualizar perfil
 router.put('/profile/:userId', authController.updateProfile);
 
+// GET /api/auth/stats/:userId - Obtener estadísticas del usuario
+router.get('/stats/:userId', authController.getUserStats);
+
 module.exports = router;

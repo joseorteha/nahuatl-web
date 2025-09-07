@@ -154,6 +154,34 @@ class AuthController {
       });
     }
   }
+
+  /**
+   * Obtener estadísticas del usuario
+   * @param {Request} req - Objeto de request
+   * @param {Response} res - Objeto de response
+   */
+  async getUserStats(req, res) {
+    try {
+      const { userId } = req.params;
+
+      if (!userId) {
+        return res.status(400).json({ error: 'ID de usuario requerido' });
+      }
+
+      const stats = await userService.getUserStats(userId);
+      
+      res.json({
+        message: 'Estadísticas obtenidas exitosamente',
+        stats: stats
+      });
+    } catch (error) {
+      console.error('Error al obtener estadísticas:', error);
+      res.status(500).json({ 
+        error: 'Error al obtener estadísticas',
+        message: error.message 
+      });
+    }
+  }
 }
 
 module.exports = new AuthController();
