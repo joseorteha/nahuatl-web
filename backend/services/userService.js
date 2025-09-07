@@ -32,10 +32,9 @@ class UserService {
           username,
           password: hashedPassword,
           nombre_completo,
-          fecha_registro: new Date().toISOString(),
           rol: 'usuario'
         }])
-        .select('id, email, username, nombre_completo, rol, fecha_registro')
+        .select('id, email, username, nombre_completo, rol, fecha_creacion')
         .single();
 
       if (error) throw error;
@@ -72,12 +71,6 @@ class UserService {
         throw new Error('Contraseña incorrecta');
       }
 
-      // Actualizar último acceso
-      await supabase
-        .from('perfiles')
-        .update({ ultimo_acceso: new Date().toISOString() })
-        .eq('id', user.id);
-
       // Retornar usuario sin la contraseña
       const { password: _, ...userWithoutPassword } = user;
       return userWithoutPassword;
@@ -96,7 +89,7 @@ class UserService {
     try {
       const { data: user, error } = await supabase
         .from('perfiles')
-        .select('id, email, username, nombre_completo, rol, fecha_registro, ultimo_acceso')
+        .select('id, email, username, nombre_completo, rol, fecha_creacion, fecha_actualizacion')
         .eq('id', userId)
         .maybeSingle();
 
