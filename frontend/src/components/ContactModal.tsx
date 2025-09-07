@@ -110,12 +110,12 @@ export default function ContactModal({ isOpen, type, onClose }: ContactModalProp
 
     try {
       const contactData: ContactMessage = {
-        name: formData.name.trim(),
+        nombre: formData.name.trim(),
         email: formData.email.trim(),
-        phone: formData.phone.trim() || undefined,
-        subject: formData.subject.trim(),
-        message: formData.message.trim(),
-        contact_type: type
+        telefono: formData.phone.trim() || undefined,
+        asunto: formData.subject.trim(),
+        mensaje: formData.message.trim(),
+        tipo_contacto: type
       };
 
       await submitContactMessage(contactData);
@@ -190,7 +190,7 @@ export default function ContactModal({ isOpen, type, onClose }: ContactModalProp
               </h2>
             </div>
             <button
-              onClick={onClose}
+              onClick={resetModal}
               className="text-gray-400 hover:text-gray-600 transition-colors"
             >
               <X className="h-6 w-6" />
@@ -198,122 +198,196 @@ export default function ContactModal({ isOpen, type, onClose }: ContactModalProp
           </div>
           <p className="text-gray-600 mt-2">
             {type === 'email' 
-              ? 'Nos pondremos en contacto contigo pronto' 
-              : 'Inicia una conversación con nuestro equipo'
+              ? 'Nos pondremos en contacto contigo por email pronto' 
+              : 'Inicia una conversación en tiempo real con nuestro equipo'
             }
           </p>
         </div>
 
-        {/* Content */}
-        <div className="p-6">
-          {isSubmitted ? (
-            <div className="text-center py-8">
-              <div className="bg-green-100 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                <CheckCircle className="h-8 w-8 text-green-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">¡Mensaje enviado!</h3>
-              <p className="text-gray-600">
-                {type === 'email' 
-                  ? 'Te responderemos a tu correo electrónico pronto.'
-                  : 'Un miembro de nuestro equipo te contactará pronto.'
-                }
-              </p>
+        {/* Status Messages */}
+        {submitStatus === 'success' && (
+          <div className="p-6 bg-green-50 border-b border-green-200">
+            <div className="flex items-center gap-3 text-green-700">
+              <CheckCircle className="h-5 w-5" />
+              <p className="font-medium">{submitMessage}</p>
             </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                  Nombre completo *
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  required
-                  value={formData.name}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-colors"
-                  placeholder="Tu nombre"
-                />
-              </div>
+          </div>
+        )}
 
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                  Correo electrónico *
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-colors"
-                  placeholder="tu@email.com"
-                />
-              </div>
+        {submitStatus === 'error' && (
+          <div className="p-6 bg-red-50 border-b border-red-200">
+            <div className="flex items-center gap-3 text-red-700">
+              <AlertCircle className="h-5 w-5" />
+              <p className="font-medium">{submitMessage}</p>
+            </div>
+          </div>
+        )}
 
-              <div>
-                <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
-                  Asunto *
-                </label>
-                <select
-                  id="subject"
-                  name="subject"
-                  required
-                  value={formData.subject}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-colors"
-                >
-                  <option value="">Selecciona un asunto</option>
-                  <option value="general">Consulta general</option>
-                  <option value="colaboracion">Colaboración</option>
-                  <option value="sugerencia">Sugerencia</option>
-                  <option value="problema">Reporte de problema</option>
-                  <option value="contenido">Contribución de contenido</option>
-                  <option value="otros">Otros</option>
-                </select>
-              </div>
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {/* Nombre */}
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+              <User className="h-4 w-4 inline mr-2" />
+              Nombre completo *
+            </label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                errors.name ? 'border-red-500 bg-red-50' : 'border-gray-300'
+              }`}
+              placeholder="Tu nombre completo"
+              disabled={isSubmitting || submitStatus === 'success'}
+            />
+            {errors.name && (
+              <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+            )}
+          </div>
 
-              <div>
-                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
-                  Mensaje *
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  required
-                  rows={4}
-                  value={formData.message}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-colors resize-none"
-                  placeholder="Escribe tu mensaje aquí..."
-                />
-              </div>
+          {/* Email */}
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <Mail className="h-4 w-4 inline mr-2" />
+              Correo electrónico *
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                errors.email ? 'border-red-500 bg-red-50' : 'border-gray-300'
+              }`}
+              placeholder="tu@email.com"
+              disabled={isSubmitting || submitStatus === 'success'}
+            />
+            {errors.email && (
+              <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+            )}
+          </div>
 
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors ${
-                  type === 'email'
-                    ? 'bg-amber-600 hover:bg-amber-700 text-white'
-                    : 'bg-emerald-600 hover:bg-emerald-700 text-white'
-                } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
-              >
-                {isSubmitting ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                    Enviando...
-                  </>
-                ) : (
-                  <>
-                    <Send className="h-4 w-4" />
-                    Enviar mensaje
-                  </>
-                )}
-              </button>
-            </form>
-          )}
+          {/* Teléfono */}
+          <div>
+            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+              <Phone className="h-4 w-4 inline mr-2" />
+              Teléfono (opcional)
+            </label>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              value={formData.phone}
+              onChange={handleInputChange}
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                errors.phone ? 'border-red-500 bg-red-50' : 'border-gray-300'
+              }`}
+              placeholder="+52 123 456 7890"
+              disabled={isSubmitting || submitStatus === 'success'}
+            />
+            {errors.phone && (
+              <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
+            )}
+          </div>
+
+          {/* Asunto */}
+          <div>
+            <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
+              Asunto *
+            </label>
+            <input
+              type="text"
+              id="subject"
+              name="subject"
+              value={formData.subject}
+              onChange={handleInputChange}
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                errors.subject ? 'border-red-500 bg-red-50' : 'border-gray-300'
+              }`}
+              placeholder={type === 'chat' ? 'Tema de la conversación' : 'Asunto del correo'}
+              disabled={isSubmitting || submitStatus === 'success'}
+            />
+            {errors.subject && (
+              <p className="mt-1 text-sm text-red-600">{errors.subject}</p>
+            )}
+          </div>
+
+          {/* Mensaje */}
+          <div>
+            <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+              Mensaje *
+            </label>
+            <textarea
+              id="message"
+              name="message"
+              value={formData.message}
+              onChange={handleInputChange}
+              rows={4}
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none ${
+                errors.message ? 'border-red-500 bg-red-50' : 'border-gray-300'
+              }`}
+              placeholder={
+                type === 'chat' 
+                  ? 'Describe tu consulta para iniciar la conversación...' 
+                  : 'Escribe tu mensaje aquí...'
+              }
+              disabled={isSubmitting || submitStatus === 'success'}
+            />
+            {errors.message && (
+              <p className="mt-1 text-sm text-red-600">{errors.message}</p>
+            )}
+          </div>
+
+          {/* Botones */}
+          <div className="flex flex-col sm:flex-row gap-3 pt-4">
+            <button
+              type="button"
+              onClick={resetModal}
+              className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              disabled={isSubmitting}
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting || submitStatus === 'success'}
+              className={`flex-1 px-6 py-3 rounded-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
+                type === 'email'
+                  ? 'bg-amber-600 hover:bg-amber-700 text-white'
+                  : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+              } disabled:opacity-50 disabled:cursor-not-allowed`}
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                  Enviando...
+                </>
+              ) : submitStatus === 'success' ? (
+                <>
+                  <CheckCircle className="h-4 w-4" />
+                  Enviado
+                </>
+              ) : (
+                <>
+                  <Send className="h-4 w-4" />
+                  {type === 'email' ? 'Enviar correo' : 'Iniciar chat'}
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+
+        {/* Footer */}
+        <div className="px-6 pb-6">
+          <p className="text-xs text-gray-500 text-center">
+            Al enviar este formulario, aceptas que procesemos tu información para responderte.
+            <br />
+            Normalmente respondemos en menos de 24 horas.
+          </p>
         </div>
       </div>
     </div>
