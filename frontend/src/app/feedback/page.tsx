@@ -8,29 +8,29 @@ import { es } from 'date-fns/locale';
 
 interface Feedback {
   id: string;
-  title: string;
-  content: string;
-  category: string;
-  status: string;
-  priority: string;
-  likes_count: number;
-  created_at: string;
-  user_id: string;
-  profiles?: {
-    full_name: string;
+  titulo: string;
+  contenido: string;
+  categoria: string;
+  estado: string;
+  prioridad: string;
+  total_likes: number;
+  fecha_creacion: string;
+  usuario_id: string;
+  perfiles?: {
+    nombre_completo: string;
     username?: string;
   };
-  feedback_replies?: Array<{
+  retroalimentacion_respuestas?: Array<{
     id: string;
-    content: string;
-    created_at: string;
-    is_admin_reply: boolean;
-    profiles?: {
-      full_name: string;
+    contenido: string;
+    fecha_creacion: string;
+    es_respuesta_admin: boolean;
+    perfiles?: {
+      nombre_completo: string;
     };
   }>;
-  feedback_likes?: Array<{
-    user_id: string;
+  retroalimentacion_likes?: Array<{
+    usuario_id: string;
   }>;
 }
 
@@ -325,7 +325,7 @@ export default function FeedbackPage() {
   };
 
   const canEditFeedback = (feedback: Feedback) => {
-    return user && (user.id === feedback.user_id || user.is_admin);
+    return user && (user.id === feedback.usuario_id || user.is_admin);
   };
 
   // Type guard para reply con user_id
@@ -474,31 +474,31 @@ export default function FeedbackPage() {
                   <div className="flex flex-col sm:flex-row sm:items-start gap-4 mb-4">
                     <div className="flex-shrink-0">
                       <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-400 to-indigo-400 flex items-center justify-center text-white font-bold">
-                        {fb.profiles?.full_name?.[0] || (user && user.id === fb.user_id && (user.full_name?.[0] || user.username?.[0])) || 'U'}
+                        {fb.perfiles?.nombre_completo?.[0] || (user && user.id === fb.usuario_id && (user.full_name?.[0] || user.username?.[0])) || 'U'}
                       </div>
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-col sm:flex-row sm:items-center gap-2 flex-wrap">
                         <h3 className="font-semibold text-gray-800 truncate">
-                          {fb.profiles?.full_name || (user && user.id === fb.user_id && (user.full_name || user.username)) || 'Usuario'}
+                          {fb.perfiles?.nombre_completo || (user && user.id === fb.usuario_id && (user.full_name || user.username)) || 'Usuario'}
                         </h3>
                         <span className="text-xs text-gray-400">
-                          {formatSafeDate(fb.created_at)}
+                          {formatSafeDate(fb.fecha_creacion)}
                         </span>
                       </div>
-                      <h4 className="text-lg font-bold text-gray-900 mt-1">{fb.title}</h4>
+                      <h4 className="text-lg font-bold text-gray-900 mt-1">{fb.titulo}</h4>
                     </div>
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleLike(fb.id)}
                         className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                          fb.feedback_likes?.some(l => l.user_id === user?.id) 
+                          fb.retroalimentacion_likes?.some(l => l.usuario_id === user?.id) 
                             ? 'bg-blue-100 text-blue-600' 
                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                         }`}
                       >
                         <ThumbsUp size={16} className="mt-0.5" />
-                        <span>{fb.feedback_likes?.length || 0}</span>
+                        <span>{fb.retroalimentacion_likes?.length || 0}</span>
                       </button>
                     </div>
                   </div>
@@ -531,7 +531,7 @@ export default function FeedbackPage() {
                         </div>
                       </div>
                     ) : (
-                      <div className="text-gray-700 whitespace-pre-line">{fb.content}</div>
+                      <div className="text-gray-700 whitespace-pre-line">{fb.contenido}</div>
                     )}
                   </div>
 
@@ -548,7 +548,7 @@ export default function FeedbackPage() {
                       {canEditFeedback(fb) && (
                         <>
                           <button
-                            onClick={() => { setEditingId(fb.id); setEditContent(fb.content || ''); }}
+                            onClick={() => { setEditingId(fb.id); setEditContent(fb.contenido || ''); }}
                             className="text-sm text-gray-500 hover:text-gray-700 font-medium flex items-center gap-1"
                           >
                             <Edit size={16} />
@@ -614,29 +614,29 @@ export default function FeedbackPage() {
                   )}
 
                   {/* Replies */}
-                  {expandedFeedback === fb.id && fb.feedback_replies && fb.feedback_replies.length > 0 && (
+                  {expandedFeedback === fb.id && fb.retroalimentacion_respuestas && fb.retroalimentacion_respuestas.length > 0 && (
                     <div className="mt-4 pl-14 space-y-4">
-                      {fb.feedback_replies.map((reply) => (
+                      {fb.retroalimentacion_respuestas.map((reply) => (
                         <div key={reply.id} className="bg-gray-50 rounded-lg p-4">
                           <div className="flex items-start gap-3">
                             <div className="flex-shrink-0">
                               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm ${
-                                reply.is_admin_reply 
+                                reply.es_respuesta_admin 
                                   ? 'bg-gradient-to-r from-indigo-500 to-purple-500' 
                                   : 'bg-gradient-to-r from-blue-400 to-indigo-400'
                               }`}>
-                                {reply.profiles?.full_name?.[0] || 'A'}
+                                {reply.perfiles?.nombre_completo?.[0] || 'A'}
                               </div>
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-1">
                                 <span className="font-medium text-gray-800">
-                                  {reply.profiles?.full_name || (reply.is_admin_reply ? 'Equipo Nawatlajtol' : 'Usuario')}
+                                  {reply.perfiles?.nombre_completo || (reply.es_respuesta_admin ? 'Equipo Nawatlajtol' : 'Usuario')}
                                 </span>
                                 <span className="text-xs text-gray-400">
-                                  {formatSafeDate(reply.created_at)}
+                                  {formatSafeDate(reply.fecha_creacion)}
                                 </span>
-                                {reply.is_admin_reply && (
+                                {reply.es_respuesta_admin && (
                                   <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">
                                     Oficial
                                   </span>
@@ -666,13 +666,13 @@ export default function FeedbackPage() {
                                   </div>
                                 </div>
                               ) : (
-                                <div className="text-gray-700 text-sm whitespace-pre-line">{reply.content}</div>
+                                <div className="text-gray-700 text-sm whitespace-pre-line">{reply.contenido}</div>
                               )}
                             </div>
                             {canEditReply(reply) && (
                               <div className="flex gap-2">
                                 <button
-                                  onClick={() => { setEditingId(reply.id); setEditContent(reply.content); }}
+                                  onClick={() => { setEditingId(reply.id); setEditContent(reply.contenido); }}
                                   className="text-gray-400 hover:text-blue-500"
                                 >
                                   <Edit size={16} />
