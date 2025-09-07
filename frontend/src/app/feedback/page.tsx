@@ -216,9 +216,8 @@ export default function FeedbackPage() {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          user_id: user!.id,
-          content: editContent,
-          title: editContent.split('\n')[0] || editContent,
+          titulo: editContent.split('\n')[0] || editContent.substring(0, 50) + '...',
+          contenido: editContent,
         }),
       });
       if (!response.ok) {

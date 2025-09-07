@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { User, Mail, AtSign, Settings, Save, X, Edit3, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createAvatar } from '@dicebear/core';
-import { lorelei, notionists, openPeeps } from '@dicebear/collection';
+import { personas, initials, thumbs } from '@dicebear/collection';
 import Header from '@/components/Header';
 import Image from 'next/image';
 
@@ -67,32 +67,32 @@ export default function ProfilePage() {
   const generateAvatars = (seed: string) => {
     const avatars: string[] = [];
     
-    // Generar 2 avatares con lorelei
+    // Generar 2 avatares con personas (profesional y minimalista)
     for (let i = 0; i < 2; i++) {
-      const avatar = createAvatar(lorelei, {
-        seed: `${seed}-lorelei-${i}`,
+      const avatar = createAvatar(personas, {
+        seed: `${seed}-personas-${i}`,
         size: 128,
-        backgroundColor: ['transparent'],
+        backgroundColor: ['f0f9ff', 'e0f2fe', 'f0fdf4', 'fefce8', 'fdf2f8'],
       });
       avatars.push(avatar.toDataUri());
     }
     
-    // Generar 2 avatares con notionists
+    // Generar 2 avatares con iniciales (formal y elegante)
     for (let i = 0; i < 2; i++) {
-      const avatar = createAvatar(notionists, {
-        seed: `${seed}-notionists-${i}`,
+      const avatar = createAvatar(initials, {
+        seed: `${seed}-initials-${i}`,
         size: 128,
-        backgroundColor: ['transparent'],
+        backgroundColor: ['3b82f6', '10b981', '8b5cf6', 'f59e0b', 'ef4444'],
       });
       avatars.push(avatar.toDataUri());
     }
     
-    // Generar 2 avatares con openPeeps
+    // Generar 2 avatares con thumbs (iconos pulgar arriba, positivo)
     for (let i = 0; i < 2; i++) {
-      const avatar = createAvatar(openPeeps, {
-        seed: `${seed}-openpeeps-${i}`,
+      const avatar = createAvatar(thumbs, {
+        seed: `${seed}-thumbs-${i}`,
         size: 128,
-        backgroundColor: ['transparent'],
+        backgroundColor: ['dbeafe', 'd1fae5', 'e0e7ff', 'fef3c7', 'fce7f3'],
       });
       avatars.push(avatar.toDataUri());
     }

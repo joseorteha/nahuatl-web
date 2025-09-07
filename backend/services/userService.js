@@ -207,13 +207,18 @@ class UserService {
 
       if (feedbackError) throw feedbackError;
 
-      // Obtener palabras guardadas (favorites) - por ahora 0 hasta implementar
-      const savedWords = 0;
+      // Obtener palabras guardadas
+      const { data: savedWords, error: savedWordsError } = await supabase
+        .from('palabras_guardadas')
+        .select('id')
+        .eq('usuario_id', userId);
+
+      if (savedWordsError) throw savedWordsError;
 
       return {
         contributions: contributions ? contributions.length : 0,
         feedback: feedback ? feedback.length : 0,
-        savedWords: savedWords
+        savedWords: savedWords ? savedWords.length : 0
       };
     } catch (error) {
       console.error('Error obteniendo estadísticas del usuario:', error);
