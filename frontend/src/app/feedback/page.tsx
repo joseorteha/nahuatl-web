@@ -42,6 +42,23 @@ interface AuthenticatedUser {
   is_admin?: boolean;
 }
 
+// Helper function para manejar fechas de forma segura
+const formatSafeDate = (dateString: string | null | undefined): string => {
+  if (!dateString) return 'Fecha no disponible';
+  
+  try {
+    const date = new Date(dateString);
+    // Verificar si la fecha es válida
+    if (isNaN(date.getTime())) {
+      return 'Fecha inválida';
+    }
+    return formatDistanceToNow(date, { addSuffix: true, locale: es });
+  } catch (error) {
+    console.error('Error formatting date:', dateString, error);
+    return 'Fecha inválida';
+  }
+};
+
 export default function FeedbackPage() {
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
   const [formData, setFormData] = useState({
@@ -466,7 +483,7 @@ export default function FeedbackPage() {
                           {fb.profiles?.full_name || (user && user.id === fb.user_id && (user.full_name || user.username)) || 'Usuario'}
                         </h3>
                         <span className="text-xs text-gray-400">
-                          {formatDistanceToNow(new Date(fb.created_at), { addSuffix: true, locale: es })}
+                          {formatSafeDate(fb.created_at)}
                         </span>
                       </div>
                       <h4 className="text-lg font-bold text-gray-900 mt-1">{fb.title}</h4>
@@ -617,7 +634,7 @@ export default function FeedbackPage() {
                                   {reply.profiles?.full_name || (reply.is_admin_reply ? 'Equipo Nawatlajtol' : 'Usuario')}
                                 </span>
                                 <span className="text-xs text-gray-400">
-                                  {formatDistanceToNow(new Date(reply.created_at), { addSuffix: true, locale: es })}
+                                  {formatSafeDate(reply.created_at)}
                                 </span>
                                 {reply.is_admin_reply && (
                                   <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">
