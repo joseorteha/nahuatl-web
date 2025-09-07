@@ -6,6 +6,7 @@ import { User, Mail, AtSign, Settings, Save, X, Edit3, RefreshCw, ExternalLink }
 import { motion, AnimatePresence } from 'framer-motion';
 import Avatar from 'boring-avatars';
 import Header from '@/components/Header';
+import Recompensas from '@/components/Recompensas';
 import Image from 'next/image';
 
 interface UserData {
@@ -591,6 +592,15 @@ export default function ProfilePage() {
               )}
             </div>
           )}
+        </motion.div>
+
+        {/* Sistema de Recompensas */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          {user && <Recompensas userId={user.id} />}
         </motion.div>
       </div>
     </div>

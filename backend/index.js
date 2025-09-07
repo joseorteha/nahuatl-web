@@ -16,6 +16,7 @@ const dictionaryRoutes = require('./routes/dictionaryRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const contributionRoutes = require('./routes/contributionRoutes');
+const recompensasRoutes = require('./routes/recompensasRoutes');
 
 // Crear aplicación Express
 const app = express();
@@ -77,7 +78,8 @@ app.get('/', (req, res) => {
       dictionary: '/api/dictionary/*',
       feedback: '/api/feedback/*',
       admin: '/api/admin/*',
-      contributions: '/api/contributions/*'
+      contributions: '/api/contributions/*',
+      recompensas: '/api/recompensas/*'
     },
     docs: 'https://github.com/joseorteha/nahuatl-web/blob/main/backend/README.md'
   });
@@ -89,6 +91,7 @@ app.use('/api/dictionary', dictionaryRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/contributions', contributionRoutes);
+app.use('/api/recompensas', recompensasRoutes);
 
 // ===== MANEJO DE ERRORES =====
 
@@ -120,6 +123,10 @@ app.listen(PORT, () => {
    - GET  /api/dictionary/saved/:userId
    - POST /api/dictionary/save
    - DEL  /api/dictionary/save
+   - GET  /api/recompensas/usuario/:userId
+   - GET  /api/recompensas/ranking
+   - POST /api/recompensas/procesar
+   - GET  /api/recompensas/historial/:userId
 🌸 ======================================
   `);
 });
