@@ -10,6 +10,7 @@ interface User {
   id: string;
   email: string;
   nombre_completo?: string;
+  rol?: string;
 }
 
 export default function Header() {

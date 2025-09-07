@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ContributeWordForm from '@/components/ContributeWordForm';
@@ -18,27 +18,21 @@ interface UserContribution {
   };
 }
 
+interface ContributeUser {
+  id: string;
+  email: string;
+  rol?: string;
+}
+
 export default function ContributePage() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<ContributeUser | null>(null);
   const [contributions, setContributions] = useState<UserContribution[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'contribute' | 'history'>('contribute');
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web.onrender.com';
 
-  useEffect(() => {
-    // Obtener usuario del localStorage
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      const parsedUser = JSON.parse(userData);
-      setUser(parsedUser);
-      loadUserContributions(parsedUser.id);
-    } else {
-      setLoading(false);
-    }
-  }, []);
-
-  const loadUserContributions = async (userId: string) => {
+  const loadUserContributions = useCallback(async (userId: string) => {
     try {
       const response = await fetch(`${API_URL}/api/contributions/user/${userId}`);
       if (response.ok) {
@@ -50,7 +44,19 @@ export default function ContributePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [API_URL]);
+
+  useEffect(() => {
+    // Obtener usuario del localStorage
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      const parsedUser = JSON.parse(userData);
+      setUser(parsedUser);
+      loadUserContributions(parsedUser.id);
+    } else {
+      setLoading(false);
+    }
+  }, [loadUserContributions]);
 
   const getStatusBadge = (estado: string) => {
     const styles = {

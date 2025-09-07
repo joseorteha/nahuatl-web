@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Header from '@/components/Header';
 
 interface AdminContribution {
@@ -25,8 +25,14 @@ interface AdminContribution {
   };
 }
 
+interface AdminUser {
+  id: string;
+  email: string;
+  rol?: string;
+}
+
 export default function AdminPage() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<AdminUser | null>(null);
   const [contributions, setContributions] = useState<AdminContribution[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'pendiente' | 'todas'>('pendiente');
@@ -35,6 +41,22 @@ export default function AdminPage() {
   const [reviewing, setReviewing] = useState(false);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
+  const loadContributions = useCallback(async (adminId: string) => {
+    try {
+      const response = await fetch(`${API_URL}/api/admin/contributions?adminId=${adminId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setContributions(data);
+      } else {
+        console.error('Error loading contributions:', await response.json());
+      }
+    } catch (error) {
+      console.error('Error loading contributions:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [API_URL]);
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
@@ -51,23 +73,7 @@ export default function AdminPage() {
     } else {
       setLoading(false);
     }
-  }, []);
-
-  const loadContributions = async (adminId: string) => {
-    try {
-      const response = await fetch(`${API_URL}/api/admin/contributions?adminId=${adminId}`);
-      if (response.ok) {
-        const data = await response.json();
-        setContributions(data);
-      } else {
-        console.error('Error loading contributions:', await response.json());
-      }
-    } catch (error) {
-      console.error('Error loading contributions:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [loadContributions]);
 
   const handleReview = async (contributionId: string, estado: 'aprobada' | 'rechazada') => {
     if (!user?.id) return;
@@ -150,7 +156,7 @@ export default function AdminPage() {
     );
   }
 
-  if (!user || !['admin', 'moderador'].includes(user.rol)) {
+  if (!user || !user.rol || !['admin', 'moderador'].includes(user.rol)) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Header />
