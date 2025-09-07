@@ -65,8 +65,26 @@ class UserService {
         throw new Error('Usuario no encontrado');
       }
 
-      // Verificar contraseña
-      const validPassword = await bcrypt.compare(password, user.password);
+      // Verificar contraseña - Compatibilidad con texto plano y bcrypt
+      let validPassword = false;
+      
+      // Verificar si la contraseña está hasheada (bcrypt)
+      if (user.password.startsWith('$2b$') || user.password.startsWith('$2a$')) {
+        validPassword = await bcrypt.compare(password, user.password);
+      } else {
+        // Contraseña en texto plano (usuarios antiguos)
+        validPassword = password === user.password;
+        
+        // Si es válida, actualizar a hash para futuras autenticaciones
+        if (validPassword) {
+          const hashedPassword = await bcrypt.hash(password, 10);
+          await supabase
+            .from('perfiles')
+            .update({ password: hashedPassword })
+            .eq('id', user.id);
+        }
+      }
+      
       if (!validPassword) {
         throw new Error('Contraseña incorrecta');
       }
