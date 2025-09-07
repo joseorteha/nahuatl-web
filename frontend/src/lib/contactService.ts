@@ -50,6 +50,16 @@ export async function submitContactMessage(data: ContactMessage) {
 
     if (error) {
       console.error('Error al enviar mensaje de contacto:', error);
+      
+      // Manejo específico de errores RLS y permisos
+      if (error.code === '42501') {
+        throw new Error('Error de permisos en la base de datos. Por favor, contacta al administrador.');
+      } else if (error.code === '42P01') {
+        throw new Error('Las tablas de la base de datos no están configuradas. Por favor, contacta al administrador.');
+      } else if (error.message?.includes('JWT')) {
+        throw new Error('Error de autenticación. Por favor, recarga la página e intenta de nuevo.');
+      }
+      
       throw new Error('Error al enviar el mensaje. Por favor, intenta de nuevo.');
     }
 
@@ -96,6 +106,16 @@ export async function submitJoinRequest(data: JoinRequest) {
 
     if (error) {
       console.error('Error al enviar solicitud de unirse:', error);
+      
+      // Manejo específico de errores RLS y permisos
+      if (error.code === '42501') {
+        throw new Error('Error de permisos en la base de datos. Por favor, contacta al administrador.');
+      } else if (error.code === '42P01') {
+        throw new Error('Las tablas de la base de datos no están configuradas. Por favor, contacta al administrador.');
+      } else if (error.message?.includes('JWT')) {
+        throw new Error('Error de autenticación. Por favor, recarga la página e intenta de nuevo.');
+      }
+      
       throw new Error('Error al enviar la solicitud. Por favor, intenta de nuevo.');
     }
 
