@@ -1,6 +1,7 @@
 'use client';
 import { ChevronDown, MessageCircle, Book, Users, Feather, Globe } from 'lucide-react';
 import { useState } from 'react';
+import ContactModal from '@/components/ContactModal';
 
 const faqs = [
   {
@@ -32,9 +33,21 @@ const faqs = [
 
 export default function FAQPage() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [contactModal, setContactModal] = useState<{ isOpen: boolean; type: 'email' | 'chat' }>({
+    isOpen: false,
+    type: 'email'
+  });
 
   const toggleFAQ = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
+  };
+
+  const openContactModal = (type: 'email' | 'chat') => {
+    setContactModal({ isOpen: true, type });
+  };
+
+  const closeContactModal = () => {
+    setContactModal({ isOpen: false, type: 'email' });
   };
 
   return (
@@ -112,29 +125,36 @@ export default function FAQPage() {
                 No dudes en contactarnos. Estamos aquí para ayudarte en tu viaje de aprendizaje del náhuatl.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
-                <a 
-                  href="#" 
+                <button 
+                  onClick={() => openContactModal('email')}
                   className="inline-flex items-center justify-center px-5 py-3 bg-white text-amber-700 font-medium rounded-lg border border-amber-200 hover:bg-amber-50 transition-colors shadow-sm"
                 >
                   <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                   Envíanos un correo
-                </a>
-                <a 
-                  href="#" 
+                </button>
+                <button 
+                  onClick={() => openContactModal('chat')}
                   className="inline-flex items-center justify-center px-5 py-3 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors shadow-sm"
                 >
                   <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
                   Chatea con nosotros
-                </a>
+                </button>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Contact Modal */}
+      <ContactModal
+        isOpen={contactModal.isOpen}
+        type={contactModal.type}
+        onClose={closeContactModal}
+      />
     </main>
   );
 }

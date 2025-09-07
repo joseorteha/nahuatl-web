@@ -1,7 +1,25 @@
+'use client';
+
 import Image from 'next/image';
+import { useState } from 'react';
 import { Feather, BookOpen, Heart, Globe, Mic, Users } from 'lucide-react';
+import ContactModal from '@/components/ContactModal';
+import JoinModal from '@/components/JoinModal';
 
 export default function NosotrosPage() {
+  const [contactModal, setContactModal] = useState<{ isOpen: boolean; type: 'email' | 'chat' }>({
+    isOpen: false,
+    type: 'email'
+  });
+  const [joinModal, setJoinModal] = useState(false);
+
+  const openContactModal = (type: 'email' | 'chat') => {
+    setContactModal({ isOpen: true, type });
+  };
+
+  const closeContactModal = () => {
+    setContactModal({ isOpen: false, type: 'email' });
+  };
   return (
     <main className="min-h-screen bg-gradient-to-br from-amber-50 via-emerald-50 to-white relative overflow-hidden">
       {/* Fondo decorativo */}
@@ -124,18 +142,24 @@ export default function NosotrosPage() {
                   Apasionado por la tecnología, la cultura y la educación. Mi sueño es que el náhuatl vuelva a escucharse en cada rincón, y que la tecnología sea el puente para lograrlo. <span className="text-emerald-600 font-medium">Tlazocamatin</span> por ser parte de esta comunidad.
                 </p>
                 <div className="mt-6 flex justify-center md:justify-start gap-4">
-                  <a href="#" className="inline-flex items-center px-5 py-2 bg-white text-amber-700 font-medium rounded-lg border border-amber-200 hover:bg-amber-50 transition-colors">
+                  <button 
+                    onClick={() => openContactModal('email')}
+                    className="inline-flex items-center px-5 py-2 bg-white text-amber-700 font-medium rounded-lg border border-amber-200 hover:bg-amber-50 transition-colors"
+                  >
                     <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
                     Contáctame
-                  </a>
-                  <a href="#" className="inline-flex items-center px-5 py-2 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors">
+                  </button>
+                  <button 
+                    onClick={() => setJoinModal(true)}
+                    className="inline-flex items-center px-5 py-2 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors"
+                  >
                     <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                     </svg>
                     Únete
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>
@@ -176,6 +200,17 @@ export default function NosotrosPage() {
           </div>
         </div>
       </div>
+
+      {/* Modales */}
+      <ContactModal 
+        isOpen={contactModal.isOpen}
+        onClose={closeContactModal}
+        type={contactModal.type}
+      />
+      <JoinModal 
+        isOpen={joinModal}
+        onClose={() => setJoinModal(false)}
+      />
     </main>
   );
 }
