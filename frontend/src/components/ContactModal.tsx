@@ -1,49 +1,172 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Mail, MessageCircle, Send, CheckCircle } from 'lucide-react';
+import { X, Mail, MessageCircle, Phone, User, Send, CheckCircle, AlertCircle } from 'lucide-react';
+import { submitContactMessage, isValidEmail, isValidPhone, type ContactMessage } from '@/lib/contactService';
 
 interface ContactModalProps {
   isOpen: boolean;
-  onClose: () => void;
   type: 'email' | 'chat';
+  onClose: () => void;
 }
 
-export default function ContactModal({ isOpen, onClose, type }: ContactModalProps) {
-  const [formData, setFormData] = useState({
+interface FormData {
+  name: string;
+  email: string;
+  phone: string;
+  subject: string;
+  message: string;
+}
+
+interface FormErrors {
+  name?: string;
+  email?: string;
+  phone?: string;
+  subject?: string;
+  message?: string;
+}
+
+export default function ContactModal({ isOpen, type, onClose }: ContactModalProps) {
+  const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
+    phone: '',
     subject: '',
     message: ''
   });
+  
+  const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [submitMessage, setSubmitMessage] = useState('');
 
   if (!isOpen) return null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    // Simular envío (aquí puedes implementar la lógica real)
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-
-    // Reset después de 3 segundos
-    setTimeout(() => {
-      setIsSubmitted(false);
-      onClose();
-      setFormData({ name: '', email: '', subject: '', message: '' });
-    }, 3000);
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [name]: value
     }));
+    
+    // Limpiar error del campo cuando el usuario empiece a escribir
+    if (errors[name as keyof FormErrors]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: undefined
+      }));
+    }
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+
+    // Validar nombre
+    if (!formData.name.trim()) {
+      newErrors.name = 'El nombre es obligatorio';
+    } else if (formData.name.trim().length < 2) {
+      newErrors.name = 'El nombre debe tener al menos 2 caracteres';
+    }
+
+    // Validar email
+    if (!formData.email.trim()) {
+      newErrors.email = 'El email es obligatorio';
+    } else if (!isValidEmail(formData.email)) {
+      newErrors.email = 'Por favor ingresa un email válido';
+    }
+
+    // Validar teléfono (opcional)
+    if (formData.phone.trim() && !isValidPhone(formData.phone)) {
+      newErrors.phone = 'Por favor ingresa un teléfono válido';
+    }
+
+    // Validar asunto
+    if (!formData.subject.trim()) {
+      newErrors.subject = 'El asunto es obligatorio';
+    } else if (formData.subject.trim().length < 5) {
+      newErrors.subject = 'El asunto debe tener al menos 5 caracteres';
+    }
+
+    // Validar mensaje
+    if (!formData.message.trim()) {
+      newErrors.message = 'El mensaje es obligatorio';
+    } else if (formData.message.trim().length < 10) {
+      newErrors.message = 'El mensaje debe tener al menos 10 caracteres';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+
+    try {
+      const contactData: ContactMessage = {
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim() || undefined,
+        subject: formData.subject.trim(),
+        message: formData.message.trim(),
+        contact_type: type
+      };
+
+      await submitContactMessage(contactData);
+      
+      setSubmitStatus('success');
+      setSubmitMessage(
+        type === 'chat' 
+          ? '¡Mensaje enviado! Te contactaremos por chat lo antes posible.' 
+          : '¡Mensaje enviado correctamente! Te responderemos por email pronto.'
+      );
+      
+      // Limpiar formulario
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        subject: '',
+        message: ''
+      });
+      
+      // Cerrar modal después de 3 segundos
+      setTimeout(() => {
+        onClose();
+        setSubmitStatus('idle');
+        setSubmitMessage('');
+      }, 3000);
+
+    } catch (error) {
+      setSubmitStatus('error');
+      setSubmitMessage(
+        error instanceof Error 
+          ? error.message 
+          : 'Hubo un error al enviar el mensaje. Por favor, intenta de nuevo.'
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const resetModal = () => {
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      subject: '',
+      message: ''
+    });
+    setErrors({});
+    setSubmitStatus('idle');
+    setSubmitMessage('');
+    onClose();
   };
 
   return (
