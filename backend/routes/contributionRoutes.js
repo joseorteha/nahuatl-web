@@ -9,14 +9,14 @@ router.get('/user/:userId', async (req, res) => {
 
   try {
     const { data, error } = await supabase
-      .from('contribuciones')
+      .from('contribuciones_diccionario')
       .select(`
         *,
         perfiles!admin_revisor_id (
           nombre_completo
         )
       `)
-      .eq('user_id', userId)
+      .eq('usuario_id', userId)
       .order('fecha_creacion', { ascending: false });
 
     if (error) {
@@ -49,9 +49,10 @@ router.post('/', async (req, res) => {
 
   try {
     const { data, error } = await supabase
-      .from('contribuciones')
+      .from('contribuciones_diccionario')
       .insert({
-        user_id,
+        usuario_id: user_id,
+        usuario_email: '', // Necesitaremos obtener esto del perfil
         word,
         definition,
         info_gramatical,

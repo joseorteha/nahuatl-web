@@ -13,10 +13,10 @@ router.get('/contributions', async (req, res) => {
 
   try {
     const { data, error } = await supabase
-      .from('contribuciones')
+      .from('contribuciones_diccionario')
       .select(`
         *,
-        perfiles!user_id (
+        perfiles!usuario_id (
           nombre_completo,
           email,
           username
@@ -50,7 +50,7 @@ router.put('/contributions/:id', async (req, res) => {
 
   try {
     const { data, error } = await supabase
-      .from('contribuciones')
+      .from('contribuciones_diccionario')
       .update({
         estado,
         comentarios_admin,
