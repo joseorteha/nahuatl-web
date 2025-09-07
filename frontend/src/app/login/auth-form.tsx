@@ -40,7 +40,7 @@ export default function AuthForm() {
 
     try {
       if (isSignUp) {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web.onrender.com'}/api/register`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web.onrender.com'}/api/auth/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ nombre_completo: fullName, email, password, username }),
@@ -55,7 +55,7 @@ export default function AuthForm() {
         setUsername('');
         // Keep email for user convenience
       } else {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web.onrender.com'}/api/login`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web.onrender.com'}/api/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ emailOrUsername: email, password }),
