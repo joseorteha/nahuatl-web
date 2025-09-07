@@ -10,8 +10,10 @@ const config = {
   SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
   SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY,
   
-  // CORS
-  CORS_ORIGIN: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  // CORS - Permite múltiples orígenes
+  CORS_ORIGIN: process.env.CORS_ORIGIN ? 
+    process.env.CORS_ORIGIN.split(',').map(origin => origin.trim()) : 
+    ['http://localhost:3000', 'https://nahuatl-web.vercel.app'],
   
   // Rate limiting - Usar valores numéricos directos
   RATE_LIMIT_WINDOW: parseInt(process.env.RATE_LIMIT_WINDOW) * 60 * 1000 || 15 * 60 * 1000, // minutos a ms
