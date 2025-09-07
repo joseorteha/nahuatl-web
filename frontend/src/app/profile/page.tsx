@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { createAvatar } from '@dicebear/core';
 import { avataaars } from '@dicebear/collection';
 import Header from '@/components/Header';
+import Image from 'next/image';
 
 interface UserData {
   id: string;
@@ -20,7 +21,6 @@ export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [showAvatarSelector, setShowAvatarSelector] = useState(false);
-  const [avatarSeed, setAvatarSeed] = useState('');
   const [generatedAvatars, setGeneratedAvatars] = useState<string[]>([]);
   const [formData, setFormData] = useState({
     nombre_completo: '',
@@ -48,7 +48,6 @@ export default function ProfilePage() {
         username: parsedUser.username || '',
         email: parsedUser.email || ''
       });
-      setAvatarSeed(parsedUser.username || parsedUser.email || 'default');
       generateAvatars(parsedUser.username || parsedUser.email || 'default');
     } catch (error) {
       console.error('Error parsing user data:', error);
@@ -73,7 +72,6 @@ export default function ProfilePage() {
 
   const generateNewAvatars = () => {
     const newSeed = Math.random().toString(36).substring(7);
-    setAvatarSeed(newSeed);
     generateAvatars(newSeed);
   };
 
@@ -169,9 +167,11 @@ export default function ProfilePage() {
               <div className="relative">
                 <div className="w-32 h-32 rounded-full bg-white p-2 shadow-lg">
                   {user.url_avatar ? (
-                    <img 
+                    <Image 
                       src={user.url_avatar} 
                       alt="Avatar" 
+                      width={128}
+                      height={128}
                       className="w-full h-full rounded-full"
                     />
                   ) : (
@@ -357,9 +357,11 @@ export default function ProfilePage() {
                           className="w-24 h-24 mx-auto mb-3 rounded-full overflow-hidden cursor-pointer hover:ring-4 hover:ring-emerald-200 transition-all transform hover:scale-105"
                           onClick={() => selectAvatar(index)}
                         >
-                          <img 
+                          <Image 
                             src={avatar} 
                             alt={`Avatar ${index + 1}`} 
+                            width={96}
+                            height={96}
                             className="w-full h-full object-cover"
                           />
                         </div>
@@ -372,7 +374,7 @@ export default function ProfilePage() {
                   
                   <div className="mt-6 p-4 bg-emerald-50 rounded-xl">
                     <p className="text-sm text-emerald-800 text-center">
-                      💡 Haz clic en "Generar Nuevos" para crear avatares diferentes con el mismo estilo
+                      💡 Haz clic en &quot;Generar Nuevos&quot; para crear avatares diferentes con el mismo estilo
                     </p>
                   </div>
                 </div>
