@@ -2,6 +2,7 @@
 import { useState, useEffect, Fragment } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import Avatar from 'boring-avatars';
 import { useRouter } from 'next/navigation';
 import { Menu, Transition } from '@headlessui/react';
 import { User as UserIcon, LogOut, LayoutDashboard, Menu as MenuIcon, X, BookOpen, Users, MessageCircle } from 'lucide-react';
@@ -47,6 +48,40 @@ export default function Header() {
   const getInitials = (name?: string) => {
     if (!name) return 'U';
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+  };
+
+  // Helper para renderizar avatares
+  const renderAvatar = (avatarString: string | undefined, size: number = 36) => {
+    if (!avatarString) {
+      return getInitials(user?.nombre_completo);
+    }
+
+    if (avatarString.startsWith('boring-avatar:')) {
+      const parts = avatarString.split(':');
+      const name = parts[1];
+      const variant = parts[2];
+      const colors = parts[3].split(',');
+      
+      return (
+        <Avatar
+          size={size}
+          name={name}
+          variant={variant as any}
+          colors={colors}
+        />
+      );
+    }
+
+    // Si es una URL normal de imagen
+    return (
+      <Image 
+        src={avatarString} 
+        alt="Avatar" 
+        width={size} 
+        height={size} 
+        className="w-full h-full object-cover"
+      />
+    );
   };
 
   const navLinks = (
@@ -167,20 +202,45 @@ interface ProfileMenuProps {
   getInitials: (name?: string) => string;
 }
 
-const ProfileMenu: React.FC<ProfileMenuProps> = ({ user, onLogout, getInitials }) => (
+const ProfileMenu: React.FC<ProfileMenuProps> = ({ user, onLogout, getInitials }) => {
+  // Helper para renderizar avatares
+  const renderAvatar = (avatarString: string | undefined, size: number = 36) => {
+    if (!avatarString) {
+      return getInitials(user?.nombre_completo);
+    }
+
+    if (avatarString.startsWith('boring-avatar:')) {
+      const parts = avatarString.split(':');
+      const name = parts[1];
+      const variant = parts[2];
+      const colors = parts[3].split(',');
+      
+      return (
+        <Avatar
+          size={size}
+          name={name}
+          variant={variant as any}
+          colors={colors}
+        />
+      );
+    }
+
+    // Si es una URL normal de imagen
+    return (
+      <Image 
+        src={avatarString} 
+        alt="Avatar" 
+        width={size} 
+        height={size} 
+        className="w-full h-full object-cover"
+      />
+    );
+  };
+
+  return (
   <Menu as="div" className="relative">
     <Menu.Button className="flex items-center justify-center w-9 h-9 bg-gradient-to-br from-orange-500 to-violet-600 text-white rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-transform hover:scale-105 overflow-hidden">
-      {user.url_avatar ? (
-        <Image 
-          src={user.url_avatar} 
-          alt="Avatar" 
-          width={36} 
-          height={36} 
-          className="w-full h-full object-cover"
-        />
-      ) : (
-        getInitials(user.nombre_completo)
-      )}
+      {renderAvatar(user.url_avatar, 36)}
     </Menu.Button>
     <Transition
       as={Fragment}
@@ -231,3 +291,4 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ user, onLogout, getInitials }
     </Transition>
   </Menu>
 );
+};

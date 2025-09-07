@@ -19,6 +19,7 @@
     "@supabase/auth-ui-shared": "^0.1.8",
     "@supabase/supabase-js": "^2.50.1",
     "@types/lodash.debounce": "^4.0.9",
+    "boring-avatars": "^2.0.1",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.19.1",
     "lodash.debounce": "^4.0.8",

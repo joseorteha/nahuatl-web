@@ -4,8 +4,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { User, Mail, AtSign, Settings, Save, X, Edit3, RefreshCw, ExternalLink } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { createAvatar } from '@dicebear/core';
-import { personas, initials, thumbs } from '@dicebear/collection';
+import Avatar from 'boring-avatars';
 import Header from '@/components/Header';
 import Image from 'next/image';
 
@@ -22,7 +21,7 @@ export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [showAvatarSelector, setShowAvatarSelector] = useState(false);
-  const [generatedAvatars, setGeneratedAvatars] = useState<string[]>([]);
+  const [generatedAvatars, setGeneratedAvatars] = useState<Array<{name: string, variant: string, colors: string[]}>>([]);
   const [formData, setFormData] = useState({
     nombre_completo: '',
     username: '',
@@ -41,6 +40,44 @@ export default function ProfilePage() {
   const router = useRouter();
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web.onrender.com';
+
+  // Helper para renderizar avatares
+  const renderAvatar = (avatarString: string | undefined, size: number = 128) => {
+    if (!avatarString) {
+      return (
+        <div className="w-full h-full rounded-full bg-emerald-100 flex items-center justify-center">
+          <User className={`w-${size/8} h-${size/8} text-emerald-600`} />
+        </div>
+      );
+    }
+
+    if (avatarString.startsWith('boring-avatar:')) {
+      const parts = avatarString.split(':');
+      const name = parts[1];
+      const variant = parts[2];
+      const colors = parts[3].split(',');
+      
+      return (
+        <Avatar
+          size={size}
+          name={name}
+          variant={variant as any}
+          colors={colors}
+        />
+      );
+    }
+
+    // Si es una URL normal de imagen
+    return (
+      <Image 
+        src={avatarString} 
+        alt="Avatar" 
+        width={size}
+        height={size}
+        className="w-full h-full rounded-full object-cover"
+      />
+    );
+  };
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
@@ -69,37 +106,26 @@ export default function ProfilePage() {
   }, [router]);
 
   const generateAvatars = (seed: string) => {
-    const avatars: string[] = [];
+    const variants = ['marble', 'beam', 'pixel', 'sunset', 'ring', 'bauhaus'];
+    const colors = [
+      ['#92A1C6', '#146A7C', '#F0AB3D', '#C271B4', '#C20D90'],
+      ['#264653', '#2A9D8F', '#E9C46A', '#F4A261', '#E76F51'],
+      ['#F1FAEE', '#A8DADC', '#457B9D', '#1D3557', '#F1FAEE'],
+      ['#FFE66D', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4'],
+      ['#FFEAA7', '#DDA0DD', '#98D8C8', '#FF7675', '#74B9FF'],
+      ['#A29BFE', '#FD79A8', '#FDCB6E', '#6C5CE7', '#00B894']
+    ];
     
-    // Generar 2 avatares con personas (profesional y minimalista)
-    for (let i = 0; i < 2; i++) {
-      const avatar = createAvatar(personas, {
-        seed: `${seed}-personas-${i}`,
-        size: 128,
-        backgroundColor: ['f0f9ff', 'e0f2fe', 'f0fdf4', 'fefce8', 'fdf2f8'],
-      });
-      avatars.push(avatar.toDataUri());
-    }
+    const avatars: any[] = [];
     
-    // Generar 2 avatares con iniciales (formal y elegante)
-    for (let i = 0; i < 2; i++) {
-      const avatar = createAvatar(initials, {
-        seed: `${seed}-initials-${i}`,
-        size: 128,
-        backgroundColor: ['3b82f6', '10b981', '8b5cf6', 'f59e0b', 'ef4444'],
-      });
-      avatars.push(avatar.toDataUri());
-    }
-    
-    // Generar 2 avatares con thumbs (iconos pulgar arriba, positivo)
-    for (let i = 0; i < 2; i++) {
-      const avatar = createAvatar(thumbs, {
-        seed: `${seed}-thumbs-${i}`,
-        size: 128,
-        backgroundColor: ['dbeafe', 'd1fae5', 'e0e7ff', 'fef3c7', 'fce7f3'],
-      });
-      avatars.push(avatar.toDataUri());
-    }
+    variants.forEach((variant, index) => {
+      const avatarData = {
+        name: `${seed}-${variant}-${index}`,
+        variant: variant as any,
+        colors: colors[index % colors.length],
+      };
+      avatars.push(avatarData);
+    });
     
     setGeneratedAvatars(avatars);
   };
@@ -148,8 +174,10 @@ export default function ProfilePage() {
   };
 
   const selectAvatar = (avatarIndex: number) => {
-    const selectedAvatar = generatedAvatars[avatarIndex];
-    const updatedUser = { ...user!, url_avatar: selectedAvatar };
+    const selectedAvatarData = generatedAvatars[avatarIndex];
+    // Crear un identificador único para este avatar que el header pueda usar
+    const avatarString = `boring-avatar:${selectedAvatarData.name}:${selectedAvatarData.variant}:${selectedAvatarData.colors.join(',')}`;
+    const updatedUser = { ...user!, url_avatar: avatarString };
     setUser(updatedUser);
     // Actualizar localStorage inmediatamente para que el header se actualice
     localStorage.setItem('user', JSON.stringify(updatedUser));
@@ -242,20 +270,8 @@ export default function ProfilePage() {
           <div className="bg-gradient-to-r from-emerald-600 to-teal-600 px-8 py-12">
             <div className="flex flex-col md:flex-row items-center gap-6">
               <div className="relative">
-                <div className="w-32 h-32 rounded-full bg-white p-2 shadow-lg">
-                  {user.url_avatar ? (
-                    <Image 
-                      src={user.url_avatar} 
-                      alt="Avatar" 
-                      width={128}
-                      height={128}
-                      className="w-full h-full rounded-full"
-                    />
-                  ) : (
-                    <div className="w-full h-full rounded-full bg-emerald-100 flex items-center justify-center">
-                      <User className="w-16 h-16 text-emerald-600" />
-                    </div>
-                  )}
+                <div className="w-32 h-32 rounded-full bg-white p-2 shadow-lg flex items-center justify-center">
+                  {renderAvatar(user.url_avatar, 120)}
                 </div>
                 <button
                   onClick={() => setShowAvatarSelector(true)}
@@ -428,22 +444,21 @@ export default function ProfilePage() {
                 
                 <div className="p-6">
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                    {generatedAvatars.map((avatar, index) => (
+                    {generatedAvatars.map((avatarData, index) => (
                       <div key={index} className="text-center">
                         <div 
-                          className="w-24 h-24 mx-auto mb-3 rounded-full overflow-hidden cursor-pointer hover:ring-4 hover:ring-emerald-200 transition-all transform hover:scale-105"
+                          className="w-24 h-24 mx-auto mb-3 rounded-full overflow-hidden cursor-pointer hover:ring-4 hover:ring-emerald-200 transition-all transform hover:scale-105 flex items-center justify-center"
                           onClick={() => selectAvatar(index)}
                         >
-                          <Image 
-                            src={avatar} 
-                            alt={`Avatar ${index + 1}`} 
-                            width={96}
-                            height={96}
-                            className="w-full h-full object-cover"
+                          <Avatar
+                            size={96}
+                            name={avatarData.name}
+                            variant={avatarData.variant as any}
+                            colors={avatarData.colors}
                           />
                         </div>
                         <p className="text-sm text-gray-600">
-                          Avatar {index + 1}
+                          {avatarData.variant}
                         </p>
                       </div>
                     ))}
