@@ -13,6 +13,9 @@ const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 // Rutas
 const authRoutes = require('./routes/authRoutes');
 const dictionaryRoutes = require('./routes/dictionaryRoutes');
+const feedbackRoutes = require('./routes/feedbackRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+const contributionRoutes = require('./routes/contributionRoutes');
 
 // Crear aplicación Express
 const app = express();
@@ -71,7 +74,10 @@ app.get('/', (req, res) => {
     endpoints: {
       health: '/health',
       auth: '/api/auth/*',
-      dictionary: '/api/dictionary/*'
+      dictionary: '/api/dictionary/*',
+      feedback: '/api/feedback/*',
+      admin: '/api/admin/*',
+      contributions: '/api/contributions/*'
     },
     docs: 'https://github.com/joseorteha/nahuatl-web/blob/main/backend/README.md'
   });
@@ -80,6 +86,9 @@ app.get('/', (req, res) => {
 // Registrar rutas de la API
 app.use('/api/auth', authRoutes);
 app.use('/api/dictionary', dictionaryRoutes);
+app.use('/api/feedback', feedbackRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/contributions', contributionRoutes);
 
 // ===== MANEJO DE ERRORES =====
 
