@@ -65,15 +65,18 @@ class AuthController {
    */
   async login(req, res) {
     try {
-      const { email, password } = req.body;
+      const { email, password, emailOrUsername } = req.body;
 
-      if (!email || !password) {
+      // Aceptar tanto email como emailOrUsername para compatibilidad
+      const loginIdentifier = email || emailOrUsername;
+
+      if (!loginIdentifier || !password) {
         return res.status(400).json({ 
-          error: 'Email y contraseña son requeridos' 
+          error: 'Email/usuario y contraseña son requeridos' 
         });
       }
 
-      const user = await userService.loginUser(email, password);
+      const user = await userService.loginUser(loginIdentifier, password);
 
       res.json({
         message: 'Login exitoso',

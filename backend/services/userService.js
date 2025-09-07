@@ -48,17 +48,17 @@ class UserService {
 
   /**
    * Autenticar usuario
-   * @param {string} email - Email del usuario
+   * @param {string} emailOrUsername - Email o username del usuario
    * @param {string} password - Contraseña
    * @returns {Promise<Object>} Usuario autenticado
    */
-  async loginUser(email, password) {
+  async loginUser(emailOrUsername, password) {
     try {
-      // Buscar usuario por email
+      // Buscar usuario por email o username
       const { data: user, error } = await supabase
         .from('perfiles')
         .select('*')
-        .eq('email', email)
+        .or(`email.eq.${emailOrUsername},username.eq.${emailOrUsername}`)
         .maybeSingle();
 
       if (error) throw error;
