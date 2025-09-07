@@ -107,7 +107,7 @@ class UserService {
     try {
       const { data: user, error } = await supabase
         .from('perfiles')
-        .select('id, email, username, nombre_completo, rol, fecha_creacion, fecha_actualizacion')
+        .select('id, email, username, nombre_completo, url_avatar, rol, fecha_creacion, fecha_actualizacion')
         .eq('id', userId)
         .maybeSingle();
 
@@ -131,12 +131,12 @@ class UserService {
    */
   async updateUserProfile(userId, updateData) {
     try {
-      const allowedFields = ['nombre_completo', 'username'];
+      const allowedFields = ['nombre_completo', 'username', 'email', 'url_avatar'];
       const filteredData = {};
       
       // Filtrar solo campos permitidos
       Object.keys(updateData).forEach(key => {
-        if (allowedFields.includes(key)) {
+        if (allowedFields.includes(key) && updateData[key] !== null && updateData[key] !== undefined) {
           filteredData[key] = updateData[key];
         }
       });
@@ -145,11 +145,14 @@ class UserService {
         throw new Error('No hay campos válidos para actualizar');
       }
 
+      // Agregar fecha de actualización
+      filteredData.fecha_actualizacion = new Date().toISOString();
+
       const { data: updatedUser, error } = await supabase
         .from('perfiles')
         .update(filteredData)
         .eq('id', userId)
-        .select('id, email, username, nombre_completo, rol, fecha_registro')
+        .select('id, email, username, nombre_completo, url_avatar, rol, fecha_creacion, fecha_actualizacion')
         .single();
 
       if (error) throw error;

@@ -53,7 +53,7 @@ export default function FAQPage() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-amber-50 via-emerald-50 to-white relative overflow-hidden py-20 px-4 sm:px-6 lg:px-8">
       {/* Fondo decorativo */}
-      <div className="absolute inset-0 opacity-10 bg-[url('/assets/nahuatl-pattern.svg')] bg-repeat"></div>
+      <div className="absolute inset-0 opacity-10 bg-gradient-to-br from-emerald-50 to-teal-50"></div>
       
       {/* Contenido principal */}
       <div className="relative z-10 max-w-4xl mx-auto">

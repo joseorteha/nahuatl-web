@@ -20,7 +20,8 @@ import Header from '@/components/Header';
 interface User {
   id: string;
   email: string;
-  full_name?: string;
+  nombre_completo?: string;
+  username?: string;
 }
 
 export default function Dashboard() {
@@ -70,7 +71,7 @@ export default function Dashboard() {
       <Header />
       
       {/* Fondo decorativo */}
-      <div className="absolute inset-0 opacity-5 bg-[url('/assets/nahuatl-pattern.svg')] bg-repeat"></div>
+      <div className="absolute inset-0 opacity-5 bg-gradient-to-br from-emerald-50 to-teal-50"></div>
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
         <motion.div
@@ -88,7 +89,7 @@ export default function Dashboard() {
               ¡Bienvenido a tu espacio de aprendizaje!
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-amber-800 mb-4">
-              ¡Bienvenido, <span className="text-emerald-700">{user?.full_name || 'Amigo'}!</span>
+              ¡Bienvenido, <span className="text-emerald-700">{user?.nombre_completo || user?.username || 'Usuario'}!</span>
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Bienvenido a <span className="font-bold text-emerald-600">Nawatlahtol</span>, tu plataforma para aprender y preservar la lengua náhuatl. 

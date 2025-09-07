@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { User, Mail, AtSign, Settings, Save, X, Edit3, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createAvatar } from '@dicebear/core';
-import { avataaars } from '@dicebear/collection';
+import { lorelei, notionists, openPeeps } from '@dicebear/collection';
 import Header from '@/components/Header';
 import Image from 'next/image';
 
@@ -58,15 +58,38 @@ export default function ProfilePage() {
   }, [router]);
 
   const generateAvatars = (seed: string) => {
-    const seeds = [seed, seed + '1', seed + '2', seed + '3', seed + '4', seed + '5'];
-    const avatars = seeds.map(currentSeed => {
-      const avatar = createAvatar(avataaars, {
-        seed: currentSeed,
+    const avatars: string[] = [];
+    
+    // Generar 2 avatares con lorelei
+    for (let i = 0; i < 2; i++) {
+      const avatar = createAvatar(lorelei, {
+        seed: `${seed}-lorelei-${i}`,
         size: 128,
         backgroundColor: ['transparent'],
       });
-      return avatar.toDataUri();
-    });
+      avatars.push(avatar.toDataUri());
+    }
+    
+    // Generar 2 avatares con notionists
+    for (let i = 0; i < 2; i++) {
+      const avatar = createAvatar(notionists, {
+        seed: `${seed}-notionists-${i}`,
+        size: 128,
+        backgroundColor: ['transparent'],
+      });
+      avatars.push(avatar.toDataUri());
+    }
+    
+    // Generar 2 avatares con openPeeps
+    for (let i = 0; i < 2; i++) {
+      const avatar = createAvatar(openPeeps, {
+        seed: `${seed}-openpeeps-${i}`,
+        size: 128,
+        backgroundColor: ['transparent'],
+      });
+      avatars.push(avatar.toDataUri());
+    }
+    
     setGeneratedAvatars(avatars);
   };
 
