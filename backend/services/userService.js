@@ -225,6 +225,36 @@ class UserService {
       throw error;
     }
   }
+
+  /**
+   * Obtener palabras guardadas por el usuario
+   * @param {number} userId - ID del usuario
+   * @returns {Promise<Array>} Lista de palabras guardadas
+   */
+  async getSavedWords(userId) {
+    try {
+      const { data: savedWords, error } = await supabase
+        .from('palabras_guardadas')
+        .select(`
+          id,
+          fecha_creacion,
+          diccionario (
+            id,
+            word,
+            definition,
+            info_gramatical
+          )
+        `)
+        .eq('usuario_id', userId)
+        .order('fecha_creacion', { ascending: false });
+
+      if (error) throw error;
+      return savedWords || [];
+    } catch (error) {
+      console.error('Error obteniendo palabras guardadas:', error);
+      throw error;
+    }
+  }
 }
 
 module.exports = new UserService();

@@ -182,6 +182,34 @@ class AuthController {
       });
     }
   }
+
+  /**
+   * Obtener palabras guardadas del usuario
+   * @param {Request} req - Objeto de request
+   * @param {Response} res - Objeto de response
+   */
+  async getSavedWords(req, res) {
+    try {
+      const { userId } = req.params;
+
+      if (!userId) {
+        return res.status(400).json({ error: 'ID de usuario requerido' });
+      }
+
+      const savedWords = await userService.getSavedWords(userId);
+      
+      res.json({
+        message: 'Palabras guardadas obtenidas exitosamente',
+        savedWords: savedWords
+      });
+    } catch (error) {
+      console.error('Error al obtener palabras guardadas:', error);
+      res.status(500).json({ 
+        error: 'Error al obtener palabras guardadas',
+        message: error.message 
+      });
+    }
+  }
 }
 
 module.exports = new AuthController();

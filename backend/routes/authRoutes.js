@@ -18,4 +18,7 @@ router.put('/profile/:userId', authController.updateProfile);
 // GET /api/auth/stats/:userId - Obtener estadísticas del usuario
 router.get('/stats/:userId', authController.getUserStats);
 
+// GET /api/auth/saved-words/:userId - Obtener palabras guardadas del usuario
+router.get('/saved-words/:userId', authController.getSavedWords);
+
 module.exports = router;
