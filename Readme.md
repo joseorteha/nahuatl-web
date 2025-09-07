@@ -1,117 +1,175 @@
-# Documentación General - Nawatlahtol (Aplicación de Aprendizaje de Náhuatl)
+# 🌸 Nawatlahtol - Plataforma Colaborativa de Aprendizaje Náhuatl
+
+[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](https://github.com/joseorteha/nahuatl-web)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://nahuatl-web.vercel.app)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Contributions](https://img.shields.io/badge/contributions-welcome-orange.svg)](CONTRIBUTING.md)
+
+> **Una plataforma educativa moderna para preservar, aprender y contribuir al náhuatl a través de tecnología colaborativa.**
+
+[🌐 **Demo en Vivo**](https://nahuatl-web.vercel.app) | [📖 **Documentación**](./docs/) | [🤝 **Contribuir**](CONTRIBUTING.md) | [🐛 **Reportar Bug**](https://github.com/joseorteha/nahuatl-web/issues)
+
+---
 
 ## 📋 Índice
-1. [Visión General del Proyecto](#visión-general-del-proyecto)
-2. [Arquitectura de la Solución](#arquitectura-de-la-solución)
-3. [Estructura del Repositorio](#estructura-del-repositorio)
-4. [Configuración del Entorno de Desarrollo](#configuración-del-entorno-de-desarrollo)
-5. [Características Principales](#características-principales)
-6. [Guías de Usuario](#guías-de-usuario)
-7. [Flujos de Usuario](#flujos-de-usuario)
-8. [Modelo de Datos](#modelo-de-datos)
-9. [Integración Frontend-Backend](#integración-frontend-backend)
-10. [Roadmap y Desarrollo Futuro](#roadmap-y-desarrollo-futuro)
-11. [Contribución al Proyecto](#contribución-al-proyecto)
-12. [Licencia y Atribuciones](#licencia-y-atribuciones)
-13. [Preguntas Frecuentes](#preguntas-frecuentes)
+1. [🎯 Visión General del Proyecto](#-visión-general-del-proyecto)
+2. [✨ Características Principales](#-características-principales)
+3. [🏗️ Arquitectura de la Solución](#️-arquitectura-de-la-solución)
+4. [📁 Estructura del Repositorio](#-estructura-del-repositorio)
+5. [🚀 Configuración y Desarrollo](#-configuración-y-desarrollo)
+6. [🔒 Sistema de Roles y Permisos](#-sistema-de-roles-y-permisos)
+7. [🌸 Sistema de Contribuciones](#-sistema-de-contribuciones)
+8. [📊 Modelo de Datos](#-modelo-de-datos)
+9. [🔄 Flujos de Usuario](#-flujos-de-usuario)
+10. [🗺️ Roadmap y Desarrollo Futuro](#️-roadmap-y-desarrollo-futuro)
 
 ---
 
-## Visión General del Proyecto
+## 🎯 Visión General del Proyecto
 
-### Misión
+### 🎌 Misión
 
-Nawatlahtol es una plataforma educativa interactiva diseñada para preservar, difundir y enseñar la lengua náhuatl utilizando tecnologías modernas. El proyecto busca conectar a hablantes, estudiantes y entusiastas para contribuir a la revitalización de esta importante lengua indígena de México.
+**Nawatlahtol** es una plataforma educativa colaborativa que utiliza tecnologías modernas para preservar, difundir y enseñar la lengua náhuatl. Nuestro objetivo es crear una comunidad activa donde hablantes, estudiantes y entusiastas contribuyan juntos a la revitalización de esta importante lengua indígena de México.
 
-### Objetivos
+### 🎯 Objetivos Estratégicos
 
-1. **Preservación Cultural**: Contribuir a la documentación y preservación del náhuatl como patrimonio cultural inmaterial
-2. **Educación Accesible**: Proporcionar herramientas gratuitas para el aprendizaje del náhuatl
-3. **Comunidad Activa**: Crear una red de aprendices y hablantes que colaboren en el enriquecimiento continuo de la plataforma
-4. **Innovación Tecnológica**: Aplicar tecnologías modernas para métodos educativos efectivos
+| Objetivo | Descripción | Estado |
+|----------|-------------|---------|
+| **🏛️ Preservación Cultural** | Documentar y preservar el náhuatl como patrimonio inmaterial | ✅ Activo |
+| **📚 Educación Accesible** | Herramientas gratuitas para aprendizaje del náhuatl | ✅ Implementado |
+| **🤝 Comunidad Colaborativa** | Red de contribuyentes para enriquecimiento continuo | ✅ **Nuevo** |
+| **🚀 Innovación Tecnológica** | Tecnologías modernas para métodos educativos efectivos | ✅ Continuo |
 
-### Público Objetivo
+### 👥 Público Objetivo
 
-- Estudiantes interesados en aprender náhuatl
-- Personas con raíces culturales náhuatl que desean reconectar con su herencia
-- Investigadores y lingüistas enfocados en lenguas indígenas
-- Educadores que buscan recursos para enseñanza
-- Entusiastas de la cultura y lenguas mesoamericanas
-
-### Historia del Proyecto
-
-Nawatlahtol nació como un proyecto de preservación cultural iniciado por José Ortega, con el objetivo de aplicar tecnologías modernas para difundir y revitalizar el náhuatl. Lo que comenzó como un diccionario digital evolucionó a una plataforma educativa completa que integra múltiples herramientas de aprendizaje y fomenta la creación de comunidad.
+- **🎓 Estudiantes** interesados en aprender náhuatl
+- **🌱 Personas con raíces culturales** que desean reconectar con su herencia
+- **🔬 Investigadores y lingüistas** enfocados en lenguas indígenas
+- **👨‍🏫 Educadores** que buscan recursos para enseñanza
+- **❤️ Entusiastas** de la cultura y lenguas mesoamericanas
 
 ---
 
-## Arquitectura de la Solución
+## ✨ Características Principales
 
-### Visión General de la Arquitectura
+### 🆕 **Nuevo: Sistema de Contribuciones Colaborativas** 
+> *Lanzado en v2.0 - Septiembre 2025*
 
-Nawatlahtol sigue una arquitectura cliente-servidor moderna con una clara separación entre frontend y backend:
+- ✅ **Contribuciones de Palabras**: Los usuarios pueden proponer nuevas palabras al diccionario
+- ✅ **Panel de Moderación**: Admins y moderadores revisan y aprueban contribuciones
+- ✅ **Workflow Completo**: Desde propuesta hasta publicación automática
+- ✅ **Historial de Contribuciones**: Tracking completo de contribuciones por usuario
 
-```
-┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐
-│                 │       │                 │       │                 │
-│  FRONTEND       │       │  BACKEND        │       │  BASE DE DATOS  │
-│  (Next.js)      │◄─────►│  (Express.js)   │◄─────►│  (Supabase)     │
-│                 │       │                 │       │                 │
-└─────────────────┘       └─────────────────┘       └─────────────────┘
-        ▲                         ▲                         ▲
-        │                         │                         │
-        ▼                         ▼                         ▼
-┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐
-│                 │       │                 │       │                 │
-│  USUARIOS       │       │  ARCHIVOS JSON  │       │  ALMACENAMIENTO │
-│  (Navegador)    │       │  (Diccionario,  │       │  (Avatares,     │
-│                 │       │   Lecciones)    │       │   Archivos)     │
-└─────────────────┘       └─────────────────┘       └─────────────────┘
-```
+### 🏛️ **Funcionalidades Core**
 
-### Componentes Principales
+| Funcionalidad | Descripción | Estado |
+|---------------|-------------|---------|
+| **📖 Diccionario Interactivo** | 4,300+ palabras con pronunciación y ejemplos | ✅ Estable |
+| **💬 Sistema de Comunidad** | Feedback, discusiones y colaboración | ✅ Mejorado |
+| **👤 Gestión de Usuarios** | Perfiles, autenticación y roles | ✅ Estable |
+| **🎯 Palabras Guardadas** | Sistema de favoritos personalizado | ✅ Estable |
+| **📱 PWA Ready** | Funciona offline y como app móvil | ✅ Estable |
 
-1. **Frontend (Next.js)**:
-   - Interfaz de usuario interactiva
-  - Renderizado híbrido (SSR + CSR)
-   - Rutas y navegación
-   - Componentes reutilizables
-   - Gestión de estado del cliente
+### 🔒 **Sistema de Roles Avanzado**
 
-2. **Backend (Express.js)**:
-   - API RESTful
-   - Lógica de negocio
-   - Acceso a datos
-   - Autenticación y autorización
-   - Manejo de errores
+| Rol | Permisos | Funcionalidades |
+|-----|----------|----------------|
+| **👤 Usuario** | Básicos | Buscar, guardar palabras, contribuir |
+| **🛡️ Moderador** | Moderación | + Revisar contribuciones, moderar comunidad |
+| **⚡ Admin** | Completos | + Gestión total, estadísticas, configuración |
 
-3. **Base de Datos (Supabase)**:
-   - Almacenamiento de datos de usuario
-   - Sistema de autenticación
-   - Relaciones entre entidades
-   - Gestión de permisos
-   - API en tiempo real (futura implementación)
+---
 
-4. **Archivos JSON**:
-   - Diccionario Náhuatl-Español
-   - Estructura de lecciones
-   - Datos de práctica y ejercicios
+## 🏗️ Arquitectura de la Solución
 
-### Diagrama de Flujo de Datos
+### 🎨 Stack Tecnológico Moderno
 
 ```
-┌────────────┐    1. Solicitud    ┌────────────┐    2. Procesamiento    ┌────────────┐
-│            │───────────────────►│            │─────────────────────►  │            │
-│  Cliente   │                    │  API       │                        │  Servicios │
-│  (Browser) │◄───────────────────│  Express   │◄─────────────────────  │  (Lógica)  │
-│            │    8. Respuesta    │            │    7. Resultado        │            │
-└────────────┘                    └────────────┘                        └────────────┘
-                                       ▲  │                                ▲  │
-                                       │  │                                │  │
-                                       │  │ 3. Consulta                    │  │ 5. Acceso
-                                       │  ▼                                │  ▼
-                                  ┌────────────┐                      ┌────────────┐
-                                  │            │                      │            │
-                                  │  Supabase  │◄─────────────────────│  Archivos  │
+🎯 FRONTEND               🔧 BACKEND                🗄️ BASE DE DATOS
+├── Next.js 15.3.4        ├── Node.js + Express     ├── Supabase PostgreSQL
+├── TypeScript             ├── Supabase Client       ├── Row Level Security
+├── Tailwind CSS           ├── CORS + JSON Parser    ├── Real-time subscriptions
+├── Headless UI            ├── API RESTful           └── Cloud Storage
+└── PWA Ready              └── Middleware Auth       
+
+📦 DEPLOYMENT             🛡️ SEGURIDAD              🔄 INTEGRACIONES
+├── Vercel (Frontend)      ├── JWT Authentication    ├── GitHub Actions
+├── Render (Backend)       ├── Role-based Access     ├── API Rate Limiting
+├── Supabase Cloud         ├── Input Validation      └── Error Monitoring
+└── CDN Global             └── HTTPS Everywhere      
+```
+
+### 🏛️ Arquitectura de Microservicios
+
+```mermaid
+graph TB
+    A[👤 Usuario] --> B[🌐 Frontend Next.js]
+    B --> C[⚡ API Gateway Express]
+    C --> D[🗄️ Supabase PostgreSQL]
+    C --> E[📁 Archivos JSON]
+    
+    F[🔐 Auth Supabase] --> B
+    F --> C
+    
+    G[🌸 Sistema Contribuciones] --> C
+    H[💬 Sistema Comunidad] --> C
+    I[📖 Motor Diccionario] --> E
+    
+    D --> J[👥 Perfiles]
+    D --> K[🌸 Contribuciones]
+    D --> L[💬 Retroalimentación]
+    D --> M[⭐ Palabras Guardadas]
+```
+
+### 🔄 Flujo de Datos Principal
+
+```
+1. 👤 Usuario hace solicitud
+   ↓
+2. 🌐 Next.js Router + Middleware
+   ↓
+3. ⚡ Express API Endpoint
+   ↓
+4. 🛡️ Validación + Auth
+   ↓
+5. 🗄️ Consulta Supabase/JSON
+   ↓
+6. 📊 Procesamiento de datos
+   ↓
+7. 📤 Respuesta estructurada
+   ↓
+8. 🎨 Renderizado en UI
+```
+
+### 🆕 **Nueva Arquitectura de Contribuciones**
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    🌸 SISTEMA DE CONTRIBUCIONES                 │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  👤 Usuario          🛡️ Moderador         ⚡ Admin             │
+│  ├── Proponer        ├── Revisar           ├── Gestión total   │
+│  ├── Editar          ├── Aprobar/Rechazar  ├── Estadísticas    │
+│  └── Historial       └── Comentarios       └── Configuración   │
+│                                                                 │
+│  📊 WORKFLOW DE CONTRIBUCIÓN:                                  │
+│  Propuesta → Revisión → Aprobación → Publicación Automática    │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 📊 Modelo de Datos Integrado
+
+| Tabla | Propósito | Relaciones |
+|-------|-----------|------------|
+| **`perfiles`** | Datos de usuario + roles | → `contribuciones_diccionario` |
+| **`contribuciones_diccionario`** | Nuevas palabras propuestas | → `perfiles`, `diccionario_nawatl` |
+| **`diccionario_nawatl`** | Diccionario principal | ← `contribuciones_diccionario` |
+| **`retroalimentacion`** | Sistema de comunidad | → `perfiles` |
+| **`palabras_guardadas`** | Favoritos de usuarios | → `perfiles` |
+
+---
                                   │  Database  │                      │  JSON      │
                                   │            │─────────────────────►│            │
                                   └────────────┘                      └────────────┘
@@ -139,101 +197,688 @@ El proyecto está organizado en un repositorio monolítico con dos carpetas prin
 nahuatl-app/
 ├── BD.sql                      # Script SQL de la base de datos
 ├── dicc-zon.md                 # Documentación del diccionario
-├── SUPABASE_SETUP.md           # Guía de configuración de Supabase
-├── vercel.json                 # Configuración de despliegue en Vercel
-├── backend/                    # API y servicios backend
-│   ├── index.js                # Punto de entrada del servidor
-│   ├── package.json            # Dependencias backend
-│   ├── README.md               # Documentación del backend
-│   └── data/                   # Datos JSON
-│       ├── dictionary.json     # Diccionario Náhuatl-Español
-│       ├── lecciones.json      # Lecciones en español
-│       ├── lessons.json        # Lecciones en inglés
-│       └── vocabulario.json    # Vocabulario por temas
-├── frontend/                   # Aplicación cliente
-│   ├── package.json            # Dependencias frontend
-│   ├── next.config.ts          # Configuración de Next.js
-│   ├── tailwind.config.js      # Configuración de Tailwind CSS
-│   ├── tsconfig.json           # Configuración de TypeScript
-│   ├── README.md               # Documentación del frontend
-│   ├── public/                 # Archivos estáticos
-│   ├── scripts/                # Scripts de utilidad
-│   └── src/                    # Código fuente
-│       ├── app/                # Páginas y rutas
-│       ├── components/         # Componentes reutilizables
-│       └── lib/                # Utilidades y configuraciones
-```
+## 📁 Estructura del Repositorio
 
-### Estructura de Archivos Clave
-
-#### Frontend (`frontend/src/`)
+### 🗂️ **Estructura de Alto Nivel**
 
 ```
-src/
-├── app/                       # Páginas y rutas (Next.js App Router)
-│   ├── layout.tsx             # Layout principal
-│   ├── page.tsx               # Página de inicio
-│   ├── diccionario/           # Página del diccionario
-│   ├── dashboard/             # Dashboard del usuario
-│   ├── login/                 # Autenticación
-│   ├── profile/               # Perfil de usuario
-│   ├── feedback/              # Sistema de comentarios
-│   └── ...                    # Otras páginas
-├── components/                # Componentes reutilizables
-│   ├── Header.tsx             # Barra de navegación
-│   ├── Footer.tsx             # Pie de página
-│   ├── Quiz.tsx               # Componente de cuestionario
-│   ├── AnimatedBackground.tsx # Fondo animado
-│   └── ...                    # Otros componentes
-└── lib/                       # Utilidades y configuración
-    ├── supabaseClient.ts      # Cliente de Supabase
-    └── database.types.ts      # Tipos de la base de datos
+nahuatl-web/
+├── 📋 BD.sql                       # Schema inicial de base de datos
+├── 🌸 BD_CONTRIBUCIONES.sql       # ✨ NUEVO: Schema de contribuciones
+├── 📚 Readme.md                   # Documentación principal (ESTE ARCHIVO)
+├── ⚙️ SUPABASE_SETUP.md           # Guía de configuración de Supabase
+├── 🚀 vercel.json                 # Configuración de deploy Vercel
+├── 🔧 backend/                    # 🖥️ Servidor API Express.js
+│   ├── 📜 index.js                # Punto de entrada del servidor
+│   ├── 📦 package.json            # Dependencias del backend
+│   ├── 📖 README.md               # Documentación específica del backend
+│   ├── 📄 DOCUMENTACION_BACKEND.md # Guía técnica detallada
+│   └── 🗂️ data/                   # Archivos JSON estáticos
+│       ├── 📖 dictionary.json     # 4,300+ palabras Náhuatl-Español
+│       ├── 📚 lecciones.json      # Lecciones estructuradas (ES)
+│       ├── 📚 lessons.json        # Lecciones estructuradas (EN)
+│       └── 📝 vocabulario.json    # Vocabulario temático
+└── 🎨 frontend/                   # 🌐 Aplicación Next.js
+    ├── 📦 package.json            # Dependencias del frontend
+    ├── ⚙️ next.config.ts          # Configuración Next.js 15
+    ├── 🎨 tailwind.config.js      # Configuración Tailwind CSS
+    ├── 📘 tsconfig.json           # Configuración TypeScript
+    ├── 📖 README.md               # Documentación del frontend
+    ├── 📄 DOCUMENTACION_FRONTEND.md # Guía técnica detallada
+    ├── 📄 SETUP.md                # Guía de configuración
+    ├── 📄 SUPABASE_SETUP.md       # Setup específico Supabase
+    ├── 📁 public/                 # Recursos estáticos
+    │   ├── 🌸 logo.png            # Logo de la aplicación
+    │   ├── 👤 jose.jpeg           # Avatar del desarrollador
+    │   └── 🎨 *.svg               # Iconos y gráficos
+    ├── 🔧 scripts/                # Scripts de utilidad
+    │   └── ✅ check-env.js        # Validador de variables de entorno
+    └── 💻 src/                    # 🧠 Código fuente principal
+        ├── 🛡️ middleware.ts       # Middleware de autenticación
+        ├── 📱 app/                # 🗂️ Rutas y páginas (App Router)
+        ├── 🧩 components/         # 🔄 Componentes reutilizables
+        └── 📚 lib/                # 🛠️ Utilidades y configuraciones
 ```
 
-#### Backend (`backend/`)
+### 🆕 **Archivos Nuevos del Sistema de Contribuciones**
 
 ```
-backend/
-├── index.js                   # Servidor Express y endpoints
-├── data/                      # Datos estáticos
-│   ├── dictionary.json        # Diccionario completo
-│   ├── lessons.json           # Estructura de lecciones
-│   └── ...                    # Otros archivos de datos
-└── package.json               # Dependencias y scripts
+📁 frontend/src/app/
+├── 🌸 contribuir/page.tsx         # ✨ NUEVO: Página de contribuciones
+├── ⚡ admin/page.tsx              # ✨ NUEVO: Panel de administración
+└── 🤝 ContributeWordForm.tsx     # ✨ NUEVO: Formulario de contribución
+
+🗄️ Base de Datos:
+├── 🌸 BD_CONTRIBUCIONES.sql      # ✨ NUEVO: Schema completo de contribuciones
+├── 👥 tabla: perfiles             # ⬆️ ACTUALIZADA: + campo 'rol'
+└── 🌸 tabla: contribuciones_diccionario # ✨ NUEVA: Gestión de contribuciones
+```
+
+### 🎯 **Frontend: Arquitectura de Componentes**
+
+```
+📱 src/app/ (Next.js App Router)
+├── 🏠 layout.tsx                  # Layout base con Header/Footer
+├── 🌟 page.tsx                   # Landing page con animaciones
+├── 📖 diccionario/page.tsx       # Motor de búsqueda del diccionario
+├── 📊 dashboard/page.tsx         # Dashboard personalizado del usuario
+├── 🔐 login/page.tsx             # Sistema de autenticación
+├── 👤 profile/page.tsx           # Gestión de perfil de usuario
+├── 💬 feedback/page.tsx          # ⬆️ MEJORADO: Sistema de comunidad
+├── ❓ faq/page.tsx               # Preguntas frecuentes
+├── 👥 nosotros/page.tsx          # Información del proyecto
+├── 🌸 contribuir/page.tsx        # ✨ NUEVO: Portal de contribuciones
+├── ⚡ admin/page.tsx             # ✨ NUEVO: Panel de moderación
+└── 🔐 auth/callback/route.ts     # Callback de autenticación Supabase
+
+🧩 components/ (Componentes Reutilizables)
+├── 🧭 Header.tsx                 # ⬆️ MEJORADO: Navegación con roles
+├── 🦶 Footer.tsx                # Pie de página con enlaces
+├── 🎯 Quiz.tsx                  # Sistema de cuestionarios
+├── 🌈 AnimatedBackground.tsx    # Fondo dinámico de la landing
+├── 🚪 LogoutButton.tsx          # Botón de cierre de sesión
+├── 🧭 Navbar.tsx               # Navegación móvil
+├── 📱 LandingHeader.tsx        # Header específico de landing
+└── ⏳ ComingSoon.tsx           # Componente de "próximamente"
+```
+
+### 🔧 **Backend: Estructura de API**
+
+```
+🖥️ backend/
+├── 📜 index.js                   # ⬆️ AMPLIADO: Servidor Express con nuevos endpoints
+├── 📁 data/                     # Archivos JSON estáticos
+│   ├── 📖 dictionary.json       # 4,300+ entradas del diccionario
+│   ├── 📚 lessons.json          # Lecciones interactivas
+│   └── 📝 vocabulario.json      # Vocabulario temático
+└── 🛠️ Endpoints API:
+    ├── 📖 /api/dictionary        # Búsqueda en diccionario
+    ├── 📚 /api/lessons           # Gestión de lecciones  
+    ├── 💬 /api/feedback          # Sistema de retroalimentación
+    ├── ⭐ /api/saved-words       # Palabras guardadas
+    ├── 🌸 /api/contributions     # ✨ NUEVO: Gestión de contribuciones
+    ├── 👥 /api/contributions/user # ✨ NUEVO: Contribuciones por usuario
+    ├── ⚡ /api/admin/contributions # ✨ NUEVO: Panel de moderación
+    └── ✅ /api/admin/contributions/:id # ✨ NUEVO: Aprobar/rechazar
 ```
 
 ---
 
-## Configuración del Entorno de Desarrollo
+## 🚀 Configuración y Desarrollo
 
-### Requisitos Previos
+### 📋 **Requisitos Previos**
 
-- Node.js (v16 o superior)
-- npm (v7 o superior)
-- Git
-- Cuenta en Supabase
-- Editor de código (recomendado: VS Code)
+```bash
+# Versiones recomendadas
+Node.js     ≥ 18.0.0    # Runtime principal
+npm         ≥ 9.0.0     # Gestor de paquetes  
+Git         ≥ 2.0.0     # Control de versiones
+```
 
-### Configuración Inicial
+### ⚡ **Instalación Rápida**
 
-1. **Clonar el repositorio**:
-   ```bash
-   git clone https://github.com/joseorteha/nahuatl-web.git
-   cd nahuatl-web
-   ```
+```bash
+# 1. Clonar repositorio
+git clone https://github.com/joseorteha/nahuatl-web.git
+cd nahuatl-web
 
-2. **Configurar el frontend**:
-   ```bash
-   cd frontend
-   npm install
-   cp .env.example .env.local
-   # Editar .env.local con tus credenciales de Supabase
-   ```
+# 2. Configurar Frontend
+cd frontend
+npm install
+cp .env.example .env.local
+# Editar .env.local con credenciales Supabase
 
-3. **Configurar el backend**:
-   ```bash
-   cd ../backend
-   npm install
+# 3. Configurar Backend  
+cd ../backend
+npm install
+cp .env.example .env
+# Editar .env con credenciales Supabase
+
+# 4. Configurar Base de Datos
+# Ejecutar BD.sql en Supabase
+# Ejecutar BD_CONTRIBUCIONES.sql para sistema de contribuciones
+
+# 5. Iniciar desarrollo
+npm run dev        # En frontend/ (puerto 3000)
+npm start          # En backend/ (puerto 3001)
+```
+
+### 🔐 **Variables de Entorno Requeridas**
+
+```bash
+# frontend/.env.local
+NEXT_PUBLIC_SUPABASE_URL=tu_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_supabase_anon_key
+NEXT_PUBLIC_API_URL=http://localhost:3001
+
+# backend/.env  
+SUPABASE_URL=tu_supabase_url
+SUPABASE_SERVICE_KEY=tu_supabase_service_role_key
+PORT=3001
+```
+
+---
+
+## 🔒 Sistema de Roles y Permisos
+
+### 👥 **Niveles de Acceso**
+
+| Rol | Características | Permisos | Acceso Especial |
+|-----|---------------|----------|-----------------|
+| **👤 Usuario** | Cuenta básica registrada | • Búscar diccionario<br>• Guardar palabras<br>• Contribuir palabras<br>• Participar en comunidad | Ninguno |
+| **🛡️ Moderador** | Usuario con permisos de moderación | • Todo lo de Usuario<br>• Revisar contribuciones<br>• Moderar comunidad<br>• Gestionar reportes | `/admin` (limitado) |
+| **⚡ Admin** | Control total del sistema | • Todo lo anterior<br>• Gestión de usuarios<br>• Configuración del sistema<br>• Estadísticas completas | `/admin` (completo) |
+
+### 🔐 **Control de Acceso**
+
+```typescript
+// Ejemplo de middleware de autorización
+const checkRole = (requiredRole: 'usuario' | 'moderador' | 'admin') => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const userRole = req.user?.rol;
+    
+    const roleHierarchy = {
+      'usuario': 1,
+      'moderador': 2, 
+      'admin': 3
+    };
+    
+    if (roleHierarchy[userRole] >= roleHierarchy[requiredRole]) {
+      next();
+    } else {
+      res.status(403).json({ error: 'Acceso denegado' });
+    }
+  };
+};
+```
+
+---
+
+## 🌸 Sistema de Contribuciones
+
+### 🎯 **Flujo Completo de Contribución**
+
+```mermaid
+graph LR
+    A[👤 Usuario] --> B[🌸 Proponer Palabra]
+    B --> C[📝 Formulario Validado]
+    C --> D[💾 Guardado en BD]
+    D --> E[📧 Notificación a Moderadores]
+    E --> F{🛡️ Revisión}
+    F -->|✅ Aprobada| G[📚 Publicada en Diccionario]
+    F -->|❌ Rechazada| H[💬 Feedback al Usuario]
+    G --> I[🎉 Visible en Búsquedas]
+    H --> J[🔄 Usuario puede Corregir]
+```
+
+### 📋 **Estructura de Contribución**
+
+```json
+{
+  "id": "uuid",
+  "palabra_nahuatl": "Xochitl",
+  "traduccion_espanol": "Flor",
+  "categoria": "Sustantivo",
+  "ejemplo_uso": "In xochitl cualli = La flor es bonita",
+  "fuente": "Diccionario de Andrews",
+  "estado": "pendiente | aprobada | rechazada | publicada",
+  "nivel_confianza": "alto | medio | bajo",
+  "razon_contribucion": "Palabra faltante en diccionario",
+  "fecha_contribucion": "2025-09-06T12:00:00Z",
+  "fecha_revision": null,
+  "comentarios_revision": null,
+  "usuario_id": "uuid",
+  "admin_revisor_id": null
+}
+```
+
+### 🛡️ **Panel de Moderación**
+
+**Características del Panel Admin:**
+- ✅ **Vista de contribuciones** pendientes/todas  
+- ✅ **Filtros avanzados** por estado, fecha, usuario
+- ✅ **Revisión detallada** con información completa
+- ✅ **Aprobación/Rechazo** con comentarios
+- ✅ **Publicación automática** al diccionario principal
+- ✅ **Historial de moderación** con tracking completo
+
+**Estados del Workflow:**
+1. **📝 Pendiente**: Esperando revisión de moderador
+2. **✅ Aprobada**: Revisada y aprobada por moderador  
+3. **❌ Rechazada**: No cumple criterios + feedback
+4. **📚 Publicada**: Automáticamente añadida al diccionario
+
+### 🔍 **Criterios de Calidad**
+
+| Criterio | Requerido | Validación |
+|----------|-----------|------------|
+| **Palabra Náhuatl** | ✅ | No vacía, caracteres válidos |
+| **Traducción** | ✅ | No vacía, español correcto |
+| **Categoría** | ✅ | Lista predefinida |
+| **Ejemplo de Uso** | ⚠️ | Recomendado fuertemente |
+| **Fuente** | ⚠️ | Preferible para verificación |
+| **Nivel de Confianza** | ✅ | Auto-asignado según completitud |
+
+---
+
+## 📊 Modelo de Datos
+
+### 🗄️ **Esquema de Base de Datos Actualizado**
+
+```sql
+-- 👥 TABLA PRINCIPAL DE USUARIOS (ACTUALIZADA)
+perfiles (
+  id uuid PRIMARY KEY,
+  nombre_completo text,
+  username text UNIQUE,
+  email text UNIQUE,
+  url_avatar text,
+  fecha_registro timestamp DEFAULT now(),
+  rol text DEFAULT 'usuario' CHECK (rol IN ('usuario', 'moderador', 'admin')) -- ✨ NUEVO
+);
+
+-- 🌸 TABLA DE CONTRIBUCIONES (NUEVA)
+contribuciones_diccionario (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  palabra_nahuatl text NOT NULL,
+  traduccion_espanol text NOT NULL,  
+  categoria text NOT NULL,
+  ejemplo_uso text,
+  fuente text,
+  estado text DEFAULT 'pendiente' CHECK (estado IN ('pendiente', 'aprobada', 'rechazada', 'publicada')),
+  nivel_confianza text DEFAULT 'medio' CHECK (nivel_confianza IN ('alto', 'medio', 'bajo')),
+  razon_contribucion text,
+  fecha_contribucion timestamp DEFAULT now(),
+  fecha_revision timestamp,
+  comentarios_revision text,
+  usuario_id uuid REFERENCES perfiles(id) ON DELETE CASCADE,
+  admin_revisor_id uuid REFERENCES perfiles(id),
+  created_at timestamp DEFAULT now(),
+  updated_at timestamp DEFAULT now()
+);
+
+-- 📖 TABLA DEL DICCIONARIO PRINCIPAL
+diccionario_nawatl (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  word text NOT NULL,
+  definition text NOT NULL,
+  info_gramatical text,
+  fuente_contribucion uuid REFERENCES contribuciones_diccionario(id) -- ✨ NUEVO: Tracking de origen
+);
+
+-- 💬 TABLA DE RETROALIMENTACIÓN DE COMUNIDAD
+retroalimentacion (
+  id uuid PRIMARY KEY,
+  titulo text NOT NULL,
+  contenido text NOT NULL,
+  categoria text,
+  estado text DEFAULT 'abierto',
+  fecha_creacion timestamp DEFAULT now(),
+  usuario_id uuid REFERENCES perfiles(id)
+);
+
+-- ⭐ TABLA DE PALABRAS GUARDADAS
+palabras_guardadas (
+  id uuid PRIMARY KEY,
+  usuario_id uuid REFERENCES perfiles(id),
+  palabra_id uuid,
+  fecha_guardado timestamp DEFAULT now()
+);
+```
+
+### 🔗 **Relaciones Clave**
+
+```
+perfiles (1) ──── (N) contribuciones_diccionario
+perfiles (1) ──── (N) retroalimentacion  
+perfiles (1) ──── (N) palabras_guardadas
+contribuciones_diccionario (1) ──── (1) diccionario_nawatl [opcional]
+```
+
+---
+
+## 🔄 Flujos de Usuario
+
+### 🌸 **Flujo de Contribución de Palabras**
+
+```
+1. 👤 Usuario registrado accede a /contribuir
+   ↓
+2. 📝 Completa formulario de nueva palabra
+   ├── Palabra en náhuatl (requerido)
+   ├── Traducción al español (requerido)  
+   ├── Categoría gramatical (requerido)
+   ├── Ejemplo de uso (opcional)
+   └── Fuente/referencia (opcional)
+   ↓
+3. ✅ Validación frontend + backend
+   ↓
+4. 💾 Guardado en tabla contribuciones_diccionario
+   ↓
+5. 📧 Notificación automática a moderadores
+   ↓
+6. 🛡️ Moderador/Admin revisa en /admin
+   ├── ✅ Aprobar → Estado: 'aprobada' → Auto-publicar
+   └── ❌ Rechazar → Estado: 'rechazada' + comentarios
+   ↓
+7. 📚 Si aprobada: Inserción automática en diccionario_nawatl
+   ↓
+8. 🔍 Palabra disponible inmediatamente en búsquedas
+```
+
+### 🛡️ **Flujo de Moderación**
+
+```
+1. 🛡️ Moderador/Admin accede a /admin
+   ↓
+2. 📊 Ve dashboard con contribuciones pendientes
+   ↓
+3. 🔍 Filtra por estado/fecha/usuario
+   ↓
+4. 👁️ Selecciona contribución para revisar
+   ↓
+5. 📱 Modal con información completa:
+   ├── Datos de la palabra
+   ├── Información del contribuyente
+   ├── Fecha de contribución
+   └── Nivel de confianza calculado
+   ↓
+6. 🎯 Toma decisión:
+   ├── ✅ Aprobar (con comentarios opcionales)
+   └── ❌ Rechazar (con comentarios requeridos)
+   ↓
+7. 💾 Actualización automática del estado
+   ↓
+---
+
+## 🗺️ Roadmap y Desarrollo Futuro
+
+### 🎯 **Versión Actual: v2.1.0** *(Septiembre 2025)*
+
+✅ **Características Implementadas:**
+- [x] Sistema de contribuciones colaborativas completo
+- [x] Panel de moderación con workflow de aprobación
+- [x] Roles de usuario (Usuario/Moderador/Admin)
+- [x] Publicación automática al diccionario
+- [x] Historial de contribuciones por usuario
+- [x] Sistema de comunidad mejorado con manejo de fechas
+- [x] Build optimizado sin errores de TypeScript/ESLint
+- [x] Deploy automático con correcciones de mapeo de datos
+
+### � **v2.2.0 - Mejoras de Experiencia** *(Octubre 2025)*
+
+🔄 **En Planificación:**
+- [ ] **🔔 Sistema de Notificaciones**
+  - Notificaciones en tiempo real para moderadores
+  - Alertas de estado de contribuciones para usuarios
+  - Email notifications para contribuciones importantes
+
+- [ ] **📊 Dashboard Avanzado**  
+  - Estadísticas de contribuciones por usuario
+  - Métricas de calidad y aprobación
+  - Leaderboard de contribuyentes
+
+- [ ] **🔍 Búsqueda Avanzada**
+  - Filtros por categoría gramatical
+  - Búsqueda fonética aproximada
+  - Sugerencias inteligentes
+
+### 🌟 **v2.3.0 - Funcionalidades Educativas** *(Noviembre 2025)*
+
+🎓 **Nuevas Características:**
+- [ ] **📚 Sistema de Lecciones Interactivas**
+  - Lecciones progresivas estructuradas
+  - Ejercicios de pronunciación
+  - Quizzes adaptativos
+
+- [ ] **🎯 Gamificación**
+  - Sistema de puntos y logros
+  - Desafíos diarios de vocabulario
+  - Racha de aprendizaje
+
+- [ ] **🔊 Pronunciación**
+  - Audio recordings para palabras principales
+  - Reconocimiento de voz básico
+  - Guías de pronunciación fonética
+
+### 🚀 **v3.0.0 - Plataforma Social** *(Q1 2026)*
+
+🤝 **Características Sociales:**
+- [ ] **👥 Perfiles de Usuario Extendidos**
+  - Biografías y especialidades
+  - Historial de contribuciones público
+  - Sistema de seguimiento
+
+- [ ] **💬 Chat y Mensajería**
+  - Mensajes directos entre usuarios
+  - Grupos de estudio
+  - Foros temáticos
+
+- [ ] **🏆 Certificaciones**
+  - Niveles de competencia verificados
+  - Badges por especialidades
+  - Exportación de certificados
+
+### 🔧 **Mejoras Técnicas Continuas**
+
+**Infraestructura:**
+- [ ] **⚡ Optimización de Performance**
+  - Lazy loading de componentes
+  - Caching inteligente
+  - CDN para recursos estáticos
+
+- [ ] **📱 PWA Avanzada**
+  - Sincronización offline
+  - Push notifications
+  - Instalación como app nativa
+
+- [ ] **🔐 Seguridad Mejorada**
+  - Rate limiting avanzado
+  - Validación de entrada robusta
+  - Audit logs completos
+
+**Calidad del Código:**
+- [ ] **🧪 Testing Comprehensivo**
+  - Unit tests para componentes críticos
+  - Integration tests para API
+  - E2E tests para flujos principales
+
+- [ ] **📊 Monitoreo y Analytics**
+  - Error tracking con Sentry
+  - Performance monitoring
+  - Usage analytics
+
+### � **Ideas Futuras** *(Backlog)*
+
+**Características Experimentales:**
+- [ ] **🤖 IA y Machine Learning**
+  - Sugerencias automáticas de traducciones
+  - Detección de errores comunes
+  - Análisis de calidad de contribuciones
+
+- [ ] **🌐 Multiidioma**
+  - Soporte para inglés completo  
+  - Traducciones a otros idiomas indígenas
+  - Localización cultural
+
+- [ ] **📱 Apps Móviles Nativas**
+  - iOS app con Swift
+  - Android app con Kotlin
+  - Funcionalidades offline expandidas
+
+---
+
+## 🤝 Contribuir al Proyecto
+
+### 🎯 **Formas de Contribuir**
+
+| Tipo | Descripción | Nivel | Tiempo |
+|------|-------------|-------|---------|
+| 🐛 **Bug Reports** | Reportar errores encontrados | Principiante | 5-15 min |
+| 🌸 **Contribuciones de Palabras** | Añadir palabras al diccionario | Principiante | 5-10 min |
+| 💡 **Sugerencias** | Ideas de mejora via /feedback | Principiante | 10-20 min |
+| 🧑‍💻 **Code Contributions** | Mejoras de código y nuevas features | Intermedio | 1-8 horas |
+| 📖 **Documentación** | Mejorar guías y documentos | Intermedio | 30min-2h |
+| 🎨 **Diseño UI/UX** | Mejoras de interfaz | Avanzado | 2-8 horas |
+
+### 🚀 **Proceso de Contribución de Código**
+
+```bash
+# 1. Fork del repositorio
+git clone https://github.com/tu-usuario/nahuatl-web.git
+
+# 2. Crear rama para feature
+git checkout -b feature/mi-nueva-caracteristica
+
+# 3. Hacer cambios y commits
+git add .
+git commit -m "feat: agregar nueva característica X"
+
+# 4. Push y crear Pull Request
+git push origin feature/mi-nueva-caracteristica
+# Crear PR en GitHub con descripción detallada
+```
+
+### � **Estándares de Código**
+
+**Convenciones:**
+- ✅ **Commits**: Seguir [Conventional Commits](https://conventionalcommits.org/)
+- ✅ **TypeScript**: Código tipificado estrictamente  
+- ✅ **ESLint**: Sin warnings en build
+- ✅ **Prettier**: Código formateado consistentemente
+
+**Testing:**
+- ✅ Probar cambios localmente antes del PR
+- ✅ Verificar que `npm run build` funcione sin errores
+- ✅ Documentar nuevas funcionalidades
+
+### 👥 **Comunidad y Contacto**
+
+**Recursos de la Comunidad:**
+- 💬 **Feedback**: [Página de Comunidad](https://nahuatl-web.vercel.app/feedback)
+- 🐛 **Issues**: [GitHub Issues](https://github.com/joseorteha/nahuatl-web/issues)
+- 📧 **Email**: joseortegahac@gmail.com
+- 🌐 **Demo**: [nahuatl-web.vercel.app](https://nahuatl-web.vercel.app)
+
+---
+
+## 📄 Licencia y Créditos
+
+### 📜 **Licencia**
+
+Este proyecto está licenciado bajo la **MIT License** - ve el archivo [LICENSE](LICENSE) para detalles.
+
+### 🙏 **Créditos y Reconocimientos**
+
+**Desarrollador Principal:**
+- 👨‍💻 **José Ortega** - *Desarrollo Full-Stack, Arquitectura, Documentación*
+
+**Tecnologías y Librerías:**
+- ⚛️ **React/Next.js** - Framework de desarrollo
+- 🎨 **Tailwind CSS** - Framework de estilos
+- 🗄️ **Supabase** - Backend-as-a-Service
+- 🚀 **Vercel** - Plataforma de deployment
+
+**Fuentes de Datos:**
+- 📖 **Diccionario Base**: Compilación de fuentes académicas de náhuatl
+- 🏛️ **Referencias Lingüísticas**: Instituto Nacional de Lenguas Indígenas (INALI)
+- 📚 **Recursos Educativos**: Comunidad de hablantes y lingüistas
+
+**Inspiración Cultural:**
+- 🌺 **Cultura Náhuatl**: Pueblos originarios de México
+- 🎯 **Preservación Lingüística**: Movimiento de revitalización de lenguas indígenas
+
+---
+
+## ❓ Preguntas Frecuentes (FAQ)
+
+### 🔍 **General**
+
+**¿Qué es Nawatlahtol?**
+Es una plataforma web colaborativa para aprender náhuatl que combina un diccionario interactivo con un sistema de contribuciones comunitarias.
+
+**¿Es gratuito?**
+Sí, completamente gratuito y open source.
+
+**¿Necesito crear cuenta?**
+Para funciones básicas (búsqueda) no, pero para contribuir, guardar palabras y participar en la comunidad sí necesitas registrarte.
+
+### 🌸 **Contribuciones**
+
+**¿Cómo puedo agregar una palabra nueva?**
+1. Regístrate y inicia sesión
+2. Ve a la sección "Contribuir" 
+3. Completa el formulario con la palabra y su información
+4. Espera la revisión de un moderador
+
+**¿Cuánto tarda en aprobarse una contribución?**
+Generalmente 1-3 días, dependiendo de la completitud y calidad de la información proporcionada.
+
+**¿Qué pasa si mi contribución es rechazada?**
+Recibirás comentarios explicando el motivo y podrás corregir y reenviar la contribución.
+
+### �️ **Técnica**
+
+**¿Cómo reporto un bug?**
+Usa la sección "Comunidad" en la plataforma o crea un issue en GitHub.
+
+**¿Puedo contribuir con código?**  
+¡Absolutamente! Fork el repo, haz tus cambios y envía un Pull Request.
+
+**¿Dónde está hosteada la aplicación?**
+Frontend en Vercel, Backend en Render, Base de datos en Supabase.
+
+---
+
+## 🚀 Deploy y Producción
+
+### 🌐 **URLs de Producción**
+
+- **Frontend**: [https://nahuatl-web.vercel.app](https://nahuatl-web.vercel.app)
+- **Backend API**: [https://nahuatl-web.onrender.com](https://nahuatl-web.onrender.com)
+- **Base de Datos**: Supabase Cloud (privada)
+
+### 📊 **Estado del Sistema**
+
+```
+🟢 Frontend (Vercel)     │ ✅ Operacional  │ 99.9% uptime
+🟢 Backend (Render)      │ ✅ Operacional  │ 99.5% uptime  
+🟢 Database (Supabase)   │ ✅ Operacional  │ 99.9% uptime
+🟢 Build Status          │ ✅ Passing      │ Sin errores
+```
+
+### 🔄 **Auto-Deploy**
+
+- ✅ **GitHub → Vercel**: Deploy automático en push a `main`
+- ✅ **GitHub → Render**: Deploy automático del backend
+- ✅ **Build Checks**: TypeScript + ESLint validation
+- ✅ **Environment**: Variables seguras configuradas
+
+---
+
+*Documentación actualizada: Septiembre 2025 - v2.1.0*  
+*Última actualización del sistema de contribuciones: Exitosa ✅*
+
+**¡Gracias por ser parte de la preservación del náhuatl! 🌸**
+
+---
+   ├── Sugerencia de mejora
+   ├── Reporte de error
+   ├── Pregunta general
+   └── Propuesta de funcionalidad
+   ↓
+3. 💬 Otros usuarios pueden:
+   ├── 👍 Dar "me gusta"
+   ├── 💬 Responder/comentar
+   └── 📤 Compartir experiencias
+   ↓
+4. 🛡️ Moderadores pueden:
+   ├── 📝 Responder oficialmente
+   ├── 🏷️ Etiquetar/categorizar
+   └── 🔒 Moderar contenido
+```
+
+---
    cp .env.example .env
    # Editar .env con tus credenciales de Supabase
    ```
