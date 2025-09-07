@@ -1,8 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Avatar from 'boring-avatars';
 import { Trophy, Star, Award, TrendingUp } from 'lucide-react';
+
+type AvatarVariant = 'marble' | 'beam' | 'pixel' | 'sunset' | 'ring' | 'bauhaus';
 
 interface UsuarioRanking {
   id: string;
@@ -67,16 +70,18 @@ const renderAvatar = (avatarString: string | undefined, size: number = 48) => {
       <Avatar
         size={size}
         name={name}
-        variant={variant as any}
+        variant={variant as AvatarVariant}
         colors={colors}
       />
     );
   }
 
   return (
-    <img 
+    <Image 
       src={avatarString} 
       alt="Avatar" 
+      width={size}
+      height={size}
       className="w-full h-full rounded-full object-cover"
     />
   );
@@ -107,15 +112,6 @@ export default function RankingRecompensas() {
       setError('No se pudo cargar el ranking');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const getTrofeoColor = (posicion: number) => {
-    switch (posicion) {
-      case 1: return 'text-yellow-500'; // Oro
-      case 2: return 'text-gray-400'; // Plata
-      case 3: return 'text-orange-600'; // Bronce
-      default: return 'text-gray-300';
     }
   };
 

@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { User, Mail, AtSign, Settings, Save, X, Edit3, RefreshCw, ExternalLink } from 'lucide-react';
@@ -17,12 +17,27 @@ interface UserData {
   url_avatar?: string;
 }
 
+interface SavedWord {
+  id: string;
+  diccionario?: {
+    word: string;
+    definition: string;
+    info_gramatical?: string;
+  };
+}
+
+interface AvatarData {
+  name: string;
+  variant: string;
+  colors: string[];
+}
+
 export default function ProfilePage() {
   const [user, setUser] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [showAvatarSelector, setShowAvatarSelector] = useState(false);
-  const [generatedAvatars, setGeneratedAvatars] = useState<Array<{name: string, variant: string, colors: string[]}>>([]);
+  const [generatedAvatars, setGeneratedAvatars] = useState<AvatarData[]>([]);
   const [formData, setFormData] = useState({
     nombre_completo: '',
     username: '',
@@ -36,7 +51,7 @@ export default function ProfilePage() {
     savedWords: 0
   });
   const [isLoadingStats, setIsLoadingStats] = useState(true);
-  const [savedWords, setSavedWords] = useState<any[]>([]);
+  const [savedWords, setSavedWords] = useState<SavedWord[]>([]);
   const [isLoadingSavedWords, setIsLoadingSavedWords] = useState(true);
   const router = useRouter();
 
@@ -62,7 +77,7 @@ export default function ProfilePage() {
         <Avatar
           size={size}
           name={name}
-          variant={variant as any}
+          variant={variant as 'marble' | 'beam' | 'pixel' | 'sunset' | 'ring' | 'bauhaus'}
           colors={colors}
         />
       );
@@ -79,6 +94,44 @@ export default function ProfilePage() {
       />
     );
   };
+
+  const loadUserStats = useCallback(async (userId: string) => {
+    try {
+      setIsLoadingStats(true);
+      const response = await fetch(`${API_URL}/api/auth/stats/${userId}`);
+      
+      if (!response.ok) {
+        throw new Error('Error al cargar estadísticas');
+      }
+      
+      const result = await response.json();
+      setStats(result.stats || { contributions: 0, feedback: 0, savedWords: 0 });
+    } catch (error) {
+      console.error('Error loading stats:', error);
+      setStats({ contributions: 0, feedback: 0, savedWords: 0 });
+    } finally {
+      setIsLoadingStats(false);
+    }
+  }, [API_URL]);
+
+  const loadSavedWords = useCallback(async (userId: string) => {
+    try {
+      setIsLoadingSavedWords(true);
+      const response = await fetch(`${API_URL}/api/dictionary/saved/${userId}`);
+      
+      if (!response.ok) {
+        throw new Error('Error al cargar palabras guardadas');
+      }
+      
+      const result = await response.json();
+      setSavedWords(result.savedWords || []);
+    } catch (error) {
+      console.error('Error loading saved words:', error);
+      setSavedWords([]);
+    } finally {
+      setIsLoadingSavedWords(false);
+    }
+  }, [API_URL]);
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
@@ -104,7 +157,7 @@ export default function ProfilePage() {
     } finally {
       setIsLoading(false);
     }
-  }, [router]);
+  }, [router, loadUserStats, loadSavedWords]);
 
   const generateAvatars = (seed: string) => {
     const variants = ['marble', 'beam', 'pixel', 'sunset', 'ring', 'bauhaus'];
@@ -117,56 +170,18 @@ export default function ProfilePage() {
       ['#A29BFE', '#FD79A8', '#FDCB6E', '#6C5CE7', '#00B894']
     ];
     
-    const avatars: any[] = [];
+    const avatars: AvatarData[] = [];
     
     variants.forEach((variant, index) => {
       const avatarData = {
         name: `${seed}-${variant}-${index}`,
-        variant: variant as any,
+        variant: variant as 'marble' | 'beam' | 'pixel' | 'sunset' | 'ring' | 'bauhaus',
         colors: colors[index % colors.length],
       };
       avatars.push(avatarData);
     });
     
     setGeneratedAvatars(avatars);
-  };
-
-  const loadUserStats = async (userId: string) => {
-    try {
-      setIsLoadingStats(true);
-      const response = await fetch(`${API_URL}/api/auth/stats/${userId}`);
-      
-      if (!response.ok) {
-        throw new Error('Error al cargar estadísticas');
-      }
-
-      const result = await response.json();
-      setStats(result.stats || { contributions: 0, feedback: 0, savedWords: 0 });
-    } catch (error) {
-      console.error('Error loading stats:', error);
-      // Mantener valores por defecto en caso de error
-    } finally {
-      setIsLoadingStats(false);
-    }
-  };
-
-  const loadSavedWords = async (userId: string) => {
-    try {
-      setIsLoadingSavedWords(true);
-      const response = await fetch(`${API_URL}/api/auth/saved-words/${userId}`);
-      
-      if (!response.ok) {
-        throw new Error('Error al cargar palabras guardadas');
-      }
-
-      const result = await response.json();
-      setSavedWords(result.savedWords || []);
-    } catch (error) {
-      console.error('Error loading saved words:', error);
-      // Mantener array vacío en caso de error
-    } finally {
-      setIsLoadingSavedWords(false);
-    }
   };
 
   const generateNewAvatars = () => {
@@ -454,7 +469,7 @@ export default function ProfilePage() {
                           <Avatar
                             size={96}
                             name={avatarData.name}
-                            variant={avatarData.variant as any}
+                            variant={avatarData.variant as 'marble' | 'beam' | 'pixel' | 'sunset' | 'ring' | 'bauhaus'}
                             colors={avatarData.colors}
                           />
                         </div>
@@ -568,7 +583,7 @@ export default function ProfilePage() {
                 </div>
               ) : (
                 <div className="grid gap-3 max-h-60 overflow-y-auto">
-                  {savedWords.slice(0, 10).map((saved: any) => (
+                  {savedWords.slice(0, 10).map((saved: SavedWord) => (
                     <div key={saved.id} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                       <div className="flex justify-between items-start">
                         <div>

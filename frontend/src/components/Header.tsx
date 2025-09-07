@@ -5,7 +5,9 @@ import Image from 'next/image';
 import Avatar from 'boring-avatars';
 import { useRouter } from 'next/navigation';
 import { Menu, Transition } from '@headlessui/react';
-import { User as UserIcon, LogOut, LayoutDashboard, Menu as MenuIcon, X, BookOpen, Users, MessageCircle, Trophy } from 'lucide-react';
+import { User as UserIcon, LogOut, LayoutDashboard, Menu as MenuIcon, X, BookOpen, Users, MessageCircle } from 'lucide-react';
+
+type AvatarVariant = 'marble' | 'beam' | 'pixel' | 'sunset' | 'ring' | 'bauhaus';
 
 interface User {
   id: string;
@@ -50,7 +52,6 @@ export default function Header() {
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   };
 
-  // Helper para renderizar avatares
   const renderAvatar = (avatarString: string | undefined, size: number = 36) => {
     if (!avatarString) {
       return getInitials(user?.nombre_completo);
@@ -66,7 +67,7 @@ export default function Header() {
         <Avatar
           size={size}
           name={name}
-          variant={variant as any}
+          variant={variant as AvatarVariant}
           colors={colors}
         />
       );
@@ -90,23 +91,17 @@ export default function Header() {
         <BookOpen size={18} />
         <span>Diccionario</span>
       </Link>
-      <Link href="/contribuir" className="flex items-center gap-2 text-slate-700 hover:text-orange-600 transition-colors duration-200">
-        <svg width={18} height={18} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-        <span>Contribuir</span>
-      </Link>
-      <Link href="/ranking" className="flex items-center gap-2 text-slate-700 hover:text-orange-600 transition-colors duration-200">
-        <Trophy size={18} />
-        <span>Ranking</span>
-      </Link>
-      <Link href="/feedback" className="flex items-center gap-2 text-slate-700 hover:text-orange-600 transition-colors duration-200">
+      <Link href="/faq" className="flex items-center gap-2 text-slate-700 hover:text-orange-600 transition-colors duration-200">
         <MessageCircle size={18} />
-        <span>Comunidad</span>
+        <span>FAQ</span>
       </Link>
-      {user?.rol === 'admin' || user?.rol === 'moderador' ? (
-        <Link href="/admin" className="flex items-center gap-2 text-red-700 hover:text-red-600 transition-colors duration-200">
-          <svg width={18} height={18} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <Link href="/nosotros" className="flex items-center gap-2 text-slate-700 hover:text-orange-600 transition-colors duration-200">
+        <Users size={18} />
+        <span>Nosotros</span>
+      </Link>
+      {user?.rol === 'admin' ? (
+        <Link href="/admin" className="flex items-center gap-2 text-slate-700 hover:text-orange-600 transition-colors duration-200">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 15H12.01M9 12H15M12 3C7 3 3 7 3 12C3 17 7 21 12 21C17 21 21 17 21 12C21 7 17 3 12 3Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
           <span>Admin</span>
@@ -128,171 +123,157 @@ export default function Header() {
             <div className="relative">
               <Image 
                 src="/logo.png" 
-                alt="Nawatlajtol Logo" 
-                width={36} 
-                height={36} 
-                className="rounded-md transition-transform duration-300 group-hover:scale-105"
+                alt="Nahuatl Web Logo" 
+                width={40} 
+                height={40} 
+                className="w-10 h-10 object-contain group-hover:scale-105 transition-transform duration-200"
+                priority
               />
             </div>
-            <span className="font-medium text-lg text-slate-800 group-hover:text-orange-600 transition-colors duration-200">
-              Nawatlahtol
-            </span>
+            <div className="flex flex-col">
+              <span className="text-xl font-bold bg-gradient-to-r from-orange-600 to-violet-600 bg-clip-text text-transparent">
+                Nahuatl
+              </span>
+              <span className="text-xs text-slate-500 font-medium leading-none">
+                Web
+              </span>
+            </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden lg:flex items-center gap-8">
             {navLinks}
           </nav>
 
-          {/* Right side actions */}
-          <div className="flex items-center gap-3">
+          {/* User menu / Auth */}
+          <div className="flex items-center gap-4">
             {isLoading ? (
               <div className="w-9 h-9 bg-slate-200 rounded-full animate-pulse"></div>
             ) : user ? (
-              <ProfileMenu user={user} onLogout={handleLogout} getInitials={getInitials} />
+              <>
+                {/* Desktop user menu */}
+                <div className="hidden lg:block">
+                  <Menu as="div" className="relative">
+                    <Menu.Button className="flex items-center justify-center w-9 h-9 bg-gradient-to-br from-orange-500 to-violet-600 text-white rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-transform hover:scale-105 overflow-hidden">
+                      {renderAvatar(user.url_avatar, 36)}
+                    </Menu.Button>
+                    <Transition
+                      as={Fragment}
+                      enter="transition ease-out duration-150"
+                      enterFrom="transform opacity-0 scale-95"
+                      enterTo="transform opacity-100 scale-100"
+                      leave="transition ease-in duration-100"
+                      leaveFrom="transform opacity-100 scale-100"
+                      leaveTo="transform opacity-0 scale-95"
+                    >
+                      <Menu.Items className="absolute right-0 mt-2 w-60 origin-top-right bg-white divide-y divide-slate-100 rounded-md shadow-lg ring-1 ring-black/5 focus:outline-none border border-slate-200">
+                        <div className="px-1 py-1">
+                          <div className="px-3 py-2 border-b border-slate-100">
+                            <p className="text-sm text-slate-900 font-medium truncate">{user.nombre_completo || 'Usuario'}</p>
+                            <p className="text-xs text-slate-500 truncate">{user.email}</p>
+                          </div>
+                          <Menu.Item>
+                            {({ active }) => (
+                              <Link href="/profile" className={`${active ? 'bg-slate-100' : ''} group flex rounded-md items-center w-full px-3 py-2 text-sm transition-colors duration-150`}>
+                                <UserIcon className="mr-2 h-4 w-4 text-slate-500" />
+                                Mi Perfil
+                              </Link>
+                            )}
+                          </Menu.Item>
+                          <Menu.Item>
+                            {({ active }) => (
+                              <Link href="/dashboard" className={`${active ? 'bg-slate-100' : ''} group flex rounded-md items-center w-full px-3 py-2 text-sm transition-colors duration-150`}>
+                                <LayoutDashboard className="mr-2 h-4 w-4 text-slate-500" />
+                                Dashboard
+                              </Link>
+                            )}
+                          </Menu.Item>
+                        </div>
+                        <div className="px-1 py-1">
+                          <Menu.Item>
+                            {({ active }) => (
+                              <button 
+                                onClick={handleLogout} 
+                                className={`${active ? 'bg-red-50 text-red-600' : 'text-slate-700'} group flex rounded-md items-center w-full px-3 py-2 text-sm transition-colors duration-150`}
+                              >
+                                <LogOut className="mr-2 h-4 w-4" />
+                                Cerrar Sesión
+                              </button>
+                            )}
+                          </Menu.Item>
+                        </div>
+                      </Menu.Items>
+                    </Transition>
+                  </Menu>
+                </div>
+
+                {/* Mobile menu button */}
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="lg:hidden p-2 text-slate-600 hover:text-orange-600 transition-colors duration-200"
+                >
+                  {mobileMenuOpen ? <X size={24} /> : <MenuIcon size={24} />}
+                </button>
+              </>
             ) : (
               <Link 
                 href="/login" 
-                className="hidden md:inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-orange-500 rounded-md hover:bg-orange-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 shadow-sm"
+                className="bg-gradient-to-r from-orange-500 to-violet-600 text-white px-4 py-2 rounded-lg font-medium hover:from-orange-600 hover:to-violet-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
               >
-                Acceder
+                Iniciar Sesión
               </Link>
             )}
-            
-            {/* Mobile Menu Button */}
-            <button 
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)} 
-              className="md:hidden p-2 text-slate-600 hover:text-orange-600 hover:bg-orange-50 rounded-md transition-colors duration-200"
-            >
-              {mobileMenuOpen ? <X size={20} /> : <MenuIcon size={20} />}
-            </button>
           </div>
         </div>
-      </div>
 
-      {/* Mobile Menu */}
-      <Transition
-        show={mobileMenuOpen}
-        enter="transition ease-out duration-150"
-        enterFrom="opacity-0 -translate-y-1"
-        enterTo="opacity-100 translate-y-0"
-        leave="transition ease-in duration-100"
-        leaveFrom="opacity-100 translate-y-0"
-        leaveTo="opacity-0 -translate-y-1"
-      >
-        <div className="md:hidden bg-white border-t border-slate-200">
-          <nav className="container-wide pt-3 pb-4 flex flex-col gap-3">
-            {navLinks}
-            <hr className="my-2 border-slate-200"/>
-            {!user && (
-              <Link 
-                href="/login" 
-                onClick={() => setMobileMenuOpen(false)} 
-                className="w-full text-center px-4 py-2 text-sm font-medium text-white bg-orange-500 rounded-md hover:bg-orange-600 transition-colors duration-200"
+        {/* Mobile Menu */}
+        {mobileMenuOpen && user && (
+          <div className="lg:hidden py-4 border-t border-slate-200 bg-white/95 backdrop-blur-sm">
+            <div className="flex flex-col space-y-4">
+              {/* User info */}
+              <div className="flex items-center gap-3 px-2 py-2">
+                <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-violet-600 text-white rounded-full flex items-center justify-center text-sm font-medium overflow-hidden">
+                  {renderAvatar(user.url_avatar, 40)}
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium text-slate-900">{user.nombre_completo || 'Usuario'}</span>
+                  <span className="text-xs text-slate-500">{user.email}</span>
+                </div>
+              </div>
+
+              {/* Navigation links */}
+              <div className="flex flex-col space-y-2">
+                <Link 
+                  href="/profile" 
+                  className="flex items-center gap-2 px-2 py-2 text-slate-700 hover:text-orange-600 transition-colors duration-200"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <UserIcon size={18} />
+                  <span>Mi Perfil</span>
+                </Link>
+                <Link 
+                  href="/dashboard" 
+                  className="flex items-center gap-2 px-2 py-2 text-slate-700 hover:text-orange-600 transition-colors duration-200"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <LayoutDashboard size={18} />
+                  <span>Dashboard</span>
+                </Link>
+                {navLinks}
+              </div>
+
+              {/* Logout button */}
+              <button 
+                onClick={handleLogout}
+                className="flex items-center gap-2 px-2 py-2 text-red-600 hover:text-red-700 transition-colors duration-200 border-t border-slate-200 pt-4"
               >
-                Acceder
-              </Link>
-            )}
-          </nav>
-        </div>
-      </Transition>
+                <LogOut size={18} />
+                <span>Cerrar Sesión</span>
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </header>
   );
 }
-
-interface ProfileMenuProps {
-  user: User;
-  onLogout: () => void;
-  getInitials: (name?: string) => string;
-}
-
-const ProfileMenu: React.FC<ProfileMenuProps> = ({ user, onLogout, getInitials }) => {
-  // Helper para renderizar avatares
-  const renderAvatar = (avatarString: string | undefined, size: number = 36) => {
-    if (!avatarString) {
-      return getInitials(user?.nombre_completo);
-    }
-
-    if (avatarString.startsWith('boring-avatar:')) {
-      const parts = avatarString.split(':');
-      const name = parts[1];
-      const variant = parts[2];
-      const colors = parts[3].split(',');
-      
-      return (
-        <Avatar
-          size={size}
-          name={name}
-          variant={variant as any}
-          colors={colors}
-        />
-      );
-    }
-
-    // Si es una URL normal de imagen
-    return (
-      <Image 
-        src={avatarString} 
-        alt="Avatar" 
-        width={size} 
-        height={size} 
-        className="w-full h-full object-cover"
-      />
-    );
-  };
-
-  return (
-  <Menu as="div" className="relative">
-    <Menu.Button className="flex items-center justify-center w-9 h-9 bg-gradient-to-br from-orange-500 to-violet-600 text-white rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-transform hover:scale-105 overflow-hidden">
-      {renderAvatar(user.url_avatar, 36)}
-    </Menu.Button>
-    <Transition
-      as={Fragment}
-      enter="transition ease-out duration-150"
-      enterFrom="transform opacity-0 scale-95"
-      enterTo="transform opacity-100 scale-100"
-      leave="transition ease-in duration-100"
-      leaveFrom="transform opacity-100 scale-100"
-      leaveTo="transform opacity-0 scale-95"
-    >
-      <Menu.Items className="absolute right-0 mt-2 w-60 origin-top-right bg-white divide-y divide-slate-100 rounded-md shadow-lg ring-1 ring-black/5 focus:outline-none border border-slate-200">
-        <div className="px-1 py-1">
-          <div className="px-3 py-2 border-b border-slate-100">
-            <p className="text-sm text-slate-900 font-medium truncate">{user.nombre_completo || 'Usuario'}</p>
-            <p className="text-xs text-slate-500 truncate">{user.email}</p>
-          </div>
-          <Menu.Item>
-            {({ active }) => (
-              <Link href="/profile" className={`${active ? 'bg-slate-100' : ''} group flex rounded-md items-center w-full px-3 py-2 text-sm transition-colors duration-150`}>
-                <UserIcon className="mr-2 h-4 w-4 text-slate-500" />
-                Mi Perfil
-              </Link>
-            )}
-          </Menu.Item>
-          <Menu.Item>
-            {({ active }) => (
-              <Link href="/dashboard" className={`${active ? 'bg-slate-100' : ''} group flex rounded-md items-center w-full px-3 py-2 text-sm transition-colors duration-150`}>
-                <LayoutDashboard className="mr-2 h-4 w-4 text-slate-500" />
-                Dashboard
-              </Link>
-            )}
-          </Menu.Item>
-        </div>
-        <div className="px-1 py-1">
-          <Menu.Item>
-            {({ active }) => (
-              <button 
-                onClick={onLogout} 
-                className={`${active ? 'bg-red-50 text-red-600' : 'text-slate-700'} group flex rounded-md items-center w-full px-3 py-2 text-sm transition-colors duration-150`}
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                Cerrar Sesión
-              </button>
-            )}
-          </Menu.Item>
-        </div>
-      </Menu.Items>
-    </Transition>
-  </Menu>
-);
-};

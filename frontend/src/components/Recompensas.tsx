@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 interface RecompensasUsuario {
@@ -68,13 +68,11 @@ export default function Recompensas({ userId }: { userId: string }) {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'resumen' | 'logros' | 'historial'>('resumen');
   
+  type TabKey = 'resumen' | 'logros' | 'historial';
+  
   const supabase = createClientComponentClient();
 
-  useEffect(() => {
-    obtenerRecompensas();
-  }, [userId]);
-
-  const obtenerRecompensas = async () => {
+  const obtenerRecompensas = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -108,7 +106,11 @@ export default function Recompensas({ userId }: { userId: string }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId, supabase.auth]);
+
+  useEffect(() => {
+    obtenerRecompensas();
+  }, [obtenerRecompensas]);
 
   const calcularProgreso = () => {
     if (!recompensas) return { porcentaje: 0, siguienteNivel: 'contribuidor', puntosNecesarios: 100 };
@@ -212,7 +214,7 @@ export default function Recompensas({ userId }: { userId: string }) {
           ].map((tab) => (
             <button
               key={tab.key}
-              onClick={() => setActiveTab(tab.key as any)}
+              onClick={() => setActiveTab(tab.key as TabKey)}
               className={`flex items-center px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === tab.key
                   ? 'border-blue-500 text-blue-600'
