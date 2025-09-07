@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Avatar from 'boring-avatars';
 import { useRouter } from 'next/navigation';
 import { Menu, Transition } from '@headlessui/react';
-import { User as UserIcon, LogOut, LayoutDashboard, Menu as MenuIcon, X, BookOpen, Users, MessageCircle } from 'lucide-react';
+import { User as UserIcon, LogOut, LayoutDashboard, Menu as MenuIcon, X, BookOpen, Users, MessageCircle, Trophy } from 'lucide-react';
 
 interface User {
   id: string;
@@ -95,6 +95,10 @@ export default function Header() {
           <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
         <span>Contribuir</span>
+      </Link>
+      <Link href="/ranking" className="flex items-center gap-2 text-slate-700 hover:text-orange-600 transition-colors duration-200">
+        <Trophy size={18} />
+        <span>Ranking</span>
       </Link>
       <Link href="/feedback" className="flex items-center gap-2 text-slate-700 hover:text-orange-600 transition-colors duration-200">
         <MessageCircle size={18} />
