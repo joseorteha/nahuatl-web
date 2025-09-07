@@ -19,6 +19,9 @@ router.get('/', async (req, res) => {
           fecha_creacion,
           usuario_id,
           perfiles (nombre_completo, username)
+        ),
+        retroalimentacion_likes (
+          usuario_id
         )
       `)
       .order('fecha_creacion', { ascending: false });
@@ -28,7 +31,13 @@ router.get('/', async (req, res) => {
       return res.status(500).json({ error: 'Error al obtener las sugerencias.', details: error.message });
     }
 
-    res.json(data);
+    // Calcular total_likes para cada feedback
+    const feedbacksWithLikes = data.map(feedback => ({
+      ...feedback,
+      total_likes: feedback.retroalimentacion_likes ? feedback.retroalimentacion_likes.length : 0
+    }));
+
+    res.json(feedbacksWithLikes);
   } catch (e) {
     console.error('Error inesperado en GET /api/feedback:', e);
     return res.status(500).json({ error: 'Error inesperado en el servidor.', details: e.message });
@@ -93,6 +102,95 @@ router.post('/reply', async (req, res) => {
     res.status(201).json(data);
   } catch (e) {
     console.error('Error inesperado en /api/feedback/reply:', e);
+    return res.status(500).json({ error: 'Error inesperado en el servidor.', details: e.message });
+  }
+});
+
+// POST /api/feedback/like - Toggle like en feedback
+router.post('/like', async (req, res) => {
+  const { user_id, feedback_id } = req.body;
+
+  if (!user_id || !feedback_id) {
+    return res.status(400).json({ error: 'Faltan campos requeridos: user_id, feedback_id.' });
+  }
+
+  try {
+    // Verificar si el usuario ya le dio like
+    const { data: existingLike, error: checkError } = await supabase
+      .from('retroalimentacion_likes')
+      .select('id')
+      .eq('usuario_id', user_id)
+      .eq('retroalimentacion_id', feedback_id)
+      .maybeSingle();
+
+    if (checkError) {
+      console.error('Error verificando like existente:', checkError);
+      return res.status(500).json({ error: 'Error al verificar like.', details: checkError.message });
+    }
+
+    if (existingLike) {
+      // Quitar like
+      const { error: deleteError } = await supabase
+        .from('retroalimentacion_likes')
+        .delete()
+        .eq('id', existingLike.id);
+
+      if (deleteError) {
+        console.error('Error eliminando like:', deleteError);
+        return res.status(500).json({ error: 'Error al quitar like.', details: deleteError.message });
+      }
+
+      res.json({ success: true, action: 'unliked' });
+    } else {
+      // Agregar like
+      const { error: insertError } = await supabase
+        .from('retroalimentacion_likes')
+        .insert({ 
+          usuario_id: user_id, 
+          retroalimentacion_id: feedback_id 
+        });
+
+      if (insertError) {
+        console.error('Error agregando like:', insertError);
+        return res.status(500).json({ error: 'Error al agregar like.', details: insertError.message });
+      }
+
+      res.json({ success: true, action: 'liked' });
+    }
+  } catch (e) {
+    console.error('Error inesperado en /api/feedback/like:', e);
+    return res.status(500).json({ error: 'Error inesperado en el servidor.', details: e.message });
+  }
+});
+
+// PUT /api/feedback/:id - Editar feedback
+router.put('/:id', async (req, res) => {
+  const { id } = req.params;
+  const { titulo, contenido, categoria } = req.body;
+
+  if (!titulo || !contenido) {
+    return res.status(400).json({ error: 'Título y contenido son requeridos.' });
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('retroalimentacion')
+      .update({ 
+        titulo, 
+        contenido, 
+        categoria: categoria || 'general' 
+      })
+      .eq('id', id)
+      .select();
+
+    if (error) {
+      console.error('Supabase error al actualizar feedback:', error);
+      return res.status(500).json({ error: 'Error al actualizar la sugerencia.', details: error.message });
+    }
+
+    res.json(data);
+  } catch (e) {
+    console.error('Error inesperado en PUT /api/feedback:', e);
     return res.status(500).json({ error: 'Error inesperado en el servidor.', details: e.message });
   }
 });
