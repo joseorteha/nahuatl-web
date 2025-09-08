@@ -55,7 +55,7 @@ export default function ProfilePage() {
   const [isLoadingSavedWords, setIsLoadingSavedWords] = useState(true);
   const router = useRouter();
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web.onrender.com';
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
   // Helper para renderizar avatares
   const renderAvatar = (avatarString: string | undefined, size: number = 128) => {
@@ -570,7 +570,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Lista de palabras guardadas */}
-          {stats.savedWords > 0 && (
+          {savedWords.length > 0 && (
             <div className="mt-8">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Mis Palabras Guardadas</h3>
               {isLoadingSavedWords ? (

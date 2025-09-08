@@ -155,6 +155,37 @@ router.post('/like', async (req, res) => {
         return res.status(500).json({ error: 'Error al agregar like.', details: insertError.message });
       }
 
+      // Obtener el autor del feedback para otorgar puntos
+      const { data: feedback, error: feedbackError } = await supabase
+        .from('retroalimentacion_usuarios')
+        .select('usuario_id')
+        .eq('id', feedback_id)
+        .single();
+
+      if (!feedbackError && feedback) {
+        // Llamar al endpoint de recompensas para otorgar puntos por like recibido
+        try {
+          const recompensasResponse = await fetch('http://localhost:3001/api/recompensas/procesar', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              userId: feedback.usuario_id,
+              accion: 'like_recibido',
+              datos: { feedback_id }
+            })
+          });
+
+          if (recompensasResponse.ok) {
+            console.log('Puntos otorgados por like recibido al usuario:', feedback.usuario_id);
+          }
+        } catch (recompensasError) {
+          console.error('Error al procesar recompensa por like:', recompensasError);
+          // No fallar la operación principal si falla la recompensa
+        }
+      }
+
       res.json({ success: true, action: 'liked' });
     }
   } catch (e) {

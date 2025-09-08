@@ -99,7 +99,7 @@ export default function RankingRecompensas() {
   const obtenerRanking = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:3001/api/recompensas/ranking');
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/recompensas/ranking`);
       
       if (!response.ok) {
         throw new Error('Error al cargar el ranking');

@@ -132,10 +132,7 @@ export default function Header() {
             </div>
             <div className="flex flex-col">
               <span className="text-xl font-bold bg-gradient-to-r from-orange-600 to-violet-600 bg-clip-text text-transparent">
-                Nahuatl
-              </span>
-              <span className="text-xs text-slate-500 font-medium leading-none">
-                Web
+                NAHUATLAHTOL
               </span>
             </div>
           </Link>

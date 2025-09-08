@@ -40,7 +40,10 @@ class DictionaryController {
       }
 
       const savedWords = await dictionaryService.getSavedWords(userId);
-      res.json(savedWords);
+      res.json({ 
+        success: true,
+        savedWords: savedWords 
+      });
     } catch (error) {
       console.error('Error al obtener palabras guardadas:', error);
       res.status(500).json({ 

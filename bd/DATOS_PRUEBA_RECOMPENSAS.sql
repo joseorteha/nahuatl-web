@@ -19,16 +19,14 @@ BEGIN
     
     RAISE NOTICE 'Usuario encontrado con UUID: %', usuario_uuid;
     
+    -- Limpiar datos existentes del usuario (por si ya existen)
+    DELETE FROM public.historial_puntos WHERE usuario_id = usuario_uuid;
+    DELETE FROM public.logros_usuario WHERE usuario_id = usuario_uuid;
+    DELETE FROM public.recompensas_usuario WHERE usuario_id = usuario_uuid;
+    
     -- Insertar datos de ejemplo en recompensas_usuario
     INSERT INTO public.recompensas_usuario (usuario_id, puntos_totales, nivel, experiencia, contribuciones_aprobadas, likes_recibidos, racha_dias) VALUES
-    (usuario_uuid, 350, 'experto', 350, 15, 8, 5) 
-    ON CONFLICT (usuario_id) DO UPDATE SET
-      puntos_totales = EXCLUDED.puntos_totales,
-      nivel = EXCLUDED.nivel,
-      experiencia = EXCLUDED.experiencia,
-      contribuciones_aprobadas = EXCLUDED.contribuciones_aprobadas,
-      likes_recibidos = EXCLUDED.likes_recibidos,
-      racha_dias = EXCLUDED.racha_dias;
+    (usuario_uuid, 350, 'experto', 350, 15, 8, 5);
 
     -- Insertar algunos logros obtenidos de ejemplo
     INSERT INTO public.logros_usuario (usuario_id, logro_id, fecha_obtenido, notificado) 
@@ -38,8 +36,7 @@ BEGIN
       now() - interval '1 day' * (row_number() OVER ()),
       false
     FROM public.logros l 
-    WHERE l.nombre IN ('Primer Paso', 'Contribuidor Activo', 'Voz de la Comunidad', 'Experto Lingüista', 'Querido por Todos')
-    ON CONFLICT (usuario_id, logro_id) DO NOTHING;
+    WHERE l.nombre IN ('Primer Paso', 'Contribuidor Activo', 'Voz de la Comunidad', 'Experto Lingüista', 'Querido por Todos');
 
     -- Insertar historial de puntos de ejemplo
     INSERT INTO public.historial_puntos (usuario_id, puntos_ganados, motivo, descripcion) VALUES
@@ -64,8 +61,7 @@ BEGIN
     (usuario_uuid, 10, 'Like recibido', 'Tu contribución "tlakatl" fue valorada'),
     (usuario_uuid, 10, 'Like recibido', 'Tu contribución "kualli" fue valorada'),
     (usuario_uuid, 10, 'Like recibido', 'Tu contribución "itztli" fue valorada'),
-    (usuario_uuid, 50, 'Logro obtenido', 'Has alcanzado el nivel Experto Lingüista')
-    ON CONFLICT DO NOTHING;
+    (usuario_uuid, 50, 'Logro obtenido', 'Has alcanzado el nivel Experto Lingüista');
     
     RAISE NOTICE 'Datos de prueba insertados correctamente para el usuario joseortegahac@gmail.com';
     

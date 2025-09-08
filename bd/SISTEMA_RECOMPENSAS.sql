@@ -1,6 +1,15 @@
 -- Sistema de Recompensas para Nawatlajtol
 -- Todas las tablas en español
 
+-- ===== LIMPIAR TABLAS EXISTENTES =====
+-- Eliminar tablas si ya existen (en orden correcto por dependencias)
+DROP TABLE IF EXISTS public.historial_puntos CASCADE;
+DROP TABLE IF EXISTS public.logros_usuario CASCADE;
+DROP TABLE IF EXISTS public.logros CASCADE;
+DROP TABLE IF EXISTS public.recompensas_usuario CASCADE;
+
+-- ===== CREAR TABLAS =====
+
 -- Tabla de recompensas de usuario (puntos, nivel, etc.)
 CREATE TABLE public.recompensas_usuario (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -14,7 +23,8 @@ CREATE TABLE public.recompensas_usuario (
   fecha_creacion timestamp with time zone DEFAULT now(),
   fecha_actualizacion timestamp with time zone DEFAULT now(),
   CONSTRAINT recompensas_usuario_pkey PRIMARY KEY (id),
-  CONSTRAINT recompensas_usuario_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id)
+  CONSTRAINT recompensas_usuario_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id),
+  CONSTRAINT recompensas_usuario_usuario_id_unique UNIQUE (usuario_id)
 );
 
 -- Tabla de definición de logros

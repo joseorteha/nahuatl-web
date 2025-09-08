@@ -77,7 +77,7 @@ export default function Recompensas({ userId }: { userId: string }) {
       setLoading(true);
       
       // Obtener datos de recompensas
-      const response = await fetch(`http://localhost:3001/api/recompensas/usuario/${userId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/recompensas/usuario/${userId}`, {
         headers: {
           'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
         },
@@ -90,7 +90,7 @@ export default function Recompensas({ userId }: { userId: string }) {
       }
 
       // Obtener historial
-      const historialResponse = await fetch(`http://localhost:3001/api/recompensas/historial/${userId}`, {
+      const historialResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/recompensas/historial/${userId}`, {
         headers: {
           'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
         },
@@ -276,7 +276,7 @@ export default function Recompensas({ userId }: { userId: string }) {
               <p className="text-gray-500 text-center py-4">No hay historial de puntos disponible</p>
             ) : (
               historial.map((entrada, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div key={`${entrada.fecha_creacion}-${entrada.puntos_ganados}-${index}`} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div>
                     <h4 className="font-medium text-gray-800">{entrada.motivo}</h4>
                     {entrada.descripcion && (
