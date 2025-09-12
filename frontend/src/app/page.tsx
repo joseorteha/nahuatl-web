@@ -2,8 +2,6 @@
 import { motion } from 'framer-motion';
 import { BookOpen, Code, Users, Feather, Mic, Languages, ChevronDown, Star } from 'lucide-react';
 import LandingHeader from '../components/LandingHeader';
-import Footer from '../components/Footer';
-import Image from 'next/image';
 
 export default function LandingPage() {
   const container = {
