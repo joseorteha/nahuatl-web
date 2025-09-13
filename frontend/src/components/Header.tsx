@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Avatar from 'boring-avatars';
 import { useRouter } from 'next/navigation';
 import { Menu, Transition } from '@headlessui/react';
-import { User as UserIcon, LogOut, LayoutDashboard, Menu as MenuIcon, X, BookOpen, Users, MessageCircle } from 'lucide-react';
+import { User as UserIcon, LogOut, LayoutDashboard, Menu as MenuIcon, X, BookOpen, Users, MessageCircle, Plus } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 
 type AvatarVariant = 'marble' | 'beam' | 'pixel' | 'sunset' | 'ring' | 'bauhaus';
@@ -100,6 +100,12 @@ export default function Header() {
         <Users size={18} />
         <span>Nosotros</span>
       </Link>
+      {user && (
+        <Link href="/contribuir" className="flex items-center gap-2 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200">
+          <Plus size={18} />
+          <span>Contribuir</span>
+        </Link>
+      )}
       {user?.rol === 'admin' ? (
         <Link href="/admin" className="flex items-center gap-2 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
