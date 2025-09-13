@@ -8,7 +8,7 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
   
   return (
-    <footer className="bg-gradient-to-b from-white to-slate-50 border-t border-slate-200 py-12">
+    <footer className="bg-gradient-to-b from-white to-slate-50 dark:from-gray-900 dark:to-gray-800 border-t border-slate-200 dark:border-gray-700 py-12 transition-colors duration-500">
       <div className="container-wide px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8 mb-10">
           <div className="flex flex-col items-center md:items-start col-span-1 md:col-span-1 lg:col-span-1">
@@ -21,23 +21,23 @@ const Footer = () => {
                   height={40} 
                   className="object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-tr from-orange-500/20 to-violet-500/20"></div>
+                <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-purple-500/20 dark:from-blue-400/20 dark:to-purple-400/20"></div>
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-xl font-bold text-slate-800 bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-violet-600">Nawatlahtol</h2>
-                  <span className="px-2 py-0.5 text-xs bg-gradient-to-r from-orange-100 to-violet-100 text-orange-800 rounded-full font-medium">Beta</span>
+                  <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-400">Nawatlahtol</h2>
+                  <span className="px-2 py-0.5 text-xs bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/40 dark:to-purple-900/40 text-blue-800 dark:text-blue-200 rounded-full font-medium">Beta</span>
                 </div>
-                <span className="text-xs text-slate-500 block">Tlahtolnemiliztli</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400 block">Tlahtolnemiliztli</span>
               </div>
             </div>
-            <p className="text-sm text-slate-600 text-center md:text-left mb-4">
+            <p className="text-sm text-slate-600 dark:text-slate-300 text-center md:text-left mb-4">
               Una plataforma moderna para aprender y preservar el idioma Náhuatl con herramientas interactivas.
             </p>
             <div className="flex items-center gap-3 mt-2">
               <a 
                 href="mailto:contacto@nawatlahtol.mx" 
-                className="text-slate-500 hover:text-orange-500 transition-colors duration-200 flex items-center gap-1.5 text-sm"
+                className="text-slate-500 dark:text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors duration-200 flex items-center gap-1.5 text-sm"
               >
                 <Mail size={14} />
                 Contáctanos
@@ -46,23 +46,23 @@ const Footer = () => {
           </div>
           
           <div className="col-span-1 md:col-span-1 lg:col-span-1">
-            <h3 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Explorar</h3>
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-4 uppercase tracking-wider">Explorar</h3>
             <nav className="flex flex-col space-y-3">
-              <Link href="/diccionario" className="text-sm text-slate-600 hover:text-orange-600 transition-colors duration-200 flex items-center gap-2">
+              <Link href="/login" className="text-sm text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 flex items-center gap-2">
                 <BookOpen size={16} />
                 Diccionario
               </Link>
-              <Link href="/lecciones" className="text-sm text-slate-600 hover:text-orange-600 transition-colors duration-200 flex items-center gap-2">
-                <svg className="h-4 w-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <span className="text-sm text-slate-400 dark:text-slate-500 flex items-center gap-2 cursor-not-allowed">
+                <svg className="h-4 w-4 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
-                Lecciones
-              </Link>
-              <Link href="/nosotros" className="text-sm text-slate-600 hover:text-orange-600 transition-colors duration-200 flex items-center gap-2">
+                Lecciones (Próximamente)
+              </span>
+              <Link href="/nosotros" className="text-sm text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 flex items-center gap-2">
                 <Info size={16} />
                 Nosotros
               </Link>
-              <Link href="/faq" className="text-sm text-slate-600 hover:text-orange-600 transition-colors duration-200 flex items-center gap-2">
+              <Link href="/faq" className="text-sm text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 flex items-center gap-2">
                 <HelpCircle size={16} />
                 FAQ
               </Link>
@@ -70,23 +70,23 @@ const Footer = () => {
           </div>
           
           <div className="col-span-1 md:col-span-1 lg:col-span-1">
-            <h3 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Comunidad</h3>
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-4 uppercase tracking-wider">Comunidad</h3>
             <nav className="flex flex-col space-y-3">
-              <Link href="/comunidad" className="text-sm text-slate-600 hover:text-orange-600 transition-colors duration-200 flex items-center gap-2">
+              <span className="text-sm text-slate-400 dark:text-slate-500 flex items-center gap-2 cursor-not-allowed">
                 <Users size={16} />
-                Comunidad
-              </Link>
-              <Link href="/feedback" className="text-sm text-slate-600 hover:text-orange-600 transition-colors duration-200 flex items-center gap-2">
-                <svg className="h-4 w-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                Comunidad (Próximamente)
+              </span>
+              <Link href="/login" className="text-sm text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 flex items-center gap-2">
+                <svg className="h-4 w-4 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                 </svg>
                 Feedback
               </Link>
-              <a href="https://github.com/JoseEduardoOax/nahuatl-app" target="_blank" rel="noopener noreferrer" className="text-sm text-slate-600 hover:text-orange-600 transition-colors duration-200 flex items-center gap-2">
+              <a href="https://github.com/joseorteha/nahuatl-web" target="_blank" rel="noopener noreferrer" className="text-sm text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 flex items-center gap-2">
                 <Github size={16} />
                 Contribuir
               </a>
-              <a href="https://cybercodigo-seven.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-sm text-slate-600 hover:text-orange-600 transition-colors duration-200 flex items-center gap-2">
+              <a href="https://cybercodigo-seven.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-sm text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 flex items-center gap-2">
                 <Globe size={16} />
                 Sitio del creador
               </a>
@@ -94,8 +94,8 @@ const Footer = () => {
           </div>
         </div>
         
-        <div className="border-t border-slate-200 mt-6 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-slate-600">
+        <div className="border-t border-slate-200 dark:border-slate-700 mt-6 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-sm text-slate-600 dark:text-slate-300">
             © {currentYear} Nawatlahtol | Creado con <Heart size={12} className="inline text-red-500 fill-red-500 mx-1" /> por José Ortega
           </p>
           
@@ -104,7 +104,7 @@ const Footer = () => {
               href="https://cybercodigo-seven.vercel.app/" 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="text-slate-500 hover:text-orange-500 transition-colors duration-200 p-2 rounded-full hover:bg-orange-50"
+              className="text-slate-500 dark:text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors duration-200 p-2 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20"
               title="Página personal"
             >
               <Globe size={18} />
@@ -113,7 +113,7 @@ const Footer = () => {
               href="https://www.facebook.com/joseortega.exe1" 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="text-slate-500 hover:text-blue-500 transition-colors duration-200 p-2 rounded-full hover:bg-blue-50"
+              className="text-slate-500 dark:text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors duration-200 p-2 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20"
               title="Facebook"
             >
               <Facebook size={18} />
@@ -122,21 +122,21 @@ const Footer = () => {
               href="https://www.instagram.com/mr.orteg4/?utm_source=qr&r=nametag" 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="text-slate-500 hover:text-pink-500 transition-colors duration-200 p-2 rounded-full hover:bg-pink-50"
+              className="text-slate-500 dark:text-slate-400 hover:text-pink-500 dark:hover:text-pink-400 transition-colors duration-200 p-2 rounded-full hover:bg-pink-50 dark:hover:bg-pink-900/20"
               title="Instagram"
             >
               <Instagram size={18} />
             </a>
             <a 
-              href="https://github.com/JoseEduardoOax/nahuatl-app" 
+              href="https://github.com/joseorteha/nahuatl-web" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-slate-500 hover:text-slate-900 transition-colors duration-200 p-2 rounded-full hover:bg-slate-100"
+              className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors duration-200 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
               title="GitHub Repository"
             >
               <Github size={18} />
             </a>
-            <span className="text-sm text-slate-500 flex items-center gap-1.5 ml-2 border-l border-slate-200 pl-4">
+            <span className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1.5 ml-2 border-l border-slate-200 dark:border-slate-700 pl-4">
               Hecho en México
             </span>
           </div>

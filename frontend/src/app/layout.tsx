@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import Footer from '@/components/Footer';
+import { ThemeProvider } from '@/components/theme-provider';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
@@ -17,11 +18,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning className={inter.variable}>
-      <body className="bg-neutral-50 text-neutral-800 min-h-screen font-sans">
-        <div className="flex-1 flex flex-col">
-          {children}
-        </div>
-        <Footer />
+      <body className="bg-neutral-50 dark:bg-gray-900 text-neutral-800 dark:text-gray-100 min-h-screen font-sans transition-colors duration-300">
+        <ThemeProvider>
+          <div className="flex-1 flex flex-col">
+            {children}
+          </div>
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );

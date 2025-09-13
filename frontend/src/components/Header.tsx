@@ -6,6 +6,7 @@ import Avatar from 'boring-avatars';
 import { useRouter } from 'next/navigation';
 import { Menu, Transition } from '@headlessui/react';
 import { User as UserIcon, LogOut, LayoutDashboard, Menu as MenuIcon, X, BookOpen, Users, MessageCircle } from 'lucide-react';
+import { ThemeToggle } from './ThemeToggle';
 
 type AvatarVariant = 'marble' | 'beam' | 'pixel' | 'sunset' | 'ring' | 'bauhaus';
 
@@ -87,27 +88,27 @@ export default function Header() {
 
   const navLinks = (
     <>
-      <Link href="/diccionario" className="flex items-center gap-2 text-slate-700 hover:text-orange-600 transition-colors duration-200">
+      <Link href="/diccionario" className="flex items-center gap-2 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200">
         <BookOpen size={18} />
         <span>Diccionario</span>
       </Link>
-      <Link href="/faq" className="flex items-center gap-2 text-slate-700 hover:text-orange-600 transition-colors duration-200">
+      <Link href="/faq" className="flex items-center gap-2 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200">
         <MessageCircle size={18} />
         <span>FAQ</span>
       </Link>
-      <Link href="/nosotros" className="flex items-center gap-2 text-slate-700 hover:text-orange-600 transition-colors duration-200">
+      <Link href="/nosotros" className="flex items-center gap-2 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200">
         <Users size={18} />
         <span>Nosotros</span>
       </Link>
       {user?.rol === 'admin' ? (
-        <Link href="/admin" className="flex items-center gap-2 text-slate-700 hover:text-orange-600 transition-colors duration-200">
+        <Link href="/admin" className="flex items-center gap-2 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 15H12.01M9 12H15M12 3C7 3 3 7 3 12C3 17 7 21 12 21C17 21 21 17 21 12C21 7 17 3 12 3Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
           <span>Admin</span>
         </Link>
       ) : null}
-      <span className="flex items-center gap-2 text-slate-400 cursor-not-allowed">
+      <span className="flex items-center gap-2 text-slate-400 dark:text-slate-500 cursor-not-allowed">
         <Users size={18} />
         <span>Lecciones (Próximamente)</span>
       </span>
@@ -115,7 +116,7 @@ export default function Header() {
   );
 
   return (
-    <header className="bg-white/90 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200 shadow-sm">
+    <header className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200 dark:border-slate-700 shadow-sm">
       <div className="container-wide">
         <div className="flex items-center justify-between h-16">
           {/* Logo and brand name */}
@@ -131,7 +132,7 @@ export default function Header() {
               />
             </div>
             <div className="flex flex-col">
-              <span className="text-xl font-bold bg-gradient-to-r from-orange-600 to-violet-600 bg-clip-text text-transparent">
+              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
                 NAHUATLAHTOL
               </span>
             </div>
@@ -144,14 +145,15 @@ export default function Header() {
 
           {/* User menu / Auth */}
           <div className="flex items-center gap-4">
+            <ThemeToggle />
             {isLoading ? (
-              <div className="w-9 h-9 bg-slate-200 rounded-full animate-pulse"></div>
+              <div className="w-9 h-9 bg-slate-200 dark:bg-slate-700 rounded-full animate-pulse"></div>
             ) : user ? (
               <>
                 {/* Desktop user menu */}
                 <div className="hidden lg:block">
                   <Menu as="div" className="relative">
-                    <Menu.Button className="flex items-center justify-center w-9 h-9 bg-gradient-to-br from-orange-500 to-violet-600 text-white rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-transform hover:scale-105 overflow-hidden">
+                    <Menu.Button className="flex items-center justify-center w-9 h-9 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 text-white rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-slate-800 transition-transform hover:scale-105 overflow-hidden">
                       {renderAvatar(user.url_avatar, 36)}
                     </Menu.Button>
                     <Transition
@@ -163,24 +165,24 @@ export default function Header() {
                       leaveFrom="transform opacity-100 scale-100"
                       leaveTo="transform opacity-0 scale-95"
                     >
-                      <Menu.Items className="absolute right-0 mt-2 w-60 origin-top-right bg-white divide-y divide-slate-100 rounded-md shadow-lg ring-1 ring-black/5 focus:outline-none border border-slate-200">
+                      <Menu.Items className="absolute right-0 mt-2 w-60 origin-top-right bg-white dark:bg-slate-800 divide-y divide-slate-100 dark:divide-slate-700 rounded-md shadow-lg ring-1 ring-black/5 dark:ring-white/10 focus:outline-none border border-slate-200 dark:border-slate-700">
                         <div className="px-1 py-1">
-                          <div className="px-3 py-2 border-b border-slate-100">
-                            <p className="text-sm text-slate-900 font-medium truncate">{user.nombre_completo || 'Usuario'}</p>
-                            <p className="text-xs text-slate-500 truncate">{user.email}</p>
+                          <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-700">
+                            <p className="text-sm text-slate-900 dark:text-slate-100 font-medium truncate">{user.nombre_completo || 'Usuario'}</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{user.email}</p>
                           </div>
                           <Menu.Item>
                             {({ active }) => (
-                              <Link href="/profile" className={`${active ? 'bg-slate-100' : ''} group flex rounded-md items-center w-full px-3 py-2 text-sm transition-colors duration-150`}>
-                                <UserIcon className="mr-2 h-4 w-4 text-slate-500" />
+                              <Link href="/profile" className={`${active ? 'bg-slate-100 dark:bg-slate-700' : ''} group flex rounded-md items-center w-full px-3 py-2 text-sm text-slate-700 dark:text-slate-300 transition-colors duration-150`}>
+                                <UserIcon className="mr-2 h-4 w-4 text-slate-500 dark:text-slate-400" />
                                 Mi Perfil
                               </Link>
                             )}
                           </Menu.Item>
                           <Menu.Item>
                             {({ active }) => (
-                              <Link href="/dashboard" className={`${active ? 'bg-slate-100' : ''} group flex rounded-md items-center w-full px-3 py-2 text-sm transition-colors duration-150`}>
-                                <LayoutDashboard className="mr-2 h-4 w-4 text-slate-500" />
+                              <Link href="/dashboard" className={`${active ? 'bg-slate-100 dark:bg-slate-700' : ''} group flex rounded-md items-center w-full px-3 py-2 text-sm text-slate-700 dark:text-slate-300 transition-colors duration-150`}>
+                                <LayoutDashboard className="mr-2 h-4 w-4 text-slate-500 dark:text-slate-400" />
                                 Dashboard
                               </Link>
                             )}
@@ -191,7 +193,7 @@ export default function Header() {
                             {({ active }) => (
                               <button 
                                 onClick={handleLogout} 
-                                className={`${active ? 'bg-red-50 text-red-600' : 'text-slate-700'} group flex rounded-md items-center w-full px-3 py-2 text-sm transition-colors duration-150`}
+                                className={`${active ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400' : 'text-slate-700 dark:text-slate-300'} group flex rounded-md items-center w-full px-3 py-2 text-sm transition-colors duration-150`}
                               >
                                 <LogOut className="mr-2 h-4 w-4" />
                                 Cerrar Sesión
@@ -207,7 +209,7 @@ export default function Header() {
                 {/* Mobile menu button */}
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="lg:hidden p-2 text-slate-600 hover:text-orange-600 transition-colors duration-200"
+                  className="lg:hidden p-2 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
                 >
                   {mobileMenuOpen ? <X size={24} /> : <MenuIcon size={24} />}
                 </button>
@@ -215,7 +217,7 @@ export default function Header() {
             ) : (
               <Link 
                 href="/login" 
-                className="bg-gradient-to-r from-orange-500 to-violet-600 text-white px-4 py-2 rounded-lg font-medium hover:from-orange-600 hover:to-violet-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
+                className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white px-4 py-2 rounded-lg font-medium hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
               >
                 Iniciar Sesión
               </Link>
@@ -225,16 +227,16 @@ export default function Header() {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && user && (
-          <div className="lg:hidden py-4 border-t border-slate-200 bg-white/95 backdrop-blur-sm">
+          <div className="lg:hidden py-4 border-t border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm">
             <div className="flex flex-col space-y-4">
               {/* User info */}
               <div className="flex items-center gap-3 px-2 py-2">
-                <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-violet-600 text-white rounded-full flex items-center justify-center text-sm font-medium overflow-hidden">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 text-white rounded-full flex items-center justify-center text-sm font-medium overflow-hidden">
                   {renderAvatar(user.url_avatar, 40)}
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-sm font-medium text-slate-900">{user.nombre_completo || 'Usuario'}</span>
-                  <span className="text-xs text-slate-500">{user.email}</span>
+                  <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{user.nombre_completo || 'Usuario'}</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">{user.email}</span>
                 </div>
               </div>
 
@@ -242,7 +244,7 @@ export default function Header() {
               <div className="flex flex-col space-y-2">
                 <Link 
                   href="/profile" 
-                  className="flex items-center gap-2 px-2 py-2 text-slate-700 hover:text-orange-600 transition-colors duration-200"
+                  className="flex items-center gap-2 px-2 py-2 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <UserIcon size={18} />
@@ -250,7 +252,7 @@ export default function Header() {
                 </Link>
                 <Link 
                   href="/dashboard" 
-                  className="flex items-center gap-2 px-2 py-2 text-slate-700 hover:text-orange-600 transition-colors duration-200"
+                  className="flex items-center gap-2 px-2 py-2 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <LayoutDashboard size={18} />
@@ -262,7 +264,7 @@ export default function Header() {
               {/* Logout button */}
               <button 
                 onClick={handleLogout}
-                className="flex items-center gap-2 px-2 py-2 text-red-600 hover:text-red-700 transition-colors duration-200 border-t border-slate-200 pt-4"
+                className="flex items-center gap-2 px-2 py-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors duration-200 border-t border-slate-200 dark:border-slate-700 pt-4"
               >
                 <LogOut size={18} />
                 <span>Cerrar Sesión</span>
