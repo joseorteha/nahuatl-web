@@ -25,7 +25,7 @@ const Footer = () => {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-400">Nawatlahtol</h2>
+                  <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-400">Nawatlajtol</h2>
                   <span className="px-2 py-0.5 text-xs bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/40 dark:to-purple-900/40 text-blue-800 dark:text-blue-200 rounded-full font-medium">Beta</span>
                 </div>
                 <span className="text-xs text-slate-500 dark:text-slate-400 block">Tlahtolnemiliztli</span>
@@ -36,7 +36,7 @@ const Footer = () => {
             </p>
             <div className="flex items-center gap-3 mt-2">
               <a 
-                href="mailto:contacto@nawatlahtol.mx" 
+                href="mailto:contacto@nawatlajtol.mx" 
                 className="text-slate-500 dark:text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors duration-200 flex items-center gap-1.5 text-sm"
               >
                 <Mail size={14} />
@@ -96,7 +96,7 @@ const Footer = () => {
         
         <div className="border-t border-slate-200 dark:border-slate-700 mt-6 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-slate-600 dark:text-slate-300">
-            © {currentYear} Nawatlahtol | Creado con <Heart size={12} className="inline text-red-500 fill-red-500 mx-1" /> por José Ortega
+            © {currentYear} Nawatlajtol | Creado con <Heart size={12} className="inline text-red-500 fill-red-500 mx-1" /> por José Ortega
           </p>
           
           <div className="flex items-center gap-5">

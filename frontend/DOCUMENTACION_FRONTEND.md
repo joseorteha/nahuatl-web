@@ -1,4 +1,4 @@
-# Documentación Técnica del Frontend - Nawatlahtol (Aplicación de Aprendizaje de Náhuatl)
+# Documentación Técnica del Frontend - Nawatlajtol (Aplicación de Aprendizaje de Náhuatl)
 
 ## 📋 Índice
 1. [Introducción](#introducción)
@@ -21,7 +21,7 @@
 
 ## Introducción
 
-Nawatlahtol es una aplicación web educativa diseñada para preservar, enseñar y difundir la lengua náhuatl. Esta plataforma incluye un diccionario interactivo, lecciones estructuradas y herramientas de práctica que permiten a los usuarios aprender náhuatl de manera moderna e interactiva.
+Nawatlajtol es una aplicación web educativa diseñada para preservar, enseñar y difundir la lengua náhuatl. Esta plataforma incluye un diccionario interactivo, lecciones estructuradas y herramientas de práctica que permiten a los usuarios aprender náhuatl de manera moderna e interactiva.
 
 **Propósito del documento**: Esta documentación técnica proporciona información detallada sobre la arquitectura, componentes, flujos y funcionalidades del frontend de la aplicación para desarrolladores, mantenedores y colaboradores del proyecto.
 

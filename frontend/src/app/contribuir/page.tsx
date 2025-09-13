@@ -240,8 +240,6 @@ export default function ContributePage() {
           )}
         </div>
       </div>
-
-      <Footer />
     </div>
   );
 }
