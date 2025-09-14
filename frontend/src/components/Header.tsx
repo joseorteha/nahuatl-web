@@ -139,7 +139,7 @@ export default function Header() {
             </div>
             <div className="flex flex-col">
               <span className="text-xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                NAHUATLAHTOL
+                NAHUATLAJTOL
               </span>
             </div>
           </Link>
