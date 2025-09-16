@@ -26,8 +26,8 @@ CREATE TABLE public.contribuciones_diccionario (
   fecha_creacion timestamp with time zone DEFAULT now(),
   fecha_actualizacion timestamp with time zone DEFAULT now(),
   CONSTRAINT contribuciones_diccionario_pkey PRIMARY KEY (id),
-  CONSTRAINT contribuciones_admin_revisor_fkey FOREIGN KEY (admin_revisor_id) REFERENCES public.perfiles(id),
-  CONSTRAINT contribuciones_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id)
+  CONSTRAINT contribuciones_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id),
+  CONSTRAINT contribuciones_admin_revisor_fkey FOREIGN KEY (admin_revisor_id) REFERENCES public.perfiles(id)
 );
 CREATE TABLE public.diccionario (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -47,6 +47,38 @@ CREATE TABLE public.diccionario (
   usuario_id uuid,
   CONSTRAINT diccionario_pkey PRIMARY KEY (id),
   CONSTRAINT diccionario_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id)
+);
+CREATE TABLE public.historial_puntos (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  usuario_id uuid NOT NULL,
+  puntos_ganados integer NOT NULL,
+  motivo text NOT NULL,
+  descripcion text,
+  fecha_creacion timestamp with time zone DEFAULT now(),
+  CONSTRAINT historial_puntos_pkey PRIMARY KEY (id),
+  CONSTRAINT historial_puntos_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id)
+);
+CREATE TABLE public.logros (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  nombre text NOT NULL,
+  descripcion text NOT NULL,
+  icono text NOT NULL,
+  categoria text DEFAULT 'general'::text CHECK (categoria = ANY (ARRAY['contribucion'::text, 'comunidad'::text, 'conocimiento'::text, 'especial'::text, 'general'::text])),
+  condicion_tipo text NOT NULL CHECK (condicion_tipo = ANY (ARRAY['contribuciones_cantidad'::text, 'likes_recibidos'::text, 'dias_consecutivos'::text, 'primera_contribucion'::text, 'feedback_cantidad'::text, 'palabras_guardadas'::text])),
+  condicion_valor integer NOT NULL,
+  puntos_otorgados integer DEFAULT 0,
+  fecha_creacion timestamp with time zone DEFAULT now(),
+  CONSTRAINT logros_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.logros_usuario (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  usuario_id uuid NOT NULL,
+  logro_id uuid NOT NULL,
+  fecha_obtenido timestamp with time zone DEFAULT now(),
+  notificado boolean DEFAULT false,
+  CONSTRAINT logros_usuario_pkey PRIMARY KEY (id),
+  CONSTRAINT logros_usuario_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id),
+  CONSTRAINT logros_usuario_logro_id_fkey FOREIGN KEY (logro_id) REFERENCES public.logros(id)
 );
 CREATE TABLE public.mensajes_contacto (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -72,8 +104,8 @@ CREATE TABLE public.palabras_guardadas (
   diccionario_id uuid NOT NULL,
   fecha_creacion timestamp with time zone DEFAULT now(),
   CONSTRAINT palabras_guardadas_pkey PRIMARY KEY (id),
-  CONSTRAINT palabras_guardadas_diccionario_id_fkey FOREIGN KEY (diccionario_id) REFERENCES public.diccionario(id),
-  CONSTRAINT palabras_guardadas_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id)
+  CONSTRAINT palabras_guardadas_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id),
+  CONSTRAINT palabras_guardadas_diccionario_id_fkey FOREIGN KEY (diccionario_id) REFERENCES public.diccionario(id)
 );
 CREATE TABLE public.perfiles (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -88,6 +120,20 @@ CREATE TABLE public.perfiles (
   password text,
   rol text DEFAULT 'usuario'::text CHECK (rol = ANY (ARRAY['usuario'::text, 'moderador'::text, 'admin'::text])),
   CONSTRAINT perfiles_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.recompensas_usuario (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  usuario_id uuid NOT NULL UNIQUE,
+  puntos_totales integer DEFAULT 0,
+  nivel text DEFAULT 'principiante'::text CHECK (nivel = ANY (ARRAY['principiante'::text, 'contribuidor'::text, 'experto'::text, 'maestro'::text, 'leyenda'::text])),
+  experiencia integer DEFAULT 0,
+  contribuciones_aprobadas integer DEFAULT 0,
+  likes_recibidos integer DEFAULT 0,
+  racha_dias integer DEFAULT 0,
+  fecha_creacion timestamp with time zone DEFAULT now(),
+  fecha_actualizacion timestamp with time zone DEFAULT now(),
+  CONSTRAINT recompensas_usuario_pkey PRIMARY KEY (id),
+  CONSTRAINT recompensas_usuario_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id)
 );
 CREATE TABLE public.respuestas_contacto (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -133,8 +179,8 @@ CREATE TABLE public.retroalimentacion_respuestas (
   fecha_creacion timestamp with time zone DEFAULT now(),
   fecha_actualizacion timestamp with time zone DEFAULT now(),
   CONSTRAINT retroalimentacion_respuestas_pkey PRIMARY KEY (id),
-  CONSTRAINT retroalimentacion_respuestas_retroalimentacion_id_fkey FOREIGN KEY (retroalimentacion_id) REFERENCES public.retroalimentacion(id),
-  CONSTRAINT retroalimentacion_respuestas_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id)
+  CONSTRAINT retroalimentacion_respuestas_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id),
+  CONSTRAINT retroalimentacion_respuestas_retroalimentacion_id_fkey FOREIGN KEY (retroalimentacion_id) REFERENCES public.retroalimentacion(id)
 );
 CREATE TABLE public.solicitudes_union (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
