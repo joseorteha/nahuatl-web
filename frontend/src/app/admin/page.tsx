@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { motion } from 'framer-motion';
+import { Settings, Users, MessageCircle, FileText, AlertCircle, Shield, Activity } from 'lucide-react';
 import Header from '@/components/Header';
 import ContributionsTab from '@/components/admin/ContributionsTab';
 import MessagesTab from '@/components/admin/MessagesTab';
@@ -9,6 +11,7 @@ import ContributionModal from '@/components/admin/ContributionModal';
 import MessageModal from '@/components/admin/MessageModal';
 import RequestModal from '@/components/admin/RequestModal';
 import { obtenerMensajesNoLeidos, obtenerSolicitudesPendientes, marcarContactoComoLeido } from '@/lib/contactService';
+import { getAdminStats } from '@/lib/contributionStats';
 
 interface AdminContribution {
   id: string;
@@ -78,6 +81,11 @@ export default function AdminPage() {
   const [selectedMensaje, setSelectedMensaje] = useState<MensajeContacto | null>(null);
   const [selectedSolicitud, setSelectedSolicitud] = useState<SolicitudUnion | null>(null);
   const [reviewing, setReviewing] = useState(false);
+  const [adminStats, setAdminStats] = useState({
+    pendingContributions: 0,
+    recentContributions: 0,
+    approvedThisMonth: 0
+  });
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -115,6 +123,15 @@ export default function AdminPage() {
     }
   }, []);
 
+  const loadAdminStats = useCallback(async () => {
+    try {
+      const stats = await getAdminStats();
+      setAdminStats(stats);
+    } catch (error) {
+      console.error('Error loading admin stats:', error);
+    }
+  }, []);
+
   useEffect(() => {
     const userData = localStorage.getItem('user');
     if (userData) {
@@ -126,13 +143,14 @@ export default function AdminPage() {
         loadContributions(parsedUser.id);
         loadMensajesContacto();
         loadSolicitudesUnion();
+        loadAdminStats(); // Cargar estadísticas de admin
       } else {
         setLoading(false);
       }
     } else {
       setLoading(false);
     }
-  }, [loadContributions, loadMensajesContacto, loadSolicitudesUnion]);
+  }, [loadContributions, loadMensajesContacto, loadSolicitudesUnion, loadAdminStats]);
 
   const handleReview = async (contributionId: string, estado: 'aprobada' | 'rechazada', reviewComment: string) => {
     if (!user?.id) return;
@@ -177,12 +195,18 @@ export default function AdminPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900">
         <Header />
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Cargando...</p>
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              className="inline-block"
+            >
+              <div className="w-12 h-12 border-4 border-blue-600/20 border-t-blue-600 rounded-full"></div>
+            </motion.div>
+            <p className="mt-4 text-gray-600 dark:text-gray-300">Cargando panel de administración...</p>
           </div>
         </div>
       </div>
@@ -191,111 +215,192 @@ export default function AdminPage() {
 
   if (!user || !user.rol || !['admin', 'moderador'].includes(user.rol)) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-red-900">
         <Header />
         <div className="container mx-auto px-4 py-8">
-          <div className="text-center bg-white rounded-lg shadow-md p-8">
-            <div className="text-red-400 text-6xl mb-4">🚫</div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="max-w-md mx-auto text-center"
+          >
+            <div className="mb-6">
+              <div className="mx-auto w-20 h-20 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center">
+                <Shield className="h-10 w-10 text-white" />
+              </div>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
               Acceso Denegado
             </h2>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-300">
               No tienes permisos para acceder al panel de administración.
             </p>
-          </div>
+          </motion.div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900">
       <Header />
       
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 dark:from-blue-400/10 dark:to-purple-400/10"></div>
+        <div className="relative container mx-auto px-4 py-16">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="max-w-4xl mx-auto text-center"
+          >
+            <div className="flex justify-center mb-6">
+              <div className="p-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl shadow-lg">
+                <Settings className="h-8 w-8 text-white" />
+              </div>
+            </div>
+            
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
               Panel de Administración
             </h1>
-            <p className="text-gray-600">
-              Gestionar contribuciones, mensajes de contacto y solicitudes de unirse.
+            
+            <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
+              Gestiona contribuciones, mensajes de contacto y solicitudes de unión desde un solo lugar.
             </p>
-          </div>
 
-          {/* Navegación por pestañas */}
-          <div className="mb-6">
-            <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
+            {/* Stats Dashboard */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-2xl mx-auto">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 rounded-xl border border-white/20 dark:border-gray-700/50"
+              >
+                <FileText className="h-6 w-6 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-gray-800 dark:text-white">
+                  {contributions.filter(c => c.estado === 'pendiente').length}
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">Contribuciones Pendientes</div>
+              </motion.div>
+              
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 rounded-xl border border-white/20 dark:border-gray-700/50"
+              >
+                <MessageCircle className="h-6 w-6 text-purple-600 dark:text-purple-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-gray-800 dark:text-white">{mensajesContacto.length}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">Mensajes Nuevos</div>
+              </motion.div>
+              
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 rounded-xl border border-white/20 dark:border-gray-700/50"
+              >
+                <Users className="h-6 w-6 text-green-600 dark:text-green-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-gray-800 dark:text-white">{solicitudesUnion.length}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">Solicitudes Pendientes</div>
+              </motion.div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+      
+      <div className="container mx-auto px-4 pb-16">
+        <div className="max-w-7xl mx-auto">
+          {/* Navigation Tabs */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-2 mb-8 border border-white/20 dark:border-gray-700/50 shadow-lg"
+          >
+            <div className="flex flex-col sm:flex-row gap-2">
               <button
                 onClick={() => setActiveTab('contribuciones')}
-                className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
                   activeTab === 'contribuciones'
-                    ? 'bg-white text-blue-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-800'
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700/50'
                 }`}
               >
-                Contribuciones
+                <FileText className="h-5 w-5" />
+                <span>Contribuciones</span>
                 {contributions.filter(c => c.estado === 'pendiente').length > 0 && (
-                  <span className="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
+                  <span className="bg-white/20 text-xs px-2 py-1 rounded-full">
                     {contributions.filter(c => c.estado === 'pendiente').length}
                   </span>
                 )}
               </button>
+              
               <button
                 onClick={() => setActiveTab('mensajes')}
-                className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
                   activeTab === 'mensajes'
-                    ? 'bg-white text-blue-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-800'
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700/50'
                 }`}
               >
-                Mensajes
+                <MessageCircle className="h-5 w-5" />
+                <span>Mensajes</span>
                 {mensajesContacto.length > 0 && (
-                  <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                  <span className="bg-white/20 text-xs px-2 py-1 rounded-full">
                     {mensajesContacto.length}
                   </span>
                 )}
               </button>
+              
               <button
                 onClick={() => setActiveTab('solicitudes')}
-                className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
                   activeTab === 'solicitudes'
-                    ? 'bg-white text-blue-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-800'
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700/50'
                 }`}
               >
-                Solicitudes
+                <Users className="h-5 w-5" />
+                <span>Solicitudes</span>
                 {solicitudesUnion.length > 0 && (
-                  <span className="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                  <span className="bg-white/20 text-xs px-2 py-1 rounded-full">
                     {solicitudesUnion.length}
                   </span>
                 )}
               </button>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Contenido por pestañas */}
-          {activeTab === 'contribuciones' && (
-            <ContributionsTab 
-              contributions={contributions}
-              onSelectContribution={setSelectedContribution}
-            />
-          )}
+          {/* Content */}
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {activeTab === 'contribuciones' && (
+              <ContributionsTab 
+                contributions={contributions}
+                onSelectContribution={setSelectedContribution}
+              />
+            )}
 
-          {activeTab === 'mensajes' && (
-            <MessagesTab 
-              mensajesContacto={mensajesContacto}
-              onSelectMensaje={setSelectedMensaje}
-              onMarkAsRead={handleMarkAsRead}
-            />
-          )}
+            {activeTab === 'mensajes' && (
+              <MessagesTab 
+                mensajesContacto={mensajesContacto}
+                onSelectMensaje={setSelectedMensaje}
+                onMarkAsRead={handleMarkAsRead}
+              />
+            )}
 
-          {activeTab === 'solicitudes' && (
-            <RequestsTab 
-              solicitudesUnion={solicitudesUnion}
-              onSelectSolicitud={setSelectedSolicitud}
-            />
-          )}
+            {activeTab === 'solicitudes' && (
+              <RequestsTab 
+                solicitudesUnion={solicitudesUnion}
+                onSelectSolicitud={setSelectedSolicitud}
+              />
+            )}
+          </motion.div>
         </div>
       </div>
 

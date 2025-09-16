@@ -37,8 +37,16 @@ router.post('/', async (req, res) => {
     usuario_id, 
     usuario_email,
     word, 
-    definition, 
+    variants,
     info_gramatical, 
+    definition,
+    nombre_cientifico,
+    examples,
+    synonyms,
+    roots,
+    ver_tambien,
+    ortografias_alternativas,
+    notes,
     razon_contribucion, 
     fuente, 
     nivel_confianza 
@@ -49,14 +57,69 @@ router.post('/', async (req, res) => {
   }
 
   try {
+    // Procesar arrays de strings para campos que lo requieren
+    const processedVariants = variants && Array.isArray(variants) ? variants : 
+                             variants ? variants.split(',').map(v => v.trim()).filter(v => v) : null;
+    
+    const processedSynonyms = synonyms && Array.isArray(synonyms) ? synonyms : 
+                             synonyms ? synonyms.split(',').map(s => s.trim()).filter(s => s) : null;
+    
+    const processedRoots = roots && Array.isArray(roots) ? roots : 
+                          roots ? roots.split(',').map(r => r.trim()).filter(r => r) : null;
+    
+    const processedVerTambien = ver_tambien && Array.isArray(ver_tambien) ? ver_tambien : 
+                               ver_tambien ? ver_tambien.split(',').map(v => v.trim()).filter(v => v) : null;
+    
+    const processedOrtografias = ortografias_alternativas && Array.isArray(ortografias_alternativas) ? ortografias_alternativas : 
+                                ortografias_alternativas ? ortografias_alternativas.split(',').map(o => o.trim()).filter(o => o) : null;
+    
+    const processedNotes = notes && Array.isArray(notes) ? notes : 
+                          notes ? notes.split('\n').map(n => n.trim()).filter(n => n) : null;
+
+    // Procesar ejemplos como JSON
+    let processedExamples = null;
+    if (examples) {
+      try {
+        // Si examples es string, intentar parsearlo como líneas separadas
+        if (typeof examples === 'string') {
+          const exampleLines = examples.split('\n').map(line => line.trim()).filter(line => line);
+          if (exampleLines.length > 0) {
+            processedExamples = exampleLines.map((line, index) => {
+              // Formato: "frase_nahuatl = traducción_español"
+              const parts = line.split('=').map(part => part.trim());
+              return {
+                id: index + 1,
+                nahuatl: parts[0] || line,
+                español: parts[1] || '',
+                original: line
+              };
+            });
+          }
+        } else if (Array.isArray(examples)) {
+          processedExamples = examples;
+        }
+      } catch (e) {
+        console.warn('Error procesando examples, usando formato original:', e);
+        processedExamples = examples;
+      }
+    }
+
     const { data, error } = await supabase
       .from('contribuciones_diccionario')
       .insert({
         usuario_id: usuario_id,
         usuario_email: usuario_email || '',
-        word,
-        definition,
+        word: word.trim(),
+        variants: processedVariants,
         info_gramatical: info_gramatical || null,
+        definition: definition.trim(),
+        nombre_cientifico: nombre_cientifico || null,
+        examples: processedExamples,
+        synonyms: processedSynonyms,
+        roots: processedRoots,
+        ver_tambien: processedVerTambien,
+        ortografias_alternativas: processedOrtografias,
+        notes: processedNotes,
         razon_contribucion: razon_contribucion || null,
         fuente: fuente || null,
         nivel_confianza: nivel_confianza || 'medio',
@@ -69,7 +132,8 @@ router.post('/', async (req, res) => {
       return res.status(500).json({ error: 'Error al crear contribución.', details: error.message });
     }
 
-    res.status(201).json(data);
+    console.log('✅ Contribución creada exitosamente:', data[0]?.word);
+    res.status(201).json(data[0]);
   } catch (e) {
     console.error('Error inesperado en POST /api/contributions:', e);
     return res.status(500).json({ error: 'Error inesperado en el servidor.', details: e.message });

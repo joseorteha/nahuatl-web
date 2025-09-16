@@ -95,13 +95,21 @@ export default function DictionaryPage() {
   const fetchSaved = async (uid: string) => {
     try {
       console.log('Fetching saved words for user:', uid);
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web.onrender.com'}/api/dictionary/saved/${uid}`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web.onrender.com'}/api/dictionary/saved/${uid}`);
       if (!res.ok) {
         throw new Error(`HTTP ${res.status}: ${res.statusText}`);
       }
       const data = await res.json();
-      console.log('Saved words fetched:', data?.length || 0, 'items');
-      setSavedWords(data.map((w: { id: string }) => w.id));
+      console.log('Saved words fetched:', data);
+      
+      // Validar que data sea un array antes de usar map
+      if (Array.isArray(data)) {
+        console.log('Setting saved words:', data.length, 'items');
+        setSavedWords(data.map((w: { id: string }) => w.id));
+      } else {
+        console.log('Data is not an array, setting empty array');
+        setSavedWords([]);
+      }
     } catch (error) {
       console.error('Error fetching saved words:', error);
       setSavedWords([]);
