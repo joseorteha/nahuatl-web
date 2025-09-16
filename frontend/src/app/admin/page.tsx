@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Settings, Users, MessageCircle, FileText, AlertCircle, Shield, Activity } from 'lucide-react';
+import { Settings, Users, MessageCircle, FileText, Shield } from 'lucide-react';
 import Header from '@/components/Header';
 import ContributionsTab from '@/components/admin/ContributionsTab';
 import MessagesTab from '@/components/admin/MessagesTab';
@@ -11,7 +11,6 @@ import ContributionModal from '@/components/admin/ContributionModal';
 import MessageModal from '@/components/admin/MessageModal';
 import RequestModal from '@/components/admin/RequestModal';
 import { obtenerMensajesNoLeidos, obtenerSolicitudesPendientes, marcarContactoComoLeido } from '@/lib/contactService';
-import { getAdminStats } from '@/lib/contributionStats';
 
 interface AdminContribution {
   id: string;
@@ -81,11 +80,6 @@ export default function AdminPage() {
   const [selectedMensaje, setSelectedMensaje] = useState<MensajeContacto | null>(null);
   const [selectedSolicitud, setSelectedSolicitud] = useState<SolicitudUnion | null>(null);
   const [reviewing, setReviewing] = useState(false);
-  const [adminStats, setAdminStats] = useState({
-    pendingContributions: 0,
-    recentContributions: 0,
-    approvedThisMonth: 0
-  });
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -123,15 +117,6 @@ export default function AdminPage() {
     }
   }, []);
 
-  const loadAdminStats = useCallback(async () => {
-    try {
-      const stats = await getAdminStats();
-      setAdminStats(stats);
-    } catch (error) {
-      console.error('Error loading admin stats:', error);
-    }
-  }, []);
-
   useEffect(() => {
     const userData = localStorage.getItem('user');
     if (userData) {
@@ -143,14 +128,13 @@ export default function AdminPage() {
         loadContributions(parsedUser.id);
         loadMensajesContacto();
         loadSolicitudesUnion();
-        loadAdminStats(); // Cargar estadísticas de admin
       } else {
         setLoading(false);
       }
     } else {
       setLoading(false);
     }
-  }, [loadContributions, loadMensajesContacto, loadSolicitudesUnion, loadAdminStats]);
+  }, [loadContributions, loadMensajesContacto, loadSolicitudesUnion]);
 
   const handleReview = async (contributionId: string, estado: 'aprobada' | 'rechazada', reviewComment: string) => {
     if (!user?.id) return;

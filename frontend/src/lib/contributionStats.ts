@@ -226,7 +226,7 @@ export async function getFullAdminStats(): Promise<AdminStats> {
           totalContributors: result.total_contribuidores || 0
         };
       }
-    } catch (rpcError) {
+    } catch {
       console.log('RPC function not available, using manual queries');
     }
 

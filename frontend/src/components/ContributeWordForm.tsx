@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Send, RotateCcw, AlertCircle, CheckCircle2, Info, FileText, Tag, Hash, Quote, BookOpen, MessageSquare, Star } from 'lucide-react';
+import { Send, RotateCcw, AlertCircle, CheckCircle2, Info, FileText, Tag, Hash, MessageSquare, Star } from 'lucide-react';
 
 interface ContributionFormData {
   word: string;

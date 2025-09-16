@@ -2,11 +2,11 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, History, Users, BookOpen, ChevronRight, Sparkles } from 'lucide-react';
+import { Plus, History, Users, BookOpen, Sparkles } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ContributeWordForm from '@/components/ContributeWordForm';
-import { getContributionStats, testSupabaseConnection, testSimpleConnection, type ContributionStats } from '@/lib/contributionStats';
+import { getContributionStats, type ContributionStats } from '@/lib/contributionStats';
 
 interface UserContribution {
   id: string;
