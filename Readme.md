@@ -63,12 +63,11 @@
 
 | Funcionalidad | Descripción | Estado |
 |---------------|-------------|---------|
-| **📖 Diccionario Interactivo** | 4,300+ palabras con pronunciación y ejemplos | ✅ Estable |
+| **📖 Diccionario Interactivo** | 3,500+ palabras con definicion y ejemplos | ✅ Estable |
 | **� Sistema de Lecciones** | Contenido educativo estructurado y progresivo | ✅ Estable |
 | **👤 Gestión de Usuarios** | Perfiles, autenticación y roles | ✅ Estable |
 | **⭐ Palabras Guardadas** | Sistema de favoritos personalizado | ✅ Estable |
 | **💬 Sistema de Comunidad** | Feedback, discusiones y colaboración | ✅ Mejorado |
-| **📱 PWA Ready** | Funciona offline y como app móvil | ✅ Estable |
 
 ### 🆕 Sistema de Contribuciones Colaborativas
 
