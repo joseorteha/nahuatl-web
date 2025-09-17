@@ -163,43 +163,44 @@ export default function AuthForm() {
     setSuccess(null);
 
     try {
-      // Timeout para mostrar mensaje informativo sobre servidor lento
-      const timeoutId = setTimeout(() => {
-        if (isLoading) {
-          setError('El servidor está iniciando. Esto puede tomar unos momentos la primera vez.');
-        }
-      }, 3000);
-
       if (isSignUp) {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web.onrender.com'}/api/auth/register`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nombre_completo: fullName, email, password, username }),
+        // Registro con Supabase Auth
+        const { error } = await supabase.auth.signUp({
+          email: email,
+          password: password,
+          options: {
+            data: {
+              full_name: fullName,
+              username: username
+            }
+          }
         });
-        clearTimeout(timeoutId);
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.error || 'Error al registrar usuario.');
-        
-        setSuccess('¡Registro exitoso! Ahora puedes iniciar sesión.');
+
+        if (error) {
+          throw new Error(error.message || 'Error al registrar usuario.');
+        }
+
+        setSuccess('¡Registro exitoso! Revisa tu email para confirmar tu cuenta.');
         setIsSignUp(false);
         setFullName('');
         setPassword('');
         setUsername('');
       } else {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web.onrender.com'}/api/auth/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ emailOrUsername: email, password }),
+        // Login con email/password usando Supabase Auth
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: email,
+          password: password,
         });
-        clearTimeout(timeoutId);
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.error || 'Credenciales incorrectas.');
 
-        localStorage.setItem('user', JSON.stringify(result.user));
-        if (result.token) {
-          localStorage.setItem('token', result.token);
+        if (error) {
+          throw new Error(error.message || 'Credenciales incorrectas.');
         }
-        router.push('/dashboard');
+
+        if (data.user) {
+          console.log('✅ Login exitoso con Supabase Auth:', data.user.email);
+          // El hook useAuth se encargará de crear/actualizar el perfil automáticamente
+          router.push('/dashboard');
+        }
       }
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'Ocurrió un error. Inténtalo de nuevo.');

@@ -16,15 +16,6 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const router = useRouter();
 
-  // Debug logging para diagnosticar problema de autenticación
-  console.log('🔍 Header Debug:', { 
-    userExists: !!user, 
-    profileExists: !!profile, 
-    loading, 
-    userEmail: user?.email,
-    profileEmail: profile?.email 
-  });
-
   const handleLogout = async () => {
     await signOut();
     router.push('/');
