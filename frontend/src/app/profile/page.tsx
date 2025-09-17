@@ -8,14 +8,7 @@ import Avatar from 'boring-avatars';
 import Header from '@/components/Header';
 import Recompensas from '@/components/Recompensas';
 import Image from 'next/image';
-
-interface UserData {
-  id: string;
-  email: string;
-  nombre_completo?: string;
-  username?: string;
-  url_avatar?: string;
-}
+import { useAuth } from '@/hooks/useAuth';
 
 interface SavedWord {
   id: string;
@@ -33,8 +26,7 @@ interface AvatarData {
 }
 
 export default function ProfilePage() {
-  const [user, setUser] = useState<UserData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { profile, loading, isAuthenticated } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [showAvatarSelector, setShowAvatarSelector] = useState(false);
   const [generatedAvatars, setGeneratedAvatars] = useState<AvatarData[]>([]);
@@ -57,8 +49,17 @@ export default function ProfilePage() {
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
+  // Datos combinados del usuario (perfil + auth)
+  const userData = profile ? {
+    id: profile.id,
+    email: profile.email,
+    nombre_completo: profile.nombre_completo,
+    url_avatar: profile.url_avatar,
+    username: profile.email // Usar email como fallback para username
+  } : null;
+
   // Helper para renderizar avatares
-  const renderAvatar = (avatarString: string | undefined, size: number = 128) => {
+  const renderAvatar = (avatarString: string | null | undefined, size: number = 128) => {
     if (!avatarString) {
       return (
         <div className="w-full h-full rounded-full bg-emerald-100 flex items-center justify-center">
@@ -134,30 +135,24 @@ export default function ProfilePage() {
   }, [API_URL]);
 
   useEffect(() => {
-    const userData = localStorage.getItem('user');
-    if (!userData) {
+    // Redirigir si no está autenticado
+    if (!loading && !isAuthenticated) {
       router.push('/login');
       return;
     }
 
-    try {
-      const parsedUser = JSON.parse(userData);
-      setUser(parsedUser);
+    // Configurar datos del formulario cuando el perfil esté disponible
+    if (profile) {
       setFormData({
-        nombre_completo: parsedUser.nombre_completo || '',
-        username: parsedUser.username || '',
-        email: parsedUser.email || ''
+        nombre_completo: profile.nombre_completo || '',
+        username: profile.email || '', // Usar email como username
+        email: profile.email || ''
       });
-      generateAvatars(parsedUser.username || parsedUser.email || 'default');
-      loadUserStats(parsedUser.id);
-      loadSavedWords(parsedUser.id);
-    } catch (error) {
-      console.error('Error parsing user data:', error);
-      router.push('/login');
-    } finally {
-      setIsLoading(false);
+      generateAvatars(profile.email || 'default');
+      loadUserStats(profile.id);
+      loadSavedWords(profile.id);
     }
-  }, [router, loadUserStats, loadSavedWords]);
+  }, [loading, isAuthenticated, profile, router, loadUserStats, loadSavedWords]);
 
   const generateAvatars = (seed: string) => {
     const variants = ['marble', 'beam', 'pixel', 'sunset', 'ring', 'bauhaus'];
@@ -193,12 +188,13 @@ export default function ProfilePage() {
     const selectedAvatarData = generatedAvatars[avatarIndex];
     // Crear un identificador único para este avatar que el header pueda usar
     const avatarString = `boring-avatar:${selectedAvatarData.name}:${selectedAvatarData.variant}:${selectedAvatarData.colors.join(',')}`;
-    const updatedUser = { ...user!, url_avatar: avatarString };
-    setUser(updatedUser);
-    // Actualizar localStorage inmediatamente para que el header se actualice
-    localStorage.setItem('user', JSON.stringify(updatedUser));
-    // Disparar evento storage para que otros componentes se actualicen
-    window.dispatchEvent(new Event('storage'));
+    
+    // Actualizar el formData para que se guarde cuando el usuario haga save
+    setFormData(prev => ({
+      ...prev,
+      url_avatar: avatarString
+    }));
+    
     setShowAvatarSelector(false);
   };
 
@@ -210,20 +206,20 @@ export default function ProfilePage() {
   };
 
   const handleSave = async () => {
-    if (!user) return;
+    if (!userData) return;
 
     setIsSaving(true);
     setMessage(null);
 
     try {
-      const response = await fetch(`${API_URL}/api/auth/profile/${user.id}`, {
+      const response = await fetch(`${API_URL}/api/auth/profile/${userData.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           ...formData,
-          url_avatar: user.url_avatar
+          url_avatar: userData.url_avatar
         }),
       });
 
@@ -233,11 +229,6 @@ export default function ProfilePage() {
         throw new Error(result.error || 'Error al actualizar perfil');
       }
 
-      // Actualizar datos locales
-      const updatedUser = { ...user, ...formData, url_avatar: user.url_avatar };
-      setUser(updatedUser);
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      
       setMessage({ type: 'success', text: '¡Perfil actualizado exitosamente!' });
       setIsEditing(false);
     } catch (error) {
@@ -257,7 +248,7 @@ export default function ProfilePage() {
     router.push('/');
   };
 
-  if (isLoading) {
+  if (loading || !profile) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100">
         <Header />
@@ -268,7 +259,7 @@ export default function ProfilePage() {
     );
   }
 
-  if (!user) {
+  if (!userData) {
     return null;
   }
 
@@ -287,7 +278,7 @@ export default function ProfilePage() {
             <div className="flex flex-col md:flex-row items-center gap-6">
               <div className="relative">
                 <div className="w-32 h-32 rounded-full bg-white p-2 shadow-lg flex items-center justify-center">
-                  {renderAvatar(user.url_avatar, 120)}
+                  {renderAvatar(userData.url_avatar, 120)}
                 </div>
                 <button
                   onClick={() => setShowAvatarSelector(true)}
@@ -299,13 +290,13 @@ export default function ProfilePage() {
               
               <div className="text-center md:text-left flex-1">
                 <h1 className="text-3xl font-bold text-white mb-2">
-                  {user.nombre_completo || 'Usuario'}
+                  {userData.nombre_completo || 'Usuario'}
                 </h1>
                 <p className="text-emerald-100 text-lg">
-                  @{user.username || 'usuario'}
+                  @{userData.username || 'usuario'}
                 </p>
                 <p className="text-emerald-200 mt-1">
-                  {user.email}
+                  {userData.email}
                 </p>
               </div>
 
@@ -615,7 +606,7 @@ export default function ProfilePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          {user && <Recompensas userId={user.id} />}
+          {userData && <Recompensas userId={userData.id} />}
         </motion.div>
       </div>
     </div>

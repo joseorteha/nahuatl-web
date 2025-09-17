@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import type { User } from '@supabase/supabase-js';
 
@@ -37,7 +37,7 @@ export function useAuth() {
   };
 
   // Función para crear perfil si no existe
-  const createProfileIfNeeded = async (authUser: User) => {
+  const createProfileIfNeeded = useCallback(async (authUser: User) => {
     try {
       console.log('🔍 Verificando si existe perfil para usuario:', authUser.email);
       
@@ -46,14 +46,15 @@ export function useAuth() {
 
       // Si no existe el perfil, crearlo
       if (!existingProfile) {
-        console.log('📝 Creando perfil para usuario OAuth:', authUser.email);
+        const isOAuth = authUser.app_metadata?.provider === 'google' || authUser.app_metadata?.provider === 'facebook';
+        console.log(`📝 Creando perfil para usuario ${isOAuth ? 'OAuth' : 'email/password'}:`, authUser.email);
         
         const profileData = {
           id: authUser.id, // Usar el ID de Supabase Auth
           email: authUser.email,
-          nombre_completo: authUser.user_metadata?.full_name || 
-                          authUser.user_metadata?.name || 
-                          'Usuario OAuth',
+          nombre_completo: isOAuth 
+            ? (authUser.user_metadata?.full_name || authUser.user_metadata?.name || 'Usuario OAuth')
+            : authUser.email?.split('@')[0] || 'Usuario', // Para email/password usar la parte del email
           url_avatar: authUser.user_metadata?.avatar_url || null,
           // NO incluir password para usuarios OAuth
         };
@@ -108,7 +109,7 @@ export function useAuth() {
     } catch (error) {
       console.error('💥 Error en createProfileIfNeeded:', error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     // Rastrear usuarios procesados para evitar duplicación
@@ -156,7 +157,7 @@ export function useAuth() {
     );
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [createProfileIfNeeded]);
 
   const signOut = async () => {
     try {
