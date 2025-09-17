@@ -1,10 +1,40 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import type { User } from '@supabase/supabase-js';
 
+interface UserProfile {
+  id: string;
+  email: string;
+  nombre_completo: string | null;
+  url_avatar: string | null;
+  bio: string | null;
+}
+
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Función para obtener el perfil del usuario
+  const fetchUserProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('perfiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error obteniendo perfil:', error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error en fetchUserProfile:', error);
+      return null;
+    }
+  };
 
   // Función para crear perfil si no existe
   const createProfileIfNeeded = async (authUser: User) => {
@@ -12,16 +42,7 @@ export function useAuth() {
       console.log('🔍 Verificando si existe perfil para usuario:', authUser.email);
       
       // Verificar si el usuario ya existe en la tabla perfiles
-      const { data: existingProfile, error: profileCheckError } = await supabase
-        .from('perfiles')
-        .select('*')
-        .eq('id', authUser.id)
-        .single();
-
-      if (profileCheckError && profileCheckError.code !== 'PGRST116') {
-        console.error('❌ Error al verificar perfil:', profileCheckError);
-        return;
-      }
+      const existingProfile = await fetchUserProfile(authUser.id);
 
       // Si no existe el perfil, crearlo
       if (!existingProfile) {
@@ -46,9 +67,13 @@ export function useAuth() {
           console.error('❌ Error al crear perfil:', insertError);
         } else {
           console.log('✅ Perfil creado exitosamente:', insertData);
+          if (insertData?.[0]) {
+            setProfile(insertData[0]);
+          }
         }
       } else {
         console.log('✅ Perfil ya existe para usuario:', authUser.email);
+        setProfile(existingProfile);
         
         // Actualizar información si es necesario (como avatar de Google)
         const updateData: { url_avatar?: string; nombre_completo?: string } = {};
@@ -63,15 +88,20 @@ export function useAuth() {
 
         if (Object.keys(updateData).length > 0) {
           console.log('🔄 Actualizando perfil con:', updateData);
-          const { error: updateError } = await supabase
+          const { data: updateResult, error: updateError } = await supabase
             .from('perfiles')
             .update(updateData)
-            .eq('id', authUser.id);
+            .eq('id', authUser.id)
+            .select()
+            .single();
             
           if (updateError) {
             console.error('❌ Error al actualizar perfil:', updateError);
           } else {
             console.log('✅ Perfil actualizado exitosamente');
+            if (updateResult) {
+              setProfile(updateResult);
+            }
           }
         }
       }
@@ -81,6 +111,9 @@ export function useAuth() {
   };
 
   useEffect(() => {
+    // Rastrear usuarios procesados para evitar duplicación
+    const processedUsers = new Set<string>();
+
     // Obtener sesión inicial
     const getInitialSession = async () => {
       try {
@@ -88,13 +121,15 @@ export function useAuth() {
         const sessionUser = session?.user ?? null;
         setUser(sessionUser);
         
-        // Si hay usuario, verificar/crear perfil
-        if (sessionUser) {
+        // Si hay usuario, verificar/crear perfil SOLO si no se ha procesado
+        if (sessionUser && !processedUsers.has(sessionUser.id)) {
+          processedUsers.add(sessionUser.id);
           await createProfileIfNeeded(sessionUser);
         }
       } catch (error) {
         console.error('Error obteniendo sesión:', error);
         setUser(null);
+        setProfile(null);
       } finally {
         setLoading(false);
       }
@@ -109,8 +144,10 @@ export function useAuth() {
         const authUser = session?.user ?? null;
         setUser(authUser);
         
-        // Si hay usuario nuevo (SIGNED_IN), verificar/crear perfil
-        if (authUser && event === 'SIGNED_IN') {
+        if (!authUser) {
+          setProfile(null);
+        } else if (event === 'SIGNED_IN' && !processedUsers.has(authUser.id)) {
+          processedUsers.add(authUser.id);
           await createProfileIfNeeded(authUser);
         }
         
@@ -125,6 +162,7 @@ export function useAuth() {
     try {
       await supabase.auth.signOut();
       setUser(null);
+      setProfile(null);
     } catch (error) {
       console.error('Error signing out:', error);
     }
@@ -132,6 +170,7 @@ export function useAuth() {
 
   return {
     user,
+    profile,
     loading,
     signOut,
     isAuthenticated: !!user

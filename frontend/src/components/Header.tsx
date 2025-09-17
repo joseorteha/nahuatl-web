@@ -12,7 +12,7 @@ import { useAuth } from '@/hooks/useAuth';
 type AvatarVariant = 'marble' | 'beam' | 'pixel' | 'sunset' | 'ring' | 'bauhaus';
 
 export default function Header() {
-  const { user, loading, signOut } = useAuth();
+  const { user, profile, loading, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const router = useRouter();
 
@@ -24,8 +24,11 @@ export default function Header() {
 
   const getInitials = (name?: string) => {
     if (!name) {
-      // Usar el nombre del metadata de Supabase o email como fallback
-      const displayName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email;
+      // Usar el nombre del perfil o metadata de Supabase como fallback
+      const displayName = profile?.nombre_completo || 
+                         user?.user_metadata?.full_name || 
+                         user?.user_metadata?.name || 
+                         user?.email;
       if (!displayName) return 'U';
       return displayName.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase();
     }
@@ -33,12 +36,17 @@ export default function Header() {
   };
 
   const renderAvatar = (avatarString: string | undefined, size: number = 36) => {
-    if (!avatarString) {
-      return getInitials(user?.user_metadata?.full_name || user?.user_metadata?.name);
+    // Usar avatar del perfil primero, luego de user_metadata
+    const avatarUrl = profile?.url_avatar || user?.user_metadata?.avatar_url;
+    
+    if (!avatarString && !avatarUrl) {
+      return getInitials(profile?.nombre_completo || user?.user_metadata?.full_name);
     }
 
-    if (avatarString.startsWith('boring-avatar:')) {
-      const parts = avatarString.split(':');
+    const finalAvatarString = avatarString || avatarUrl;
+
+    if (finalAvatarString?.startsWith('boring-avatar:')) {
+      const parts = finalAvatarString.split(':');
       const name = parts[1];
       const variant = parts[2];
       const colors = parts[3].split(',');
@@ -56,7 +64,7 @@ export default function Header() {
     // Si es una URL normal de imagen
     return (
       <Image 
-        src={avatarString} 
+        src={finalAvatarString} 
         alt="Avatar" 
         width={size} 
         height={size} 
@@ -153,7 +161,7 @@ export default function Header() {
                       <Menu.Items className="absolute right-0 mt-2 w-60 origin-top-right bg-white dark:bg-slate-800 divide-y divide-slate-100 dark:divide-slate-700 rounded-md shadow-lg ring-1 ring-black/5 dark:ring-white/10 focus:outline-none border border-slate-200 dark:border-slate-700">
                         <div className="px-1 py-1">
                           <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-700">
-                            <p className="text-sm text-slate-900 dark:text-slate-100 font-medium truncate">{user.user_metadata?.full_name || user.user_metadata?.name || user.email || 'Usuario'}</p>
+                            <p className="text-sm text-slate-900 dark:text-slate-100 font-medium truncate">{profile?.nombre_completo || user.user_metadata?.full_name || user.user_metadata?.name || user.email || 'Usuario'}</p>
                             <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{user.email}</p>
                           </div>
                           <Menu.Item>
@@ -220,7 +228,7 @@ export default function Header() {
                   {renderAvatar(user.user_metadata?.avatar_url, 40)}
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{user.user_metadata?.full_name || user.user_metadata?.name || user.email || 'Usuario'}</span>
+                  <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{profile?.nombre_completo || user.user_metadata?.full_name || user.user_metadata?.name || user.email || 'Usuario'}</span>
                   <span className="text-xs text-slate-500 dark:text-slate-400">{user.email}</span>
                 </div>
               </div>
