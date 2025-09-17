@@ -5,6 +5,10 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export async function GET(request: NextRequest) {
+  // LOG INMEDIATO PARA VER SI ESTA RUTA SE EJECUTA
+  console.log('🟢 CALLBACK ROUTE EJECUTÁNDOSE - INICIO');
+  console.log('🔗 URL completa:', request.url);
+  
   console.log('🚀 Iniciando callback OAuth...');
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get('code');
@@ -131,6 +135,7 @@ export async function GET(request: NextRequest) {
     }
   } else {
     console.error('❌ No se recibió código OAuth');
+    console.log('🔍 Parámetros de URL recibidos:', Object.fromEntries(requestUrl.searchParams));
   }
 
   // Redirigir al dashboard después de autenticación exitosa
