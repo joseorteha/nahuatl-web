@@ -40,19 +40,11 @@ export async function GET(request: NextRequest) {
             id: string;
             email: string | undefined;
             nombre_completo: string;
-            rol: string;
-            provider: string;
-            fecha_registro: string;
-            activo: boolean;
             url_avatar?: string;
           } = {
             id: user.id,
             email: user.email,
-            nombre_completo: user.user_metadata?.full_name || user.user_metadata?.name || 'Usuario OAuth',
-            rol: 'usuario', // rol por defecto
-            provider: user.app_metadata?.provider || 'oauth',
-            fecha_registro: new Date().toISOString(),
-            activo: true
+            nombre_completo: user.user_metadata?.full_name || user.user_metadata?.name || 'Usuario OAuth'
           };
 
           // Si viene de Google, usar el avatar de Google
@@ -66,7 +58,9 @@ export async function GET(request: NextRequest) {
 
           if (insertError) {
             console.error('Error al crear perfil:', insertError);
-            // No redirigir con error, el usuario puede usar la app sin perfil completo
+            console.error('Datos del perfil:', profileData);
+            // Redirigir con error específico para debug
+            return NextResponse.redirect(`${requestUrl.origin}/login?error=database_error&details=${encodeURIComponent(insertError.message)}`);
           }
         } else {
           // Actualizar información si es necesario (como avatar de Google)

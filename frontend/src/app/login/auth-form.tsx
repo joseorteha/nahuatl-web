@@ -1,6 +1,6 @@
 'use client';
-import { useState, FC, InputHTMLAttributes, ElementType } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, FC, InputHTMLAttributes, ElementType, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabaseClient';
 import { 
@@ -82,6 +82,7 @@ const InputField: FC<InputFieldProps> = ({ icon: Icon, label, error, type, ...pr
 
 export default function AuthForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -91,6 +92,38 @@ export default function AuthForm() {
   const [success, setSuccess] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<{[key: string]: string}>({});
+
+  // Capturar errores de OAuth desde URL
+  useEffect(() => {
+    const errorParam = searchParams.get('error');
+    const errorDetails = searchParams.get('details');
+    
+    if (errorParam) {
+      let errorMessage = 'Error de autenticación';
+      
+      switch (errorParam) {
+        case 'database_error':
+          errorMessage = `Error de base de datos: ${errorDetails ? decodeURIComponent(errorDetails) : 'Error al crear el perfil de usuario'}`;
+          break;
+        case 'auth_error':
+          errorMessage = 'Error de autenticación con el proveedor OAuth';
+          break;
+        case 'callback_error':
+          errorMessage = 'Error en el proceso de callback de OAuth';
+          break;
+        case 'server_error':
+          errorMessage = 'Error interno del servidor durante la autenticación';
+          break;
+        default:
+          errorMessage = `Error: ${errorParam}`;
+      }
+      
+      setError(errorMessage);
+      
+      // Limpiar URL después de mostrar el error
+      router.replace('/login', { scroll: false });
+    }
+  }, [searchParams, router]);
 
   // Validación en tiempo real
   const validateField = (name: string, value: string) => {
@@ -181,10 +214,13 @@ export default function AuthForm() {
     setError(null);
     
     try {
+      // Obtener la URL base correcta
+      const baseUrl = typeof window !== 'undefined' ? window.location.origin : process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`
+          redirectTo: `${baseUrl}/auth/callback`
         }
       });
 
@@ -203,10 +239,13 @@ export default function AuthForm() {
     setError(null);
     
     try {
+      // Obtener la URL base correcta
+      const baseUrl = typeof window !== 'undefined' ? window.location.origin : process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'facebook',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`
+          redirectTo: `${baseUrl}/auth/callback`
         }
       });
 
