@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, Fragment } from 'react';
+import { useState, Fragment } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Avatar from 'boring-avatars';
@@ -7,55 +7,34 @@ import { useRouter } from 'next/navigation';
 import { Menu, Transition } from '@headlessui/react';
 import { User as UserIcon, LogOut, LayoutDashboard, Menu as MenuIcon, X, BookOpen, Users, MessageCircle, Plus } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
+import { useAuth } from '@/hooks/useAuth';
 
 type AvatarVariant = 'marble' | 'beam' | 'pixel' | 'sunset' | 'ring' | 'bauhaus';
 
-interface User {
-  id: string;
-  email: string;
-  nombre_completo?: string;
-  rol?: string;
-  url_avatar?: string;
-}
-
 export default function Header() {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { user, loading, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    const checkUser = () => {
-      try {
-        const userData = localStorage.getItem('user');
-        setUser(userData ? JSON.parse(userData) : null);
-      } catch {
-        setUser(null);
-      }
-      setIsLoading(false);
-    };
-
-    checkUser();
-    window.addEventListener('storage', checkUser);
-    return () => window.removeEventListener('storage', checkUser);
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    setUser(null);
+  const handleLogout = async () => {
+    await signOut();
     router.push('/');
     if (mobileMenuOpen) setMobileMenuOpen(false);
   };
 
   const getInitials = (name?: string) => {
-    if (!name) return 'U';
+    if (!name) {
+      // Usar el nombre del metadata de Supabase o email como fallback
+      const displayName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email;
+      if (!displayName) return 'U';
+      return displayName.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase();
+    }
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   };
 
   const renderAvatar = (avatarString: string | undefined, size: number = 36) => {
     if (!avatarString) {
-      return getInitials(user?.nombre_completo);
+      return getInitials(user?.user_metadata?.full_name || user?.user_metadata?.name);
     }
 
     if (avatarString.startsWith('boring-avatar:')) {
@@ -106,7 +85,7 @@ export default function Header() {
           <span>Contribuir</span>
         </Link>
       )}
-      {user?.rol === 'admin' && (
+      {user?.user_metadata?.rol === 'admin' && (
         <Link href="/admin" className="flex items-center gap-2 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 15H12.01M9 12H15M12 3C7 3 3 7 3 12C3 17 7 21 12 21C17 21 21 17 21 12C21 7 17 3 12 3Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -152,7 +131,7 @@ export default function Header() {
           {/* User menu / Auth */}
           <div className="flex items-center gap-4">
             <ThemeToggle />
-            {isLoading ? (
+            {loading ? (
               <div className="w-9 h-9 bg-slate-200 dark:bg-slate-700 rounded-full animate-pulse"></div>
             ) : user ? (
               <>
@@ -160,7 +139,7 @@ export default function Header() {
                 <div className="hidden lg:block">
                   <Menu as="div" className="relative">
                     <Menu.Button className="flex items-center justify-center w-9 h-9 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 text-white rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-slate-800 transition-transform hover:scale-105 overflow-hidden">
-                      {renderAvatar(user.url_avatar, 36)}
+                      {renderAvatar(user.user_metadata?.avatar_url, 36)}
                     </Menu.Button>
                     <Transition
                       as={Fragment}
@@ -174,7 +153,7 @@ export default function Header() {
                       <Menu.Items className="absolute right-0 mt-2 w-60 origin-top-right bg-white dark:bg-slate-800 divide-y divide-slate-100 dark:divide-slate-700 rounded-md shadow-lg ring-1 ring-black/5 dark:ring-white/10 focus:outline-none border border-slate-200 dark:border-slate-700">
                         <div className="px-1 py-1">
                           <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-700">
-                            <p className="text-sm text-slate-900 dark:text-slate-100 font-medium truncate">{user.nombre_completo || 'Usuario'}</p>
+                            <p className="text-sm text-slate-900 dark:text-slate-100 font-medium truncate">{user.user_metadata?.full_name || user.user_metadata?.name || user.email || 'Usuario'}</p>
                             <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{user.email}</p>
                           </div>
                           <Menu.Item>
@@ -238,10 +217,10 @@ export default function Header() {
               {/* User info */}
               <div className="flex items-center gap-3 px-2 py-2">
                 <div className="w-10 h-10 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 text-white rounded-full flex items-center justify-center text-sm font-medium overflow-hidden">
-                  {renderAvatar(user.url_avatar, 40)}
+                  {renderAvatar(user.user_metadata?.avatar_url, 40)}
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{user.nombre_completo || 'Usuario'}</span>
+                  <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{user.user_metadata?.full_name || user.user_metadata?.name || user.email || 'Usuario'}</span>
                   <span className="text-xs text-slate-500 dark:text-slate-400">{user.email}</span>
                 </div>
               </div>

@@ -59,8 +59,14 @@ export async function GET(request: NextRequest) {
           if (insertError) {
             console.error('Error al crear perfil:', insertError);
             console.error('Datos del perfil:', profileData);
-            // Redirigir con error específico para debug
-            return NextResponse.redirect(`${requestUrl.origin}/login?error=database_error&details=${encodeURIComponent(insertError.message)}`);
+            
+            // Si el error es porque el usuario ya existe, continuar normalmente
+            if (insertError.code === '23505' || insertError.message.includes('duplicate key')) {
+              console.log('Usuario ya existe, continuando...');
+            } else {
+              // Para otros errores, log pero continuar (OAuth funcionó)
+              console.error('Error no crítico al crear perfil, continuando con OAuth exitoso');
+            }
           }
         } else {
           // Actualizar información si es necesario (como avatar de Google)

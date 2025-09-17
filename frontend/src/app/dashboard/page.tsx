@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { 
@@ -16,26 +15,10 @@ import {
   TrendingUp
 } from 'lucide-react';
 import Header from '@/components/Header';
-
-interface User {
-  id: string;
-  email: string;
-  nombre_completo?: string;
-  username?: string;
-}
+import { useAuth } from '@/hooks/useAuth';
 
 export default function Dashboard() {
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    const checkUser = () => {
-      const userData = localStorage.getItem('user');
-      if (userData) {
-        setUser(JSON.parse(userData));
-      }
-    };
-    checkUser();
-  }, []);
+  const { user } = useAuth();
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -89,7 +72,7 @@ export default function Dashboard() {
               ¡Bienvenido a tu espacio de aprendizaje!
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-blue-800 dark:text-blue-200 mb-4">
-              ¡Bienvenido, <span className="bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent">{user?.nombre_completo || user?.username || 'Usuario'}!</span>
+              ¡Bienvenido, <span className="bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent">{user?.user_metadata?.nombre_completo || user?.email?.split('@')[0] || 'Usuario'}!</span>
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
               Bienvenido a <span className="font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">Nawatlajtol</span>, tu plataforma para aprender y preservar la lengua náhuatl. 
