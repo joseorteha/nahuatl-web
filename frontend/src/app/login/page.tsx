@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Globe, BookOpen, Users, Star, Heart, Sparkles, Shield } from 'lucide-react';
+import { Suspense } from 'react';
 
 export default function LoginPage() {
   const containerVariants = {
@@ -161,7 +162,13 @@ export default function LoginPage() {
         >
           <div className="w-full max-w-md mx-auto">
             <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-3xl p-8 shadow-2xl border border-white/20 dark:border-gray-700/20">
-              <AuthForm />
+              <Suspense fallback={
+                <div className="flex items-center justify-center p-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                </div>
+              }>
+                <AuthForm />
+              </Suspense>
             </div>
 
             {/* Enlaces públicos */}
