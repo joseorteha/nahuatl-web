@@ -1,216 +1,372 @@
 'use client';
 
-import Image from 'next/image';
+import { motion } from 'framer-motion';
+import { Heart, Globe, Users, BookOpen, Target, Lightbulb, Feather, Star, ArrowRight, Mail } from 'lucide-react';
 import { useState } from 'react';
-import { Feather, BookOpen, Heart, Globe, Mic, Users } from 'lucide-react';
-import ContactModal from '@/components/ContactModal';
+import Image from 'next/image';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import JoinModal from '@/components/JoinModal';
 
 export default function NosotrosPage() {
-  const [contactModal, setContactModal] = useState<{ isOpen: boolean; type: 'email' | 'chat' }>({
-    isOpen: false,
-    type: 'email'
-  });
-  const [joinModal, setJoinModal] = useState(false);
+  const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
 
-  const openContactModal = (type: 'email' | 'chat') => {
-    setContactModal({ isOpen: true, type });
-  };
+  const values = [
+    {
+      icon: Heart,
+      title: "Preservación Cultural",
+      description: "Mantener viva la riqueza del náhuatl para las futuras generaciones",
+      color: "red"
+    },
+    {
+      icon: Globe,
+      title: "Accesibilidad Global",
+      description: "Hacer el náhuatl accesible a cualquier persona, en cualquier lugar del mundo",
+      color: "blue"
+    },
+    {
+      icon: Users,
+      title: "Comunidad Inclusiva",
+      description: "Crear espacios donde todos puedan aprender y contribuir",
+      color: "green"
+    },
+    {
+      icon: BookOpen,
+      title: "Educación de Calidad",
+      description: "Proporcionar recursos educativos rigurosos y efectivos",
+      color: "purple"
+    }
+  ];
 
-  const closeContactModal = () => {
-    setContactModal({ isOpen: false, type: 'email' });
-  };
+  const stats = [
+    { number: "1000+", label: "Palabras en el diccionario", color: "blue" },
+    { number: "50+", label: "Lecciones estructuradas", color: "green" },
+    { number: "24/7", label: "Acceso disponible", color: "purple" },
+    { number: "100%", label: "Gratuito y libre", color: "red" }
+  ];
+
+  const team = [
+    {
+      name: "Comunidad de Hablantes",
+      role: "Guardianes del conocimiento",
+      description: "Hablantes nativos que comparten su sabiduría ancestral"
+    },
+    {
+      name: "Educadores Especializados", 
+      role: "Metodología pedagógica",
+      description: "Expertos en enseñanza de lenguas indígenas"
+    },
+    {
+      name: "Desarrolladores Comprometidos",
+      role: "Tecnología al servicio cultural",
+      description: "Tecnólogos dedicados a la preservación digital"
+    }
+  ];
+
   return (
-    <main className="min-h-screen bg-gradient-to-br from-amber-50 via-emerald-50 to-white relative overflow-hidden">
-      {/* Fondo decorativo */}
-      <div className="absolute inset-0 opacity-10 bg-gradient-to-br from-emerald-50 to-teal-50"></div>
-      
-      {/* Contenido principal */}
-      <div className="relative z-10 py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-5xl mx-auto">
-          {/* Encabezado con elementos decorativos */}
-          <div className="text-center mb-16 relative">
-            <div className="absolute -top-6 left-1/2 transform -translate-x-1/2">
-              <div className="bg-amber-100 text-amber-600 p-3 rounded-full inline-flex">
-                <Feather className="h-8 w-8" />
+    <>
+      <Header />
+      <main className="min-h-screen bg-slate-50 dark:bg-slate-900">
+        {/* Hero Section */}
+        <section className="relative pt-20 pb-16 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-green-600/10 dark:from-blue-400/5 dark:via-purple-400/5 dark:to-green-400/5"></div>
+          
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-center mb-16"
+            >
+              <div className="inline-flex items-center gap-3 bg-blue-100 dark:bg-blue-900/30 px-6 py-3 rounded-full mb-8">
+                <Feather className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                <span className="text-blue-800 dark:text-blue-200 font-medium">Sobre Nosotros</span>
               </div>
-            </div>
-            <h1 className="text-5xl md:text-6xl font-bold text-amber-800 mb-4 relative">
-              <span className="relative inline-block">
-                To nonemilis
-                <svg className="absolute -bottom-3 left-0 w-full" viewBox="0 0 200 10" preserveAspectRatio="none">
-                  <path d="M0,5 Q50,10 100,5 T200,5" fill="none" stroke="#b45309" strokeWidth="2" />
-                </svg>
-              </span>
-              <br />
-              <span className="text-emerald-700">Nuestra historia</span>
-            </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              El viaje de reconectar con nuestras raíces a través de la tecnología
-            </p>
+              
+              <h1 className="text-5xl md:text-6xl font-bold text-slate-900 dark:text-slate-100 mb-6">
+                Construyendo puentes entre
+                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
+                  tradición y futuro
+                </span>
+              </h1>
+              
+              <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed">
+                En <strong className="text-slate-900 dark:text-slate-100">Nahuatlajtol</strong>, creemos que la tecnología puede ser un aliado poderoso 
+                para preservar y revitalizar las lenguas originarias de América.
+              </p>
+            </motion.div>
+
+            {/* Stats Grid */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-20"
+            >
+              {stats.map((stat, index) => (
+                <div key={index} className="text-center">
+                  <div className={`text-3xl md:text-4xl font-bold text-${stat.color}-600 dark:text-${stat.color}-400 mb-2`}>
+                    {stat.number}
+                  </div>
+                  <div className="text-sm text-slate-600 dark:text-slate-400">
+                    {stat.label}
+                  </div>
+                </div>
+              ))}
+            </motion.div>
           </div>
+        </section>
 
-          {/* Contenedor principal con efecto de códice */}
-          <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border border-amber-200">
-            {/* Barra decorativa superior */}
-            <div className="bg-gradient-to-r from-amber-500 to-emerald-600 h-2 w-full"></div>
-            
-            <div className="p-8 md:p-12">
-              {/* Sección de historia con iconos */}
-              <div className="grid md:grid-cols-2 gap-12">
-                <div className="space-y-8">
-                  <div className="flex items-start gap-4">
-                    <div className="bg-amber-100 p-3 rounded-full flex-shrink-0 mt-1">
-                      <BookOpen className="h-6 w-6 text-amber-600" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-bold text-amber-800 mb-2">El comienzo</h3>
-                      <p className="text-gray-700">
-                        Todo gran viaje comienza con una sola palabra. Para nosotros, esa palabra fue &quot;Tlasohkamati&quot; (Gracias). Nawatlajtol nació de una búsqueda personal por reconectar con una herencia que sentíamos lejana pero vibrante.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-4">
-                    <div className="bg-emerald-100 p-3 rounded-full flex-shrink-0 mt-1">
-                      <Globe className="h-6 w-6 text-emerald-600" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-bold text-emerald-800 mb-2">La visión</h3>
-                      <p className="text-gray-700">
-                        Vimos una oportunidad única: usar el poder de la tecnología para construir un puente entre el pasado y el futuro. Nawatlajtol fue concebido como una solución moderna a un desafío ancestral.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-8">
-                  <div className="flex items-start gap-4">
-                    <div className="bg-blue-100 p-3 rounded-full flex-shrink-0 mt-1">
-                      <Mic className="h-6 w-6 text-blue-600" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-bold text-blue-800 mb-2">La lengua viva</h3>
-                      <p className="text-gray-700">
-                        Entendimos que una lengua no vive en los libros, vive en las voces de su gente. Cada lección completada es una contribución a un esfuerzo colectivo: la revitalización de una de las lenguas más importantes de nuestro continente.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-4">
-                    <div className="bg-purple-100 p-3 rounded-full flex-shrink-0 mt-1">
-                      <Users className="h-6 w-6 text-purple-600" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-bold text-purple-800 mb-2">La comunidad</h3>
-                      <p className="text-gray-700">
-                        Nawatlajtol es un punto de encuentro. &quot;Ma timoixmachtikan&quot; (Conozcámonos). Aprender náhuatl es unirse a una conversación que ha durado siglos.
-                      </p>
-                    </div>
-                  </div>
-                </div>
+        {/* Mission Section */}
+        <section className="py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="border-l-4 border-blue-600 pl-8 mb-16"
+            >
+              <div className="flex items-center gap-4 mb-8">
+                <Target className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+                <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
+                  Nuestra Misión
+                </h2>
               </div>
-
-              {/* Cita destacada */}
-              <div className="mt-16 p-6 bg-amber-50 rounded-xl border-l-4 border-amber-500">
-                <blockquote className="text-2xl italic text-amber-800 text-center font-medium">
-                  &quot;El náhuatl no es solo un idioma, es una forma de ver el mundo. Cada palabra es un universo de significado.&quot;
-                </blockquote>
-              </div>
-            </div>
-          </div>
-
-          {/* Sección del fundador */}
-          <div className="mt-16 bg-gradient-to-r from-amber-100 to-emerald-100 rounded-3xl p-8 md:p-12 shadow-lg border border-amber-200">
-            <div className="flex flex-col md:flex-row items-center gap-8">
-              <div className="relative">
-                <Image 
-                  src="/jose.jpeg" 
-                  alt="José Ortega" 
-                  width={160} 
-                  height={160} 
-                  className="rounded-full border-4 border-white shadow-xl"
-                />
-                <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-white p-2 rounded-full">
-                  <Heart className="h-5 w-5" />
-                </div>
-              </div>
-              <div className="text-center md:text-left">
-                <h2 className="text-3xl font-bold text-emerald-800">José Ortega</h2>
-                <p className="text-lg text-amber-700 font-medium mb-4">Fundador de Nawatlajtol</p>
-                <p className="text-gray-700 max-w-2xl">
-                  Apasionado por la tecnología, la cultura y la educación. Mi sueño es que el náhuatl vuelva a escucharse en cada rincón, y que la tecnología sea el puente para lograrlo. <span className="text-emerald-600 font-medium">Tlazocamatin</span> por ser parte de esta comunidad.
+              
+              <div className="prose prose-lg dark:prose-invert max-w-none">
+                <p className="text-slate-700 dark:text-slate-300 text-lg leading-relaxed mb-6">
+                  Democratizar el acceso al aprendizaje del náhuatl mediante una plataforma digital innovadora 
+                  que respeta la tradición oral mientras abraza las posibilidades de la era digital.
                 </p>
-                <div className="mt-6 flex justify-center md:justify-start gap-4">
-                  <button 
-                    onClick={() => openContactModal('email')}
-                    className="inline-flex items-center px-5 py-2 bg-white text-amber-700 font-medium rounded-lg border border-amber-200 hover:bg-amber-50 transition-colors"
-                  >
-                    <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                    </svg>
-                    Contáctame
-                  </button>
-                  <button 
-                    onClick={() => setJoinModal(true)}
-                    className="inline-flex items-center px-5 py-2 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors"
-                  >
-                    <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                    </svg>
-                    Únete
-                  </button>
+                
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-8 rounded-xl border border-blue-200 dark:border-blue-800">
+                  <h3 className="text-xl font-semibold text-blue-800 dark:text-blue-200 mb-4">
+                    ¿Por qué es importante?
+                  </h3>
+                  <div className="space-y-4 text-blue-700 dark:text-blue-300">
+                    <div className="flex items-start gap-3">
+                      <Star className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-1 flex-shrink-0" />
+                      <p>El náhuatl es hablado por más de 1.7 millones de personas en México</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <Star className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-1 flex-shrink-0" />
+                      <p>Es una de las lenguas indígenas más importantes de América</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <Star className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-1 flex-shrink-0" />
+                      <p>Preserva conocimientos ancestrales y cosmovisión única</p>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
+        </section>
 
-          {/* Sección de valores */}
-          <div className="mt-20">
-            <h2 className="text-3xl font-bold text-center text-amber-800 mb-12">
-              Nuestros <span className="text-emerald-600">valores</span>
-            </h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              {[
-                {
-                  icon: <Globe className="h-8 w-8 text-amber-600" />,
-                  title: "Identidad",
-                  description: "Honramos nuestras raíces y trabajamos para mantener viva la cosmovisión náhuatl."
-                },
-                {
-                  icon: <BookOpen className="h-8 w-8 text-emerald-600" />,
-                  title: "Educación",
-                  description: "Creemos en el aprendizaje accesible, interactivo y respetuoso con la cultura."
-                },
-                {
-                  icon: <Users className="h-8 w-8 text-blue-600" />,
-                  title: "Comunidad",
-                  description: "El náhuatl vive en sus hablantes. Fomentamos conexiones significativas."
-                }
-              ].map((value, index) => (
-                <div key={index} className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
-                  <div className="bg-amber-50 w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto">
-                    {value.icon}
+        {/* Values Section */}
+        <section className="py-20 bg-slate-100 dark:bg-slate-800">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="text-center mb-16"
+            >
+              <div className="flex items-center justify-center gap-4 mb-8">
+                <Lightbulb className="h-8 w-8 text-green-600 dark:text-green-400" />
+                <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
+                  Nuestros Valores
+                </h2>
+              </div>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {values.map((value, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="bg-white dark:bg-slate-900 p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                >
+                  <div className={`w-16 h-16 rounded-full bg-${value.color}-100 dark:bg-${value.color}-900/30 flex items-center justify-center mb-6`}>
+                    <value.icon className={`h-8 w-8 text-${value.color}-600 dark:text-${value.color}-400`} />
                   </div>
-                  <h3 className="text-xl font-bold text-center text-gray-900 mb-3">{value.title}</h3>
-                  <p className="text-gray-700 text-center">{value.description}</p>
-                </div>
+                  <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-4">
+                    {value.title}
+                  </h3>
+                  <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                    {value.description}
+                  </p>
+                </motion.div>
               ))}
             </div>
           </div>
-        </div>
-      </div>
+        </section>
 
-      {/* Modales */}
-      <ContactModal 
-        isOpen={contactModal.isOpen}
-        onClose={closeContactModal}
-        type={contactModal.type}
-      />
+        {/* Team Section */}
+        <section className="py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="border-l-4 border-green-600 pl-8 mb-16"
+            >
+              <div className="flex items-center gap-4 mb-8">
+                <Users className="h-8 w-8 text-green-600 dark:text-green-400" />
+                <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
+                  Nuestro Equipo
+                </h2>
+              </div>
+              
+              <p className="text-slate-700 dark:text-slate-300 text-lg leading-relaxed mb-12">
+                Somos un colectivo diverso unido por la pasión de preservar y promover la lengua náhuatl. 
+                Nuestro equipo combina conocimiento ancestral con innovación tecnológica.
+              </p>
+
+              <div className="grid md:grid-cols-3 gap-8">
+                {team.map((member, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    viewport={{ once: true }}
+                    className="bg-green-50 dark:bg-green-900/20 p-8 rounded-xl border border-green-200 dark:border-green-800"
+                  >
+                    <h3 className="text-xl font-semibold text-green-800 dark:text-green-200 mb-2">
+                      {member.name}
+                    </h3>
+                    <p className="text-green-600 dark:text-green-400 font-medium mb-4">
+                      {member.role}
+                    </p>
+                    <p className="text-green-700 dark:text-green-300 leading-relaxed">
+                      {member.description}
+                    </p>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* José Ortega Section */}
+        <section className="py-20 bg-gradient-to-br from-amber-50 via-emerald-50 to-white dark:from-slate-800 dark:via-slate-700 dark:to-slate-900">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="bg-white dark:bg-slate-800 rounded-3xl p-8 md:p-12 shadow-2xl border border-amber-200 dark:border-slate-700"
+            >
+              <div className="flex flex-col lg:flex-row items-center gap-12">
+                {/* Profile Image */}
+                <div className="relative">
+                  <div className="w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-4 border-emerald-500 shadow-xl">
+                    <Image 
+                      src="/jose.jpeg" 
+                      alt="José Ortega - Fundador de Nahuatlajtol"
+                      width={224}
+                      height={224}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-white p-3 rounded-full shadow-lg">
+                    <Heart className="h-6 w-6 fill-current" />
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 text-center lg:text-left">
+                  <motion.div
+                    initial={{ opacity: 0, x: 30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.8, delay: 0.2 }}
+                    viewport={{ once: true }}
+                  >
+                    <h2 className="text-3xl md:text-4xl font-bold text-emerald-800 dark:text-emerald-300 mb-3">
+                      José Ortega
+                    </h2>
+                    <p className="text-xl text-amber-700 dark:text-amber-400 font-semibold mb-6">
+                      Fundador de Nahuatlajtol
+                    </p>
+                    
+                    <div className="prose prose-lg max-w-none text-slate-700 dark:text-slate-300 mb-8">
+                      <p className="leading-relaxed">
+                        Apasionado por la tecnología, la cultura y la educación. Mi sueño es que el náhuatl vuelva a 
+                        escucharse en cada rincón, y que la tecnología sea el puente para lograrlo. 
+                        <span className="text-emerald-600 dark:text-emerald-400 font-semibold"> Tlazocamatin</span> por 
+                        ser parte de esta comunidad.
+                      </p>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <a
+                        href="mailto:joseortegahac@gmail.com?subject=Hola José - Consulta sobre Nahuatlajtol&body=Hola José,%0D%0A%0D%0AMe pongo en contacto contigo porque:%0D%0A%0D%0A[Escribe tu mensaje aquí]%0D%0A%0D%0AGracias por tu tiempo y por crear Nahuatlajtol.%0D%0A%0D%0ASaludos,"
+                        className="inline-flex items-center justify-center px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                      >
+                        <Mail className="h-5 w-5 mr-2" />
+                        Contáctame
+                      </a>
+                      
+                      <button
+                        onClick={() => setIsJoinModalOpen(true)}
+                        className="inline-flex items-center justify-center px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                      >
+                        <Users className="h-5 w-5 mr-2" />
+                        Únete
+                      </button>
+                    </div>
+                  </motion.div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="py-20 bg-gradient-to-br from-purple-600 to-blue-600 dark:from-purple-700 dark:to-blue-700">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+            >
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+                Únete a nuestra misión
+              </h2>
+              <p className="text-xl text-purple-100 mb-8 leading-relaxed">
+                Ayúdanos a mantener viva una de las lenguas más hermosas de América. 
+                Cada palabra aprendida es un paso hacia la preservación cultural.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button className="bg-white text-purple-600 px-8 py-4 rounded-xl font-semibold hover:bg-purple-50 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl">
+                  Comenzar a aprender
+                  <ArrowRight className="h-5 w-5" />
+                </button>
+                <button className="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white hover:text-purple-600 transition-all duration-300">
+                  Contribuir al proyecto
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+      </main>
+      <Footer />
+      
+      {/* Join Modal */}
       <JoinModal 
-        isOpen={joinModal}
-        onClose={() => setJoinModal(false)}
+        isOpen={isJoinModalOpen} 
+        onClose={() => setIsJoinModalOpen(false)} 
       />
-    </main>
+    </>
   );
 }

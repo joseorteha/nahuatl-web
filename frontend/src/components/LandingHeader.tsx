@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Info, HelpCircle, BookOpen, Menu } from 'lucide-react';
+import { Info, HelpCircle, Menu } from 'lucide-react';
 import { useState } from 'react';
 import { ThemeToggle, ThemeToggleMobile } from './ThemeToggle';
 
@@ -75,14 +75,6 @@ export default function LandingHeader() {
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-gray-100 dark:border-gray-800 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md">
           <nav className="container-wide py-4 space-y-2">
-            <Link 
-              href="/diccionario" 
-              className="flex items-center px-4 py-3 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-colors duration-200"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              <BookOpen size={18} className="mr-3" />
-              Diccionario
-            </Link>
             <Link 
               href="/nosotros" 
               className="flex items-center px-4 py-3 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-colors duration-200"

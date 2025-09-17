@@ -1,160 +1,262 @@
 'use client';
-import { ChevronDown, MessageCircle, Book, Users, Feather, Globe } from 'lucide-react';
+
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronDown, MessageCircle, Book, Users, Feather, Globe, HelpCircle, Lightbulb, ArrowRight, Star } from 'lucide-react';
 import { useState } from 'react';
-import ContactModal from '@/components/ContactModal';
+import Image from 'next/image';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
 const faqs = [
   {
-    question: '¿Qué es Nawatlajtol?',
-    answer: 'Es una plataforma digital para aprender, practicar y preservar el idioma náhuatl de manera moderna, interactiva y gratuita. Usamos tecnología avanzada para hacer accesible nuestra lengua a nuevas generaciones.',
-    icon: <Feather className="h-5 w-5 text-amber-600" />
+    question: '¿Qué es Nahuatlajtol?',
+    answer: 'Nahuatlajtol es una plataforma digital educativa dedicada a la preservación, enseñanza y promoción de la lengua náhuatl. Utilizamos tecnología moderna para hacer accesible esta hermosa lengua ancestral a estudiantes de todo el mundo, combinando métodos pedagógicos efectivos con respeto por la tradición cultural.',
+    icon: <Feather className="h-5 w-5 text-blue-600 dark:text-blue-400" />,
+    category: 'general'
+  },
+  {
+    question: '¿Es completamente gratuito?',
+    answer: 'Sí, Nahuatlajtol es 100% gratuito. Creemos que el acceso al conocimiento de las lenguas originarias debe ser universal. Todos nuestros recursos, lecciones, diccionario y herramientas están disponibles sin costo alguno para cualquier persona interesada en aprender náhuatl.',
+    icon: <Star className="h-5 w-5 text-green-600 dark:text-green-400" />,
+    category: 'general'
   },
   {
     question: '¿Quién puede usar la plataforma?',
-    answer: 'Cualquier persona interesada en el náhuatl: estudiantes, hablantes nativos, curiosos, maestros y público en general. ¡No necesitas conocimientos previos!',
-    icon: <Users className="h-5 w-5 text-emerald-600" />
+    answer: 'Nahuatlajtol está diseñado para todo tipo de estudiantes: desde principiantes sin conocimiento previo hasta hablantes nativos que desean fortalecer sus habilidades. Es ideal para estudiantes, profesores, investigadores, y cualquier persona curious about esta rica tradición lingüística.',
+    icon: <Users className="h-5 w-5 text-purple-600 dark:text-purple-400" />,
+    category: 'usuarios'
   },
   {
-    question: '¿Cómo puedo contribuir o dar sugerencias?',
-    answer: 'Puedes enviarnos tus comentarios desde la sección de feedback o contactarnos en nuestras redes sociales. También aceptamos colaboraciones de hablantes y maestros. ¡Tus palabras nos construyen!',
-    icon: <MessageCircle className="h-5 w-5 text-blue-600" />
+    question: '¿Qué recursos de aprendizaje ofrecen?',
+    answer: 'Ofrecemos un diccionario interactivo con más de 1000 palabras, lecciones estructuradas por niveles, ejercicios de pronunciación, evaluaciones de progreso, contenido cultural, y herramientas de práctica. Constantemente agregamos nuevo contenido basado en feedback de nuestra comunidad.',
+    icon: <Book className="h-5 w-5 text-orange-600 dark:text-orange-400" />,
+    category: 'contenido'
   },
   {
-    question: '¿Habrá más recursos y lecciones en el futuro?',
-    answer: '¡Siempre! Estamos en desarrollo constante. Pronto agregaremos: módulos avanzados de gramática, historias tradicionales interactivas, recursos para maestros y más variantes dialectales.',
-    icon: <Book className="h-5 w-5 text-purple-600" />
+    question: '¿Cómo puedo empezar a aprender?',
+    answer: 'Es muy sencillo: crea una cuenta gratuita, completa tu perfil de aprendizaje, y comienza con nuestras lecciones básicas. Te recomendamos dedicar al menos 15-20 minutos diarios y usar nuestro diccionario para reforzar vocabulario. El progreso se guarda automáticamente.',
+    icon: <ArrowRight className="h-5 w-5 text-blue-600 dark:text-blue-400" />,
+    category: 'comenzar'
   },
   {
-    question: '¿Cómo puedo practicar el náhuatl?',
-    answer: 'Te recomendamos: usar nuestro diccionario diariamente, completar al menos una lección por semana, unirte a nuestros círculos de conversación y seguir nuestras redes para tips diarios.',
-    icon: <Globe className="h-5 w-5 text-amber-600" />
+    question: '¿Puedo contribuir con contenido?',
+    answer: 'Absolutamente. Valoramos mucho las contribuciones de hablantes nativos, maestros y estudiantes avanzados. Puedes colaborar sugiriendo traducciones, compartiendo conocimiento cultural, reportando errores, o ayudando con contenido audio. Contactanos através de nuestro formulario de feedback.',
+    icon: <MessageCircle className="h-5 w-5 text-green-600 dark:text-green-400" />,
+    category: 'contribuir'
+  },
+  {
+    question: '¿Qué variante del náhuatl enseñan?',
+    answer: 'Actualmente nos enfocamos en el náhuatl clásico y variantes centrales más ampliamente habladas, pero nuestro objetivo es expandir gradualmente para incluir otras variantes regionales. Reconocemos la riqueza dialectal del náhuatl y trabajamos con hablantes de diferentes comunidades.',
+    icon: <Globe className="h-5 w-5 text-red-600 dark:text-red-400" />,
+    category: 'contenido'
+  },
+  {
+    question: '¿Habrá más funcionalidades en el futuro?',
+    answer: 'Definitivamente. Nuestro roadmap incluye: módulos avanzados de gramática, historias tradicionales interactivas, comunidad de práctica, certificaciones, recursos para educadores, aplicación móvil, y expansión a más variantes dialectales. Estamos en desarrollo constante.',
+    icon: <Lightbulb className="h-5 w-5 text-purple-600 dark:text-purple-400" />,
+    category: 'futuro'
   }
+];
+
+const categories = [
+  { id: 'todos', label: 'Todas las preguntas', icon: HelpCircle },
+  { id: 'general', label: 'General', icon: Feather },
+  { id: 'usuarios', label: 'Para usuarios', icon: Users },
+  { id: 'contenido', label: 'Contenido', icon: Book },
+  { id: 'comenzar', label: 'Comenzar', icon: ArrowRight },
+  { id: 'contribuir', label: 'Contribuir', icon: MessageCircle },
+  { id: 'futuro', label: 'Futuro', icon: Lightbulb }
 ];
 
 export default function FAQPage() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [contactModal, setContactModal] = useState<{ isOpen: boolean; type: 'email' | 'chat' }>({
-    isOpen: false,
-    type: 'email'
-  });
+  const [activeCategory, setActiveCategory] = useState('todos');
 
   const toggleFAQ = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
-  const openContactModal = (type: 'email' | 'chat') => {
-    setContactModal({ isOpen: true, type });
-  };
-
-  const closeContactModal = () => {
-    setContactModal({ isOpen: false, type: 'email' });
-  };
+  const filteredFAQs = activeCategory === 'todos' 
+    ? faqs 
+    : faqs.filter(faq => faq.category === activeCategory);
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-amber-50 via-emerald-50 to-white relative overflow-hidden py-20 px-4 sm:px-6 lg:px-8">
-      {/* Fondo decorativo */}
-      <div className="absolute inset-0 opacity-10 bg-gradient-to-br from-emerald-50 to-teal-50"></div>
-      
-      {/* Contenido principal */}
-      <div className="relative z-10 max-w-4xl mx-auto">
-        {/* Encabezado con elementos decorativos */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center bg-amber-100 text-amber-800 px-4 py-2 rounded-full text-sm font-medium mb-6 border border-amber-200">
-            <MessageCircle className="h-4 w-4 mr-2" />
-            Tlen titlanantih (Lo que preguntan)
-          </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-amber-800 mb-4">
-            Preguntas <span className="text-emerald-700">Frecuentes</span>
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Encuentra respuestas a las dudas más comunes sobre nuestra plataforma
-          </p>
-        </div>
-
-        {/* Acordeón de FAQs */}
-        <div className="space-y-4">
-          {faqs.map((faq, idx) => (
-            <div 
-              key={idx} 
-              className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 transition-all duration-300"
+    <>
+      <Header />
+      <main className="min-h-screen bg-slate-50 dark:bg-slate-900">
+        {/* Hero Section */}
+        <section className="relative pt-20 pb-16 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-green-600/10 dark:from-blue-400/5 dark:via-purple-400/5 dark:to-green-400/5"></div>
+          
+          <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-center mb-16"
             >
-              <button
-                onClick={() => toggleFAQ(idx)}
-                className="w-full flex items-center justify-between p-6 text-left focus:outline-none"
-              >
-                <div className="flex items-start gap-4">
-                  <div className="bg-amber-50 p-2 rounded-lg flex-shrink-0">
-                    {faq.icon}
-                  </div>
-                  <h2 className="text-xl font-semibold text-gray-900">
-                    {faq.question.split(' (')[0]}
-                    {faq.question.includes('(') && (
-                      <span className="block text-sm font-normal text-gray-500 mt-1">
-                        {faq.question.match(/\(([^)]+)\)/)?.[1]}
-                      </span>
-                    )}
-                  </h2>
-                </div>
-                <ChevronDown 
-                  className={`h-5 w-5 text-amber-600 transition-transform duration-300 ${openIndex === idx ? 'rotate-180' : ''}`}
-                />
-              </button>
+              <div className="inline-flex items-center gap-3 bg-purple-100 dark:bg-purple-900/30 px-6 py-3 rounded-full mb-8">
+                <HelpCircle className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                <span className="text-purple-800 dark:text-purple-200 font-medium">Preguntas Frecuentes</span>
+              </div>
               
-              <div 
-                className={`px-6 pb-6 pt-0 transition-all duration-300 ${openIndex === idx ? 'block' : 'hidden'}`}
-                style={{ marginTop: openIndex === idx ? '0' : '-0.5rem' }}
-              >
-                <div 
-                  className="text-gray-700 prose prose-ul:list-disc prose-ol:list-decimal prose-li:my-1"
-                  dangerouslySetInnerHTML={{ __html: faq.answer }}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Sección de contacto adicional */}
-        <div className="mt-16 bg-gradient-to-r from-amber-100 to-emerald-100 rounded-2xl p-8 md:p-10 shadow-lg border border-amber-200">
-          <div className="flex flex-col md:flex-row items-center gap-8">
-            <div className="bg-white p-4 rounded-full shadow-md flex-shrink-0">
-              <MessageCircle className="h-10 w-10 text-amber-600" />
-            </div>
-            <div className="text-center md:text-left">
-              <h2 className="text-2xl font-bold text-emerald-800 mb-2">¿Tienes otra pregunta?</h2>
-              <p className="text-gray-700 mb-4">
-                No dudes en contactarnos. Estamos aquí para ayudarte en tu viaje de aprendizaje del náhuatl.
+              <h1 className="text-5xl md:text-6xl font-bold text-slate-900 dark:text-slate-100 mb-6">
+                ¿Tienes preguntas sobre
+                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-400 dark:to-blue-400">
+                  Nahuatlajtol?
+                </span>
+              </h1>
+              
+              <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed">
+                Encuentra respuestas a las preguntas más comunes sobre nuestra plataforma, 
+                el aprendizaje del náhuatl y cómo puedes formar parte de nuestra comunidad.
               </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
-                <button 
-                  onClick={() => openContactModal('email')}
-                  className="inline-flex items-center justify-center px-5 py-3 bg-white text-amber-700 font-medium rounded-lg border border-amber-200 hover:bg-amber-50 transition-colors shadow-sm"
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Categories Filter */}
+        <section className="py-8 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-wrap gap-3 justify-center">
+              {categories.map((category) => (
+                <button
+                  key={category.id}
+                  onClick={() => setActiveCategory(category.id)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                    activeCategory === category.id
+                      ? 'bg-purple-600 text-white shadow-lg'
+                      : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600'
+                  }`}
                 >
-                  <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                  Envíanos un correo
+                  <category.icon className="h-4 w-4" />
+                  {category.label}
                 </button>
-                <button 
-                  onClick={() => openContactModal('chat')}
-                  className="inline-flex items-center justify-center px-5 py-3 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors shadow-sm"
-                >
-                  <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
-                  Chatea con nosotros
-                </button>
-              </div>
+              ))}
             </div>
           </div>
-        </div>
-      </div>
+        </section>
 
-      {/* Contact Modal */}
-      <ContactModal
-        isOpen={contactModal.isOpen}
-        type={contactModal.type}
-        onClose={closeContactModal}
-      />
-    </main>
+        {/* FAQ Section */}
+        <section className="py-20">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="space-y-6"
+            >
+              {filteredFAQs.map((faq, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden"
+                >
+                  <button
+                    onClick={() => toggleFAQ(index)}
+                    className="w-full px-8 py-6 text-left flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors duration-300"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-600">
+                        {faq.icon}
+                      </div>
+                      <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                        {faq.question}
+                      </h3>
+                    </div>
+                    <motion.div
+                      animate={{ rotate: openIndex === index ? 180 : 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <ChevronDown className="h-5 w-5 text-slate-400" />
+                    </motion.div>
+                  </button>
+                  
+                  <AnimatePresence>
+                    {openIndex === index && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-8 pb-6 pt-2">
+                          <div className="border-l-4 border-purple-600 pl-6">
+                            <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                              {faq.answer}
+                            </p>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+
+        {/* José Ortega Section */}
+        <section className="py-20">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="bg-gradient-to-br from-amber-50 via-emerald-50 to-white dark:from-slate-800 dark:via-slate-700 dark:to-slate-900 rounded-3xl p-8 md:p-12 shadow-2xl border border-amber-200 dark:border-slate-700">
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+                className="flex flex-col lg:flex-row items-center gap-12"
+              >
+                {/* Profile Image */}
+                <div className="relative">
+                  <div className="w-40 h-40 md:w-48 md:h-48 rounded-full overflow-hidden border-4 border-emerald-500 shadow-xl">
+                    <Image 
+                      src="/jose.jpeg" 
+                      alt="José Ortega - Fundador de Nahuatlajtol"
+                      width={192}
+                      height={192}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-white p-3 rounded-full shadow-lg">
+                    <MessageCircle className="h-5 w-5 fill-current" />
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 text-center lg:text-left">
+                  <h2 className="text-2xl md:text-3xl font-bold text-emerald-800 dark:text-emerald-300 mb-2">
+                    José Ortega
+                  </h2>
+                  <p className="text-lg text-amber-700 dark:text-amber-400 font-semibold mb-4">
+                    Fundador de Nahuatlajtol
+                  </p>
+                  
+                  <p className="text-slate-700 dark:text-slate-300 leading-relaxed mb-6">
+                    ¿Tienes otra pregunta? No dudes en contactarme directamente. 
+                    Estoy aquí para ayudarte en tu viaje de aprendizaje del náhuatl.
+                  </p>
+
+                  {/* Contact Button */}
+                  <a
+                    href="mailto:joseortegahac@gmail.com?subject=Pregunta sobre Nahuatlajtol - FAQ&body=Hola José,%0D%0A%0D%0ATengo una pregunta sobre Nahuatlajtol:%0D%0A%0D%0A[Escribe tu pregunta aquí]%0D%0A%0D%0AGracias por tu tiempo.%0D%0A%0D%0ASaludos,"
+                    className="inline-flex items-center justify-center px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                  >
+                    <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    Envíame tu pregunta
+                  </a>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+      </main>
+      <Footer />
+    </>
   );
 }

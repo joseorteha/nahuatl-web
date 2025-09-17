@@ -1,0 +1,424 @@
+'use client';
+import { motion } from 'framer-motion';
+import Header from '@/components/Header';
+import { Cookie, Settings, Eye, Shield, AlertTriangle, Mail, Monitor, Globe, Clock } from 'lucide-react';
+
+export default function CookiesPolicy() {
+  return (
+    <>
+      <Header />
+      <main className="min-h-screen bg-white dark:bg-slate-900">
+        <div className="container mx-auto px-4 py-16 max-w-4xl">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <div className="w-20 h-20 bg-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-lg">
+              <Cookie className="h-10 w-10 text-white" />
+            </div>
+            <h1 className="text-4xl lg:text-5xl font-bold text-slate-900 dark:text-slate-100 mb-6">
+              Política de Cookies
+            </h1>
+            <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed">
+              Esta política explica cómo Nahuatlajtol utiliza cookies y tecnologías similares para mejorar tu experiencia 
+              de navegación y proporcionar funcionalidades esenciales en nuestra plataforma.
+            </p>
+            <div className="mt-6 text-sm text-slate-500 dark:text-slate-400">
+              Última actualización: 16 de septiembre de 2025
+            </div>
+          </motion.div>
+
+          {/* Content */}
+          <div className="space-y-12">
+            {/* ¿Qué son las Cookies? */}
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="border-l-4 border-orange-600 pl-8"
+            >
+              <div className="flex items-center gap-4 mb-8">
+                <Eye className="h-8 w-8 text-orange-600 dark:text-orange-400" />
+                <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
+                  ¿Qué son las Cookies?
+                </h2>
+              </div>
+              
+              <div className="prose prose-lg dark:prose-invert max-w-none">
+                <p className="text-slate-700 dark:text-slate-300 mb-8 text-lg leading-relaxed">
+                  Las cookies son pequeños archivos de texto que se almacenan en tu dispositivo cuando visitas un sitio web. 
+                  Nos ayudan a recordar tus preferencias, mantener tu sesión activa y mejorar la funcionalidad de la plataforma.
+                </p>
+                
+                <div className="bg-orange-50 dark:bg-orange-900/20 p-8 rounded-xl border border-orange-200 dark:border-orange-800">
+                  <h3 className="text-xl font-semibold text-orange-800 dark:text-orange-200 mb-6">
+                    Características de las Cookies
+                  </h3>
+                  
+                  <div className="grid md:grid-cols-3 gap-6">
+                    <div className="text-center">
+                      <div className="w-12 h-12 bg-orange-600 text-white rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <Clock className="h-6 w-6" />
+                      </div>
+                      <h4 className="font-semibold text-orange-800 dark:text-orange-200 mb-2">Temporales</h4>
+                      <p className="text-sm text-orange-700 dark:text-orange-300">
+                        Se eliminan automáticamente cuando cierras el navegador
+                      </p>
+                    </div>
+                    
+                    <div className="text-center">
+                      <div className="w-12 h-12 bg-orange-600 text-white rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <Monitor className="h-6 w-6" />
+                      </div>
+                      <h4 className="font-semibold text-orange-800 dark:text-orange-200 mb-2">Persistentes</h4>
+                      <p className="text-sm text-orange-700 dark:text-orange-300">
+                        Permanecen hasta una fecha específica o hasta que las elimines manualmente
+                      </p>
+                    </div>
+                    
+                    <div className="text-center">
+                      <div className="w-12 h-12 bg-orange-600 text-white rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <Shield className="h-6 w-6" />
+                      </div>
+                      <h4 className="font-semibold text-orange-800 dark:text-orange-200 mb-2">Seguras</h4>
+                      <p className="text-sm text-orange-700 dark:text-orange-300">
+                        No pueden ejecutar programas ni contener virus en tu dispositivo
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.section>
+
+            {/* Tipos de Cookies que Utilizamos */}
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="border-l-4 border-blue-600 pl-8"
+            >
+              <div className="flex items-center gap-4 mb-8">
+                <Settings className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+                <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
+                  Tipos de Cookies que Utilizamos
+                </h2>
+              </div>
+              
+              <div className="prose prose-lg dark:prose-invert max-w-none">
+                <div className="grid md:grid-cols-2 gap-8">
+                  <div className="bg-slate-50 dark:bg-slate-800 p-6 rounded-lg">
+                    <h4 className="font-semibold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
+                      <Shield className="h-5 w-5 text-green-600" />
+                      Cookies Estrictamente Necesarias
+                    </h4>
+                    <p className="text-slate-700 dark:text-slate-300 mb-4 text-sm">
+                      Esenciales para el funcionamiento básico de la plataforma. No pueden ser desactivadas.
+                    </p>
+                    <ul className="space-y-2 text-slate-700 dark:text-slate-300 text-sm">
+                      <li>• Mantener tu sesión de usuario activa</li>
+                      <li>• Recordar tu estado de autenticación</li>
+                      <li>• Configuraciones de seguridad</li>
+                      <li>• Preferencias de accesibilidad</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-slate-50 dark:bg-slate-800 p-6 rounded-lg">
+                    <h4 className="font-semibold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
+                      <Settings className="h-5 w-5 text-blue-600" />
+                      Cookies de Funcionalidad
+                    </h4>
+                    <p className="text-slate-700 dark:text-slate-300 mb-4 text-sm">
+                      Mejoran la experiencia del usuario recordando preferencias y configuraciones.
+                    </p>
+                    <ul className="space-y-2 text-slate-700 dark:text-slate-300 text-sm">
+                      <li>• Tema preferido (claro/oscuro)</li>
+                      <li>• Idioma de la interfaz</li>
+                      <li>• Configuraciones de usuario</li>
+                      <li>• Progreso en lecciones</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-slate-50 dark:bg-slate-800 p-6 rounded-lg">
+                    <h4 className="font-semibold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
+                      <Eye className="h-5 w-5 text-purple-600" />
+                      Cookies de Rendimiento
+                    </h4>
+                    <p className="text-slate-700 dark:text-slate-300 mb-4 text-sm">
+                      Nos ayudan a entender cómo los usuarios interactúan con la plataforma para mejorarla.
+                    </p>
+                    <ul className="space-y-2 text-slate-700 dark:text-slate-300 text-sm">
+                      <li>• Análisis de uso de funcionalidades</li>
+                      <li>• Tiempo de permanencia en páginas</li>
+                      <li>• Errores técnicos reportados</li>
+                      <li>• Optimización de rendimiento</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-slate-50 dark:bg-slate-800 p-6 rounded-lg">
+                    <h4 className="font-semibold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
+                      <Globe className="h-5 w-5 text-orange-600" />
+                      Cookies de Terceros
+                    </h4>
+                    <p className="text-slate-700 dark:text-slate-300 mb-4 text-sm">
+                      Proporcionadas por servicios externos que utilizamos para funcionalidades específicas.
+                    </p>
+                    <ul className="space-y-2 text-slate-700 dark:text-slate-300 text-sm">
+                      <li>• Autenticación con Google/Facebook</li>
+                      <li>• Servicios de hosting y CDN</li>
+                      <li>• Análisis web básico</li>
+                      <li>• Funcionalidades de respaldo</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </motion.section>
+
+            {/* Gestión de Cookies */}
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="border-l-4 border-green-600 pl-8"
+            >
+              <div className="flex items-center gap-4 mb-8">
+                <Settings className="h-8 w-8 text-green-600 dark:text-green-400" />
+                <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
+                  Gestión y Control de Cookies
+                </h2>
+              </div>
+              
+              <div className="prose prose-lg dark:prose-invert max-w-none">
+                <p className="text-slate-700 dark:text-slate-300 mb-8 text-lg leading-relaxed">
+                  Tienes control total sobre las cookies en tu dispositivo. Puedes gestionarlas a través de 
+                  la configuración de tu navegador o utilizando nuestro panel de preferencias.
+                </p>
+                
+                <div className="bg-green-50 dark:bg-green-900/20 p-8 rounded-xl border border-green-200 dark:border-green-800 mb-8">
+                  <h3 className="text-xl font-semibold text-green-800 dark:text-green-200 mb-6">
+                    Opciones de Control
+                  </h3>
+                  
+                  <div className="space-y-6">
+                    <div className="flex items-start gap-4">
+                      <div className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                        <span className="text-sm font-bold">1</span>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-green-800 dark:text-green-200 mb-2">
+                          Configuración del Navegador
+                        </h4>
+                        <p className="text-green-700 dark:text-green-300 text-sm">
+                          Puedes bloquear, eliminar o gestionar cookies directamente desde la configuración 
+                          de privacidad de tu navegador web.
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start gap-4">
+                      <div className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                        <span className="text-sm font-bold">2</span>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-green-800 dark:text-green-200 mb-2">
+                          Panel de Preferencias (Próximamente)
+                        </h4>
+                        <p className="text-green-700 dark:text-green-300 text-sm">
+                          Implementaremos un centro de preferencias donde podrás seleccionar qué tipos 
+                          de cookies aceptar o rechazar.
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start gap-4">
+                      <div className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                        <span className="text-sm font-bold">3</span>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-green-800 dark:text-green-200 mb-2">
+                          Navegación Privada
+                        </h4>
+                        <p className="text-green-700 dark:text-green-300 text-sm">
+                          Utiliza el modo incógnito/privado de tu navegador para una sesión sin cookies persistentes.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 p-6 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                  <div className="flex items-start gap-3">
+                    <AlertTriangle className="h-6 w-6 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-1" />
+                    <div>
+                      <h4 className="font-semibold text-yellow-800 dark:text-yellow-200 mb-2">
+                        Importante: Impacto en la Funcionalidad
+                      </h4>
+                      <p className="text-yellow-700 dark:text-yellow-300 text-sm">
+                        Si desactivas las cookies esenciales, algunas funcionalidades de Nahuatlajtol pueden no funcionar 
+                        correctamente, incluyendo el inicio de sesión, el guardado de progreso y las preferencias personalizadas.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.section>
+
+            {/* Cookies Específicas que Utilizamos */}
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="border-l-4 border-purple-600 pl-8"
+            >
+              <div className="flex items-center gap-4 mb-8">
+                <Globe className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+                <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
+                  Cookies Específicas de Nahuatlajtol
+                </h2>
+              </div>
+              
+              <div className="prose prose-lg dark:prose-invert max-w-none">
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse border border-slate-300 dark:border-slate-600 text-sm">
+                    <thead>
+                      <tr className="bg-slate-100 dark:bg-slate-800">
+                        <th className="border border-slate-300 dark:border-slate-600 p-3 text-left font-semibold">Nombre</th>
+                        <th className="border border-slate-300 dark:border-slate-600 p-3 text-left font-semibold">Propósito</th>
+                        <th className="border border-slate-300 dark:border-slate-600 p-3 text-left font-semibold">Duración</th>
+                        <th className="border border-slate-300 dark:border-slate-600 p-3 text-left font-semibold">Tipo</th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-slate-700 dark:text-slate-300">
+                      <tr>
+                        <td className="border border-slate-300 dark:border-slate-600 p-3 font-mono">sb-access-token</td>
+                        <td className="border border-slate-300 dark:border-slate-600 p-3">Token de autenticación de Supabase</td>
+                        <td className="border border-slate-300 dark:border-slate-600 p-3">1 hora</td>
+                        <td className="border border-slate-300 dark:border-slate-600 p-3">Esencial</td>
+                      </tr>
+                      <tr className="bg-slate-50 dark:bg-slate-800/50">
+                        <td className="border border-slate-300 dark:border-slate-600 p-3 font-mono">sb-refresh-token</td>
+                        <td className="border border-slate-300 dark:border-slate-600 p-3">Renovación automática de sesión</td>
+                        <td className="border border-slate-300 dark:border-slate-600 p-3">30 días</td>
+                        <td className="border border-slate-300 dark:border-slate-600 p-3">Esencial</td>
+                      </tr>
+                      <tr>
+                        <td className="border border-slate-300 dark:border-slate-600 p-3 font-mono">theme-preference</td>
+                        <td className="border border-slate-300 dark:border-slate-600 p-3">Preferencia de tema (claro/oscuro)</td>
+                        <td className="border border-slate-300 dark:border-slate-600 p-3">1 año</td>
+                        <td className="border border-slate-300 dark:border-slate-600 p-3">Funcionalidad</td>
+                      </tr>
+                      <tr className="bg-slate-50 dark:bg-slate-800/50">
+                        <td className="border border-slate-300 dark:border-slate-600 p-3 font-mono">lesson-progress</td>
+                        <td className="border border-slate-300 dark:border-slate-600 p-3">Progreso actual en lecciones</td>
+                        <td className="border border-slate-300 dark:border-slate-600 p-3">Sesión</td>
+                        <td className="border border-slate-300 dark:border-slate-600 p-3">Funcionalidad</td>
+                      </tr>
+                      <tr>
+                        <td className="border border-slate-300 dark:border-slate-600 p-3 font-mono">user-settings</td>
+                        <td className="border border-slate-300 dark:border-slate-600 p-3">Configuraciones personalizadas</td>
+                        <td className="border border-slate-300 dark:border-slate-600 p-3">90 días</td>
+                        <td className="border border-slate-300 dark:border-slate-600 p-3">Funcionalidad</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </motion.section>
+
+            {/* Cambios en la Política */}
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="border-l-4 border-indigo-600 pl-8"
+            >
+              <div className="flex items-center gap-4 mb-8">
+                <Clock className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
+                <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
+                  Actualizaciones de esta Política
+                </h2>
+              </div>
+              
+              <div className="bg-indigo-50 dark:bg-indigo-900/20 p-8 rounded-xl border border-indigo-200 dark:border-indigo-800">
+                <p className="text-indigo-800 dark:text-indigo-200 text-lg mb-6 leading-relaxed">
+                  Podemos actualizar esta política de cookies periódicamente para reflejar cambios en nuestras 
+                  prácticas, tecnologías utilizadas o requisitos legales.
+                </p>
+                
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-indigo-600 rounded-full mt-3 flex-shrink-0"></div>
+                    <p className="text-indigo-700 dark:text-indigo-300">
+                      <strong>Notificación:</strong> Te informaremos sobre cambios significativos a través de 
+                      un aviso en la plataforma o por correo electrónico.
+                    </p>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-indigo-600 rounded-full mt-3 flex-shrink-0"></div>
+                    <p className="text-indigo-700 dark:text-indigo-300">
+                      <strong>Revisión regular:</strong> Te recomendamos revisar esta política periódicamente 
+                      para mantenerte informado sobre nuestras prácticas.
+                    </p>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-indigo-600 rounded-full mt-3 flex-shrink-0"></div>
+                    <p className="text-indigo-700 dark:text-indigo-300">
+                      <strong>Fecha de vigencia:</strong> Los cambios entran en vigor inmediatamente tras 
+                      su publicación, salvo que se indique lo contrario.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </motion.section>
+
+            {/* Contacto */}
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+              className="bg-slate-900 dark:bg-slate-800 rounded-2xl p-12 text-white text-center"
+            >
+              <div className="flex items-center justify-center gap-4 mb-8">
+                <Mail className="h-10 w-10 text-blue-400" />
+                <h2 className="text-3xl font-bold">¿Preguntas sobre Cookies?</h2>
+              </div>
+              
+              <p className="text-xl text-slate-300 mb-8 leading-relaxed max-w-2xl mx-auto">
+                Si tienes preguntas sobre nuestra política de cookies, necesitas ayuda para gestionarlas, 
+                o quieres más información sobre nuestras prácticas de privacidad:
+              </p>
+              
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+                <a 
+                  href="mailto:joseortegahac@gmail.com"
+                  className="inline-flex items-center gap-3 bg-blue-600 hover:bg-blue-700 px-8 py-4 rounded-lg font-semibold transition-colors duration-200"
+                >
+                  <Mail className="h-5 w-5" />
+                  joseortegahac@gmail.com
+                </a>
+                
+                <div className="text-slate-400">
+                  <p>Responsable de privacidad:</p>
+                  <p className="font-semibold text-white">José Ortega</p>
+                </div>
+              </div>
+              
+              <div className="mt-8 pt-8 border-t border-slate-700">
+                <p className="text-sm text-slate-400 mb-4">
+                  Nos comprometemos a proteger tu privacidad y a ser transparentes sobre el uso de cookies.
+                </p>
+                <p className="text-xs text-slate-500">
+                  Respuesta estimada a consultas sobre cookies: 2-5 días hábiles
+                </p>
+              </div>
+            </motion.section>
+          </div>
+        </div>
+      </main>
+    </>
+  );
+}
