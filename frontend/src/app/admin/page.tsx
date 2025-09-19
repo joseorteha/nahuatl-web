@@ -11,6 +11,7 @@ import ContributionModal from '@/components/admin/ContributionModal';
 import MessageModal from '@/components/admin/MessageModal';
 import RequestModal from '@/components/admin/RequestModal';
 import { obtenerMensajesNoLeidos, obtenerSolicitudesPendientes, marcarContactoComoLeido } from '@/lib/contactService';
+import { useAuth } from '@/hooks/useAuth';
 
 interface AdminContribution {
   id: string;
@@ -63,14 +64,8 @@ interface SolicitudUnion {
   fecha_creacion: string;
 }
 
-interface AdminUser {
-  id: string;
-  email: string;
-  rol?: string;
-}
-
 export default function AdminPage() {
-  const [user, setUser] = useState<AdminUser | null>(null);
+  const { user: authUser, profile, loading: authLoading } = useAuth();
   const [contributions, setContributions] = useState<AdminContribution[]>([]);
   const [mensajesContacto, setMensajesContacto] = useState<MensajeContacto[]>([]);
   const [solicitudesUnion, setSolicitudesUnion] = useState<SolicitudUnion[]>([]);
@@ -118,26 +113,25 @@ export default function AdminPage() {
   }, []);
 
   useEffect(() => {
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      const parsedUser = JSON.parse(userData);
-      setUser(parsedUser);
-      
-      // Verificar si es admin/moderador
-      if (parsedUser.rol && ['admin', 'moderador'].includes(parsedUser.rol)) {
-        loadContributions(parsedUser.id);
-        loadMensajesContacto();
-        loadSolicitudesUnion();
-      } else {
-        setLoading(false);
-      }
+    if (authLoading) return; // Esperar a que termine de cargar
+    
+    if (!authUser || !profile) {
+      setLoading(false);
+      return;
+    }
+    
+    // Verificar si es admin/moderador usando el perfil del hook useAuth
+    if (profile.rol && ['admin', 'moderador'].includes(profile.rol)) {
+      loadContributions(profile.id);
+      loadMensajesContacto();
+      loadSolicitudesUnion();
     } else {
       setLoading(false);
     }
-  }, [loadContributions, loadMensajesContacto, loadSolicitudesUnion]);
+  }, [authUser, profile, authLoading, loadContributions, loadMensajesContacto, loadSolicitudesUnion]);
 
   const handleReview = async (contributionId: string, estado: 'aprobada' | 'rechazada', reviewComment: string) => {
-    if (!user?.id) return;
+    if (!profile?.id) return;
 
     setReviewing(true);
     try {
@@ -145,14 +139,14 @@ export default function AdminPage() {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          adminId: user.id,
+          adminId: profile.id,
           estado,
           comentarios_admin: reviewComment.trim() || null
         })
       });
 
       if (response.ok) {
-        await loadContributions(user.id);
+        await loadContributions(profile.id);
         setSelectedContribution(null);
       } else {
         const error = await response.json();
@@ -177,7 +171,7 @@ export default function AdminPage() {
     }
   };
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900">
         <Header />
@@ -197,7 +191,7 @@ export default function AdminPage() {
     );
   }
 
-  if (!user || !user.rol || !['admin', 'moderador'].includes(user.rol)) {
+  if (!authUser || !profile || !profile.rol || !['admin', 'moderador'].includes(profile.rol)) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-red-900">
         <Header />
