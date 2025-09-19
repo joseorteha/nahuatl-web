@@ -119,7 +119,7 @@ export async function getContributionStats(userId?: string): Promise<Contributio
     const { data: contributorsData } = await supabase
       .from('contribuciones_diccionario')
       .select('usuario_id')
-      .neq('usuario_id', null);
+      .not('usuario_id', 'is', null);
 
     const uniqueContributors = new Set(contributorsData?.map(c => c.usuario_id) || []);
     const totalContributors = uniqueContributors.size;
@@ -264,7 +264,7 @@ export async function getFullAdminStats(): Promise<AdminStats> {
     const { data: contributorsData } = await supabase
       .from('contribuciones_diccionario')
       .select('usuario_id')
-      .neq('usuario_id', null);
+      .not('usuario_id', 'is', null);
 
     const uniqueContributors = new Set(contributorsData?.map(c => c.usuario_id) || []);
 

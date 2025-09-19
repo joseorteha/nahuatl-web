@@ -193,9 +193,12 @@ export default function AuthForm() {
         });
 
         if (error) {
-          // Si es un error de credenciales inválidas, dar opción de registro
-          if (error.message.includes('Invalid login credentials') || error.message.includes('Email not confirmed')) {
-            throw new Error(`No se encontró tu cuenta. ¿Necesitas registrarte primero? Error: ${error.message}`);
+          // Si es un error de credenciales inválidas, dar opción de migración
+          if (error.message.includes('Invalid login credentials')) {
+            throw new Error('Usuario no encontrado en Supabase Auth. Si tenías una cuenta anterior, ve a /migrate para migrar tu cuenta.');
+          }
+          if (error.message.includes('Email not confirmed')) {
+            throw new Error('Email no confirmado. Revisa tu correo y haz clic en el enlace de confirmación.');
           }
           throw new Error(error.message || 'Credenciales incorrectas.');
         }
@@ -472,6 +475,18 @@ export default function AuthForm() {
             {isSignUp ? '¿Ya tienes una cuenta? Inicia sesión' : '¿No tienes cuenta? Regístrate gratis'}
           </button>
         </div>
+
+        {/* Enlace de migración solo en login */}
+        {!isSignUp && (
+          <div className="text-center mt-2">
+            <a
+              href="/migrate"
+              className="text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 text-xs font-medium transition-colors duration-200 underline decoration-2 underline-offset-4"
+            >
+              ¿Tenías una cuenta anterior? Migra aquí →
+            </a>
+          </div>
+        )}
       </form>
 
       {/* Información adicional */}

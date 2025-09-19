@@ -184,14 +184,14 @@ export default function DictionaryPage() {
   const renderInitialState = () => (
     <div className="text-center py-16 flex flex-col items-center">
       <div className="relative mb-8">
-        <BookOpen size={80} className="text-amber-500/20" />
+        <BookOpen size={80} className="text-amber-500/20 dark:text-amber-400/20" />
         <div className="absolute inset-0 flex items-center justify-center">
-          <BookOpen size={48} className="text-amber-600" />
+          <BookOpen size={48} className="text-amber-600 dark:text-amber-400" />
         </div>
       </div>
-      <h2 className="text-3xl font-bold text-gray-800 mb-3">Tlahtoltecpantiliztli</h2>
-      <p className="text-xl text-gray-600 max-w-md mb-6">Diccionario interactivo de náhuatl</p>
-      <p className="text-gray-500 max-w-lg">
+      <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-3">Tlahtoltecpantiliztli</h2>
+      <p className="text-xl text-gray-600 dark:text-gray-300 max-w-md mb-6">Diccionario interactivo de náhuatl</p>
+      <p className="text-gray-500 dark:text-gray-400 max-w-lg">
         Comienza a escribir en náhuatl o español para explorar definiciones, ejemplos y la riqueza de nuestra lengua.
       </p>
     </div>
@@ -200,15 +200,15 @@ export default function DictionaryPage() {
   const renderNoResults = () => (
     <div className="text-center py-16 flex flex-col items-center">
       <div className="relative mb-8">
-        <AlertCircle size={80} className="text-amber-500/20" />
+        <AlertCircle size={80} className="text-amber-500/20 dark:text-amber-400/20" />
         <div className="absolute inset-0 flex items-center justify-center">
-          <AlertCircle size={48} className="text-amber-500" />
+          <AlertCircle size={48} className="text-amber-500 dark:text-amber-400" />
         </div>
       </div>
-      <h2 className="text-2xl font-semibold text-gray-800 mb-2">Axcanah tlenon (No encontramos)</h2>
-      <p className="text-gray-600 max-w-md mb-4">{error || `No hay resultados para "${searchTerm}"`}</p>
-      <div className="bg-amber-50 border-l-4 border-amber-400 p-4 max-w-md text-left">
-        <div className="text-sm text-gray-700">
+      <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Axcanah tlenon (No encontramos)</h2>
+      <p className="text-gray-600 dark:text-gray-300 max-w-md mb-4">{error || `No hay resultados para "${searchTerm}"`}</p>
+      <div className="bg-amber-50/80 dark:bg-amber-900/30 backdrop-blur-sm border-l-4 border-amber-400 dark:border-amber-500 p-4 max-w-md text-left rounded-r-lg">
+        <div className="text-sm text-gray-700 dark:text-gray-300">
           <span className="font-semibold">Sugerencias:</span>
           <ul className="list-disc pl-5 mt-1 space-y-1">
             <li>Revisa la ortografía</li>
@@ -223,9 +223,9 @@ export default function DictionaryPage() {
   const renderLoading = () => (
     <div className="text-center py-16 flex flex-col items-center">
       <div className="animate-pulse mb-8">
-        <Bot size={64} className="text-emerald-500" />
+        <Bot size={64} className="text-emerald-500 dark:text-emerald-400" />
       </div>
-      <p className="text-xl font-medium text-gray-700 animate-pulse">Tictemoa... (Buscando)</p>
+      <p className="text-xl font-medium text-gray-700 dark:text-gray-300 animate-pulse">Tictemoa... (Buscando)</p>
     </div>
   );
 
@@ -368,17 +368,17 @@ export default function DictionaryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-emerald-50">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-emerald-50 dark:from-gray-900 dark:via-gray-800 dark:to-emerald-900">
       <Header />
       <div className="container mx-auto px-4 max-w-4xl py-8">
         {/* Hero Section */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-amber-800 mb-3">
-            <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-amber-600 to-emerald-600">
+          <h1 className="text-4xl md:text-5xl font-bold text-amber-800 dark:text-amber-200 mb-3">
+            <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-amber-600 to-emerald-600 dark:from-amber-400 dark:to-emerald-400">
               Tlahtoltecpantiliztli
             </span>
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
             Diccionario interactivo del náhuatl de Zongolica
           </p>
         </div>
@@ -391,10 +391,10 @@ export default function DictionaryPage() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Tictemoznequi... (Busca palabras en náhuatl o español)"
-              className="w-full p-5 pl-14 rounded-full border-2 border-amber-200 bg-white text-gray-800 shadow-lg focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 transition-all text-lg placeholder-gray-400"
+              className="w-full p-5 pl-14 rounded-full border-2 border-amber-200 dark:border-amber-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-800 dark:text-white shadow-lg focus:border-emerald-400 dark:focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 dark:focus:ring-emerald-800 transition-all text-lg placeholder-gray-400 dark:placeholder-gray-500"
             />
             <div className="absolute left-5 top-1/2 -translate-y-1/2">
-              <Search className="text-amber-500" size={24} />
+              <Search className="text-amber-500 dark:text-amber-400" size={24} />
             </div>
           </div>
         </div>
@@ -408,19 +408,19 @@ export default function DictionaryPage() {
                 {results.map((entry, index) => (
                   <article 
                     key={index} 
-                    className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow overflow-hidden border border-gray-100"
+                    className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl dark:shadow-gray-900/20 transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700/50 hover:border-emerald-200 dark:hover:border-emerald-600/50"
                   >
                     <div className="p-6">
                       <header className="mb-4 flex flex-col sm:flex-row sm:items-center gap-3 flex-wrap">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <h2 className="text-2xl font-bold text-emerald-700">{entry.word}</h2>
+                          <h2 className="text-2xl font-bold text-emerald-700 dark:text-emerald-400">{entry.word}</h2>
                           {/* Badge de relevancia */}
                           {entry.score && (
                             <span className={`text-xs font-medium px-2 py-1 rounded-full ${
-                              entry.score >= 95 ? 'bg-green-100 text-green-800' :
-                              entry.score >= 85 ? 'bg-blue-100 text-blue-800' :
-                              entry.score >= 70 ? 'bg-yellow-100 text-yellow-800' :
-                              'bg-gray-100 text-gray-800'
+                              entry.score >= 95 ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' :
+                              entry.score >= 85 ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300' :
+                              entry.score >= 70 ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300' :
+                              'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'
                             }`}>
                               {entry.score >= 95 ? '🎯 Coincidencia exacta' :
                                entry.score >= 85 ? '✨ Muy relevante' :
@@ -429,23 +429,23 @@ export default function DictionaryPage() {
                             </span>
                           )}
                           {entry.variants?.length > 0 && (
-                            <span className="text-sm text-amber-600 bg-amber-50 px-2 py-1 rounded-full">
+                            <span className="text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 px-2 py-1 rounded-full">
                               {entry.variants.join(', ')}
                             </span>
                           )}
                         </div>
                         <div className="sm:ml-auto flex items-center gap-2">
-                          <span className="text-sm text-gray-500 italic">{entry.info_gramatical}</span>
+                          <span className="text-sm text-gray-500 dark:text-gray-400 italic">{entry.info_gramatical}</span>
                           <button 
                             onClick={() => playAudio(entry.word)}
-                            className="p-2 text-amber-500 hover:text-amber-600 rounded-full hover:bg-amber-50"
+                            className="p-2 text-amber-500 dark:text-amber-400 hover:text-amber-600 dark:hover:text-amber-300 rounded-full hover:bg-amber-50 dark:hover:bg-amber-900/30 transition-colors"
                             aria-label="Escuchar pronunciación"
                           >
                             <Volume2 size={18} />
                           </button>
                           <button 
                             onClick={() => shareWord(entry.word)}
-                            className="p-2 text-emerald-500 hover:text-emerald-600 rounded-full hover:bg-emerald-50"
+                            className="p-2 text-emerald-500 dark:text-emerald-400 hover:text-emerald-600 dark:hover:text-emerald-300 rounded-full hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors"
                             aria-label="Compartir palabra"
                           >
                             <Share2 size={18} />
@@ -454,7 +454,7 @@ export default function DictionaryPage() {
                             savedWords.includes(entry.id) ? (
                               <button
                                 onClick={() => handleUnsave(entry.id)}
-                                className={`p-2 text-emerald-600 hover:text-red-500 rounded-full hover:bg-emerald-50 ${saving === entry.id ? 'opacity-50 pointer-events-none' : ''}`}
+                                className={`p-2 text-emerald-600 dark:text-emerald-400 hover:text-red-500 dark:hover:text-red-400 rounded-full hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors ${saving === entry.id ? 'opacity-50 pointer-events-none' : ''}`}
                                 aria-label="Quitar de guardados"
                               >
                                 <BookmarkCheck size={18} />
@@ -462,7 +462,7 @@ export default function DictionaryPage() {
                             ) : (
                               <button
                                 onClick={() => handleSave(entry.id)}
-                                className={`p-2 text-blue-500 hover:text-emerald-600 rounded-full hover:bg-blue-50 ${saving === entry.id ? 'opacity-50 pointer-events-none' : ''}`}
+                                className={`p-2 text-blue-500 dark:text-blue-400 hover:text-emerald-600 dark:hover:text-emerald-300 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors ${saving === entry.id ? 'opacity-50 pointer-events-none' : ''}`}
                                 aria-label="Guardar palabra"
                               >
                                 <Bookmark size={18} />
@@ -473,9 +473,9 @@ export default function DictionaryPage() {
                       </header>
 
                       <div className="mb-4">
-                        <p className="text-lg text-gray-800">{entry.definition}</p>
+                        <p className="text-lg text-gray-800 dark:text-gray-200">{entry.definition}</p>
                         {entry.nombre_cientifico && (
-                          <p className="text-sm text-gray-500 mt-1">
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                             <span className="font-semibold">Nombre científico:</span> {entry.nombre_cientifico}
                           </p>
                         )}
@@ -484,23 +484,27 @@ export default function DictionaryPage() {
                       {/* Metadata Grid */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm mb-4">
                         {(entry.synonyms?.length ?? 0) > 0 && (
-                          <div className="bg-amber-50 p-3 rounded-lg">
-                            <span className="font-semibold text-amber-700">Sinónimos:</span> {(entry.synonyms ?? []).join(', ')}
+                          <div className="bg-amber-50/80 dark:bg-amber-900/30 backdrop-blur-sm p-3 rounded-lg border border-amber-200/50 dark:border-amber-700/50">
+                            <span className="font-semibold text-amber-700 dark:text-amber-300">Sinónimos:</span> 
+                            <span className="text-gray-700 dark:text-gray-300"> {(entry.synonyms ?? []).join(', ')}</span>
                           </div>
                         )}
                         {(entry.roots?.length ?? 0) > 0 && (
-                          <div className="bg-emerald-50 p-3 rounded-lg">
-                            <span className="font-semibold text-emerald-700">Raíces:</span> {(entry.roots ?? []).join(', ')}
+                          <div className="bg-emerald-50/80 dark:bg-emerald-900/30 backdrop-blur-sm p-3 rounded-lg border border-emerald-200/50 dark:border-emerald-700/50">
+                            <span className="font-semibold text-emerald-700 dark:text-emerald-300">Raíces:</span> 
+                            <span className="text-gray-700 dark:text-gray-300"> {(entry.roots ?? []).join(', ')}</span>
                           </div>
                         )}
                         {(entry.ver_tambien?.length ?? 0) > 0 && (
-                          <div className="bg-blue-50 p-3 rounded-lg">
-                            <span className="font-semibold text-blue-700">Ver también:</span> {(entry.ver_tambien ?? []).join(', ')}
+                          <div className="bg-blue-50/80 dark:bg-blue-900/30 backdrop-blur-sm p-3 rounded-lg border border-blue-200/50 dark:border-blue-700/50">
+                            <span className="font-semibold text-blue-700 dark:text-blue-300">Ver también:</span> 
+                            <span className="text-gray-700 dark:text-gray-300"> {(entry.ver_tambien ?? []).join(', ')}</span>
                           </div>
                         )}
                         {(entry.ortografias_alternativas?.length ?? 0) > 0 && (
-                          <div className="bg-purple-50 p-3 rounded-lg">
-                            <span className="font-semibold text-purple-700">Otras formas:</span> {(entry.ortografias_alternativas ?? []).join(', ')}
+                          <div className="bg-purple-50/80 dark:bg-purple-900/30 backdrop-blur-sm p-3 rounded-lg border border-purple-200/50 dark:border-purple-700/50">
+                            <span className="font-semibold text-purple-700 dark:text-purple-300">Otras formas:</span> 
+                            <span className="text-gray-700 dark:text-gray-300"> {(entry.ortografias_alternativas ?? []).join(', ')}</span>
                           </div>
                         )}
                       </div>
@@ -508,7 +512,7 @@ export default function DictionaryPage() {
                       {/* Examples */}
                       {(entry.examples?.length ?? 0) > 0 && (
                         <div className="mt-4">
-                          <h4 className="font-semibold text-emerald-700 mb-2 flex items-center gap-2">
+                          <h4 className="font-semibold text-emerald-700 dark:text-emerald-300 mb-2 flex items-center gap-2">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
@@ -516,9 +520,9 @@ export default function DictionaryPage() {
                           </h4>
                           <ul className="space-y-3">
                             {(entry.examples ?? []).map((ex, i) => (
-                              <li key={i} className="bg-emerald-50 p-3 rounded-lg">
-                                <span className="text-emerald-700 font-semibold">{ex.nahuatl}</span>
-                                <span className="text-gray-600 ml-2">{ex.espanol}</span>
+                              <li key={i} className="bg-emerald-50/80 dark:bg-emerald-900/30 backdrop-blur-sm p-3 rounded-lg border border-emerald-200/50 dark:border-emerald-700/50">
+                                <span className="text-emerald-700 dark:text-emerald-300 font-semibold">{ex.nahuatl}</span>
+                                <span className="text-gray-600 dark:text-gray-400 ml-2">{ex.espanol}</span>
                               </li>
                             ))}
                           </ul>
@@ -528,10 +532,10 @@ export default function DictionaryPage() {
                       {/* Notes */}
                       {(entry.notes?.length ?? 0) > 0 && (
                         <div className="mt-4">
-                          <h4 className="font-semibold text-amber-700 mb-2">Notas</h4>
+                          <h4 className="font-semibold text-amber-700 dark:text-amber-300 mb-2">Notas</h4>
                           <ul className="list-disc pl-5 space-y-1">
                             {(entry.notes ?? []).map((note, i) => (
-                              <li key={i} className="text-gray-700">{note}</li>
+                              <li key={i} className="text-gray-700 dark:text-gray-300">{note}</li>
                             ))}
                           </ul>
                         </div>

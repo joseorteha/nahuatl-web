@@ -232,15 +232,15 @@ export default function Recompensas({ userId }: { userId: string }) {
       <div className="p-6">
         {activeTab === 'resumen' && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="text-center p-4 bg-blue-50 rounded-lg">
+            <div key="contribuciones" className="text-center p-4 bg-blue-50 rounded-lg">
               <div className="text-2xl font-bold text-blue-600">{recompensas.contribuciones_aprobadas}</div>
               <div className="text-sm text-gray-600">Contribuciones</div>
             </div>
-            <div className="text-center p-4 bg-red-50 rounded-lg">
+            <div key="likes" className="text-center p-4 bg-red-50 rounded-lg">
               <div className="text-2xl font-bold text-red-600">{recompensas.likes_recibidos}</div>
               <div className="text-sm text-gray-600">Likes Recibidos</div>
             </div>
-            <div className="text-center p-4 bg-green-50 rounded-lg">
+            <div key="logros" className="text-center p-4 bg-green-50 rounded-lg">
               <div className="text-2xl font-bold text-green-600">{logros.length}</div>
               <div className="text-sm text-gray-600">Logros Obtenidos</div>
             </div>

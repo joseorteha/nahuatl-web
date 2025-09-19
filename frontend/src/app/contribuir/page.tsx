@@ -7,6 +7,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ContributeWordForm from '@/components/ContributeWordForm';
 import { getContributionStats, type ContributionStats } from '@/lib/contributionStats';
+import { useAuth } from '@/hooks/useAuth';
 
 interface UserContribution {
   id: string;
@@ -21,14 +22,8 @@ interface UserContribution {
   };
 }
 
-interface ContributeUser {
-  id: string;
-  email: string;
-  rol?: string;
-}
-
 export default function ContributePage() {
-  const [user, setUser] = useState<ContributeUser | null>(null);
+  const { user, profile, loading: authLoading } = useAuth();
   const [contributions, setContributions] = useState<UserContribution[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'contribute' | 'history'>('contribute');
@@ -68,18 +63,16 @@ export default function ContributePage() {
   }, []);
 
   useEffect(() => {
-    // Obtener usuario del localStorage
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      const parsedUser = JSON.parse(userData);
-      setUser(parsedUser);
-      loadUserContributions(parsedUser.id);
-      loadStats(parsedUser.id); // Cargar estadísticas con ID del usuario
-    } else {
-      setLoading(false);
-      loadStats(); // Cargar estadísticas sin usuario
+    if (!authLoading) {
+      if (user && profile) {
+        loadUserContributions(profile.id);
+        loadStats(profile.id); // Cargar estadísticas con ID del usuario
+      } else {
+        setLoading(false);
+        loadStats(); // Cargar estadísticas sin usuario
+      }
     }
-  }, [loadUserContributions, loadStats]);
+  }, [user, profile, authLoading, loadUserContributions, loadStats]);
 
   const getStatusBadge = (estado: string) => {
     const styles = {
@@ -231,7 +224,7 @@ export default function ContributePage() {
                   )}
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-300">
-                  {user ? 'Tus contribuciones' : 'Contribuciones promedio'}
+                  {profile ? 'Tus contribuciones' : 'Contribuciones promedio'}
                 </div>
               </motion.div>
             </div>
@@ -262,7 +255,7 @@ export default function ContributePage() {
                 <span>Nueva Contribución</span>
               </button>
               
-              {user && (
+              {profile && (
                 <button
                   onClick={() => setActiveTab('history')}
                   className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
@@ -292,19 +285,19 @@ export default function ContributePage() {
           >
             {activeTab === 'contribute' && (
               <ContributeWordForm
-                userId={user?.id}
-                userEmail={user?.email}
+                userId={profile?.id}
+                userEmail={profile?.email}
                 onSuccess={() => {
-                  if (user) {
-                    loadUserContributions(user.id);
-                    loadStats(user.id); // Recargar estadísticas
+                  if (profile) {
+                    loadUserContributions(profile.id);
+                    loadStats(profile.id); // Recargar estadísticas
                   }
                   setActiveTab('history');
                 }}
               />
             )}
 
-            {activeTab === 'history' && user && (
+            {activeTab === 'history' && profile && (
               <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg p-8 border border-white/20 dark:border-gray-700/50">
                 <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
                   Historial de Contribuciones
