@@ -8,6 +8,7 @@ interface UserProfile {
   nombre_completo: string | null;
   url_avatar: string | null;
   bio: string | null;
+  rol: string | null;
 }
 
 export function useAuth() {

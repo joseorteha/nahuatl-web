@@ -15,6 +15,7 @@ export interface Database {
           es_beta_tester: boolean;
           contador_feedback: number;
           password: string | null;
+          rol: string | null;
         };
         Insert: {
           id?: string;
@@ -27,6 +28,7 @@ export interface Database {
           es_beta_tester?: boolean;
           contador_feedback?: number;
           password?: string | null;
+          rol?: string | null;
         };
         Update: {
           id?: string;
@@ -39,6 +41,7 @@ export interface Database {
           es_beta_tester?: boolean;
           contador_feedback?: number;
           password?: string | null;
+          rol?: string | null;
         };
         Relationships: [
           {
