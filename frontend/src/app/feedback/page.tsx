@@ -184,7 +184,7 @@ export default function FeedbackPage() {
 
   // Otorgar puntos al usuario
   const awardPoints = async (action: string, points: number, description: string) => {
-    if (!profile?.id) return;
+    if (!profile?.id) return false;
     
     try {
       const response = await ApiService.awardPoints({
@@ -199,12 +199,12 @@ export default function FeedbackPage() {
         fetchUserStats();
         return true;
       } else {
-        console.error('Error awarding points:', response.error);
-        return false;
+        console.warn('No se pudieron otorgar puntos:', response.error);
+        return false; // No fallar, solo avisar
       }
     } catch (error) {
-      console.error('Error awarding points:', error);
-      return false;
+      console.warn('Error awarding points:', error);
+      return false; // No fallar, solo avisar
     }
   };
 

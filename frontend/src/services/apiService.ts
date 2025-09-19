@@ -223,34 +223,17 @@ export class ApiService {
         return { success: false, error: 'Error al cargar estadísticas del usuario' };
       }
 
-      // Obtener estadísticas adicionales
-      const statsResponse = await fetch(`${API_URL}/api/users/${userId}/stats`);
-      
-      if (statsResponse.ok) {
-        const additionalStats = await statsResponse.json();
-        
-        return {
-          success: true,
-          data: {
-            puntos_totales: rewardsResponse.data.puntos_totales,
-            nivel: rewardsResponse.data.nivel,
-            contribuciones_aprobadas: additionalStats.contribuciones_aprobadas || 0,
-            likes_recibidos: additionalStats.likes_recibidos || 0,
-            posicion_ranking: additionalStats.posicion_ranking
-          }
-        };
-      } else {
-        // Si no hay endpoint de stats, devolver datos básicos
-        return {
-          success: true,
-          data: {
-            puntos_totales: rewardsResponse.data.puntos_totales,
-            nivel: rewardsResponse.data.nivel,
-            contribuciones_aprobadas: 0,
-            likes_recibidos: 0
-          }
-        };
-      }
+      // Por ahora, crear stats básicas desde las recompensas hasta que el backend esté listo
+      return {
+        success: true,
+        data: {
+          puntos_totales: rewardsResponse.data.puntos_totales,
+          nivel: rewardsResponse.data.nivel,
+          contribuciones_aprobadas: 0, // Temporal
+          likes_recibidos: 0, // Temporal
+          posicion_ranking: undefined
+        }
+      };
     } catch (error) {
       console.error('Error fetching user stats:', error);
       return { success: false, error: 'Error de conexión al servidor' };
@@ -275,15 +258,38 @@ export class ApiService {
         }),
       });
 
-      const result = await response.json();
-      
+      // Si hay error 400, intentar con estructura alternativa
+      if (response.status === 400) {
+        console.warn('Estructura original falló, intentando estructura alternativa');
+        const altResponse = await fetch(`${API_URL}/api/recompensas/procesar`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: data.userId,
+            action: data.motivo,
+            points: data.points,
+            description: data.descripcion
+          }),
+        });
+        
+        if (altResponse.ok) {
+          const altResult = await altResponse.json();
+          return { success: true, data: altResult };
+        }
+      }
+
       if (!response.ok) {
+        const result = await response.json();
+        console.warn('Error awarding points:', result);
+        // No fallar silenciosamente para no interrumpir el flujo
         return { success: false, error: result.error || 'Error al otorgar puntos' };
       }
 
+      const result = await response.json();
       return { success: true, data: result };
     } catch (error) {
       console.error('Error awarding points:', error);
+      // No fallar para no interrumpir el flujo principal
       return { success: false, error: 'Error de conexión al servidor' };
     }
   }
