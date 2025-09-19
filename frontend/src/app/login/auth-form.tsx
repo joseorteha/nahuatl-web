@@ -193,6 +193,10 @@ export default function AuthForm() {
         });
 
         if (error) {
+          // Si es un error de credenciales inválidas, dar opción de registro
+          if (error.message.includes('Invalid login credentials') || error.message.includes('Email not confirmed')) {
+            throw new Error(`No se encontró tu cuenta. ¿Necesitas registrarte primero? Error: ${error.message}`);
+          }
           throw new Error(error.message || 'Credenciales incorrectas.');
         }
 
