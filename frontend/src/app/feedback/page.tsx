@@ -222,7 +222,7 @@ export default function FeedbackPage() {
     } catch (error) {
       console.error('Error fetching user stats:', error);
     }
-  }, [profile?.id]);
+  }, [user?.id]);
 
   // Fetch feedbacks
   const fetchFeedbacks = useCallback(async () => {

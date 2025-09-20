@@ -128,7 +128,7 @@ export default function AdminPage() {
     } else {
       setLoading(false);
     }
-  }, [authUser, profile, authLoading, loadContributions, loadMensajesContacto, loadSolicitudesUnion]);
+  }, [authUser, authLoading, loadContributions, loadMensajesContacto, loadSolicitudesUnion]);
 
   const handleReview = async (contributionId: string, estado: 'aprobada' | 'rechazada', reviewComment: string) => {
     if (!profile?.id) return;

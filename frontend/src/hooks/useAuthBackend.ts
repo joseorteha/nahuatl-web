@@ -66,7 +66,7 @@ export function useAuthBackend() {
     }
 
     return response;
-  }, [tokens, API_URL]);
+  }, [tokens, API_URL, refreshTokens]);
 
   // Función para renovar tokens
   const refreshTokens = useCallback(async (): Promise<AuthTokens | null> => {
@@ -110,7 +110,7 @@ export function useAuthBackend() {
     } finally {
       refreshing.current = false;
     }
-  }, [tokens?.refreshToken, API_URL]);
+  }, [tokens?.refreshToken, API_URL, signOut]);
 
   // Función de login
   const login = useCallback(async (email: string, password: string) => {

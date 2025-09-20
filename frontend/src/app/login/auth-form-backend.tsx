@@ -1,5 +1,5 @@
 'use client';
-import { useState, FC, InputHTMLAttributes, ElementType, useEffect } from 'react';
+import { useState, FC, InputHTMLAttributes, ElementType } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthBackend } from '@/hooks/useAuthBackend';
@@ -82,7 +82,7 @@ const InputField: FC<InputFieldProps> = ({ icon: Icon, label, error, type, ...pr
 
 export default function AuthFormBackend() {
   const router = useRouter();
-  const { login, register, loading } = useAuthBackend();
+  const { login, register } = useAuthBackend();
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

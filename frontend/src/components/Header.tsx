@@ -14,7 +14,6 @@ type AvatarVariant = 'marble' | 'beam' | 'pixel' | 'sunset' | 'ring' | 'bauhaus'
 export default function Header() {
   const { user, loading, signOut } = useAuthBackend();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const router = useRouter();
 
   const handleLogout = async () => {
     await signOut();

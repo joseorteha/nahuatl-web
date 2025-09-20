@@ -72,7 +72,7 @@ export default function ContributePage() {
         loadStats(); // Cargar estadísticas sin usuario
       }
     }
-  }, [user, profile, authLoading, loadUserContributions, loadStats]);
+  }, [user, authLoading, loadUserContributions, loadStats]);
 
   const getStatusBadge = (estado: string) => {
     const styles = {

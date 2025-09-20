@@ -5,7 +5,6 @@ import { Heart, Globe, Users, BookOpen, Target, Lightbulb, Feather, Star, ArrowR
 import { useState } from 'react';
 import Image from 'next/image';
 import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import JoinModal from '@/components/JoinModal';
 
 export default function NosotrosPage() {
