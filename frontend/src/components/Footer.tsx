@@ -121,7 +121,7 @@ const Footer = () => {
         
         <div className="border-t border-slate-200 dark:border-slate-700 mt-6 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-slate-600 dark:text-slate-300">
-            © {currentYear} Nawatlajtol | Creado con <Heart size={12} className="inline text-red-500 fill-red-500 mx-1" /> por José Ortega
+            © {currentYear} Nawatlahtol | Creado con <Heart size={12} className="inline text-red-500 fill-red-500 mx-1" /> por José Ortega
           </p>
           
           <div className="flex items-center gap-5">

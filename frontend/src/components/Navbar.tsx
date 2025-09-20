@@ -20,7 +20,7 @@ export default function Navbar() {
               <span className="text-white font-bold text-sm">N</span>
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent group-hover:from-blue-500 group-hover:via-purple-500 group-hover:to-pink-500 transition-all duration-300">
-              Nawatlajtol
+              Nawatlahtol
             </span>
           </Link>
 
