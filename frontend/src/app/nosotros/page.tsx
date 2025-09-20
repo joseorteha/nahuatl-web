@@ -360,7 +360,6 @@ export default function NosotrosPage() {
           </div>
         </section>
       </main>
-      <Footer />
       
       {/* Join Modal */}
       <JoinModal 
