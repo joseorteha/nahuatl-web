@@ -11,7 +11,7 @@ import ContributionModal from '@/components/admin/ContributionModal';
 import MessageModal from '@/components/admin/MessageModal';
 import RequestModal from '@/components/admin/RequestModal';
 import { obtenerMensajesNoLeidos, obtenerSolicitudesPendientes, marcarContactoComoLeido } from '@/lib/contactService';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuthBackend } from '@/hooks/useAuthBackend';
 
 interface AdminContribution {
   id: string;
@@ -65,7 +65,7 @@ interface SolicitudUnion {
 }
 
 export default function AdminPage() {
-  const { user: authUser, profile, loading: authLoading } = useAuth();
+  const { user: authUser, loading: authLoading } = useAuthBackend();
   const [contributions, setContributions] = useState<AdminContribution[]>([]);
   const [mensajesContacto, setMensajesContacto] = useState<MensajeContacto[]>([]);
   const [solicitudesUnion, setSolicitudesUnion] = useState<SolicitudUnion[]>([]);
@@ -115,14 +115,14 @@ export default function AdminPage() {
   useEffect(() => {
     if (authLoading) return; // Esperar a que termine de cargar
     
-    if (!authUser || !profile) {
+    if (!authUser) {
       setLoading(false);
       return;
     }
     
     // Verificar si es admin/moderador usando el perfil del hook useAuth
-    if (profile.rol && ['admin', 'moderador'].includes(profile.rol)) {
-      loadContributions(profile.id);
+    if (authUser.rol && ['admin', 'moderador'].includes(authUser.rol)) {
+      loadContributions(authUser.id);
       loadMensajesContacto();
       loadSolicitudesUnion();
     } else {
@@ -139,14 +139,14 @@ export default function AdminPage() {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          adminId: profile.id,
+          adminId: authUser.id,
           estado,
           comentarios_admin: reviewComment.trim() || null
         })
       });
 
       if (response.ok) {
-        await loadContributions(profile.id);
+        await loadContributions(authUser.id);
         setSelectedContribution(null);
       } else {
         const error = await response.json();
@@ -191,7 +191,7 @@ export default function AdminPage() {
     );
   }
 
-  if (!authUser || !profile || !profile.rol || !['admin', 'moderador'].includes(profile.rol)) {
+  if (!authUser || !authUser.rol || !['admin', 'moderador'].includes(authUser.rol)) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-red-900">
         <Header />

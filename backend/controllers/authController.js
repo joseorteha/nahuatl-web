@@ -1,5 +1,7 @@
 // controllers/authController.js
 const userService = require('../services/userService');
+const { generateToken, generateRefreshToken } = require('../middleware/auth');
+const { passport } = require('../config/googleOAuth');
 
 class AuthController {
   /**
@@ -40,9 +42,16 @@ class AuthController {
         nombre_completo
       });
 
+      // Generar tokens
+      const accessToken = generateToken(newUser.id, newUser.email);
+      const refreshToken = generateRefreshToken(newUser.id);
+
       res.status(201).json({
         message: 'Usuario registrado exitosamente',
-        user: newUser
+        user: newUser,
+        accessToken,
+        refreshToken,
+        expiresIn: process.env.JWT_EXPIRY || '7d'
       });
     } catch (error) {
       console.error('Error en registro:', error);
@@ -78,9 +87,16 @@ class AuthController {
 
       const user = await userService.loginUser(loginIdentifier, password);
 
+      // Generar tokens
+      const accessToken = generateToken(user.id, user.email);
+      const refreshToken = generateRefreshToken(user.id);
+
       res.json({
         message: 'Login exitoso',
-        user
+        user,
+        accessToken,
+        refreshToken,
+        expiresIn: process.env.JWT_EXPIRY || '7d'
       });
     } catch (error) {
       console.error('Error en login:', error);
@@ -208,6 +224,170 @@ class AuthController {
         error: 'Error al obtener palabras guardadas',
         message: error.message 
       });
+    }
+  }
+
+  /**
+   * Renovar token de acceso
+   * @param {Request} req - Objeto de request
+   * @param {Response} res - Objeto de response
+   */
+  async refreshToken(req, res) {
+    try {
+      const { refreshToken } = req.body;
+
+      if (!refreshToken) {
+        return res.status(400).json({ 
+          error: 'Refresh token requerido' 
+        });
+      }
+
+      // Verificar refresh token
+      const jwt = require('jsonwebtoken');
+      const decoded = jwt.verify(
+        refreshToken, 
+        process.env.JWT_REFRESH_SECRET || 'tu_refresh_secret_muy_seguro'
+      );
+
+      if (decoded.type !== 'refresh') {
+        return res.status(401).json({ 
+          error: 'Token inválido' 
+        });
+      }
+
+      // Verificar que el usuario aún existe
+      const user = await userService.getUserProfile(decoded.userId);
+
+      // Generar nuevos tokens
+      const newAccessToken = generateToken(user.id, user.email);
+      const newRefreshToken = generateRefreshToken(user.id);
+
+      res.json({
+        message: 'Tokens renovados exitosamente',
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+        expiresIn: process.env.JWT_EXPIRY || '7d'
+      });
+    } catch (error) {
+      console.error('Error renovando token:', error);
+      
+      if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+        return res.status(401).json({ 
+          error: 'Refresh token inválido o expirado' 
+        });
+      }
+      
+      res.status(500).json({ 
+        error: 'Error renovando token',
+        message: error.message 
+      });
+    }
+  }
+
+  /**
+   * Cerrar sesión (invalidar token)
+   * @param {Request} req - Objeto de request
+   * @param {Response} res - Objeto de response
+   */
+  async logout(req, res) {
+    try {
+      // En un sistema más avanzado, aquí podrías invalidar el token
+      // agregándolo a una lista negra en Redis o BD
+      
+      res.json({
+        message: 'Sesión cerrada exitosamente'
+      });
+    } catch (error) {
+      console.error('Error cerrando sesión:', error);
+      res.status(500).json({ 
+        error: 'Error cerrando sesión',
+        message: error.message 
+      });
+    }
+  }
+
+  /**
+   * Iniciar autenticación con Google
+   * @param {Request} req - Objeto de request
+   * @param {Response} res - Objeto de response
+   */
+  async googleAuth(req, res) {
+    try {
+      // Esta función será manejada por passport
+      // Solo redirigir a Google
+    } catch (error) {
+      console.error('Error en Google Auth:', error);
+      res.status(500).json({ 
+        error: 'Error iniciando autenticación con Google',
+        message: error.message 
+      });
+    }
+  }
+
+  /**
+   * Callback de Google OAuth
+   * @param {Request} req - Objeto de request
+   * @param {Response} res - Objeto de response
+   */
+  async googleCallback(req, res) {
+    try {
+      // Esta función será manejada por passport
+      // El middleware de passport manejará la autenticación
+    } catch (error) {
+      console.error('Error en Google Callback:', error);
+      res.status(500).json({ 
+        error: 'Error en callback de Google',
+        message: error.message 
+      });
+    }
+  }
+
+  /**
+   * Manejar éxito de autenticación OAuth
+   * @param {Request} req - Objeto de request
+   * @param {Response} res - Objeto de response
+   */
+  async oauthSuccess(req, res) {
+    try {
+      const user = req.user;
+      
+      if (!user) {
+        return res.status(401).json({
+          error: 'Error de autenticación',
+          message: 'No se pudo autenticar con Google'
+        });
+      }
+
+      // Generar tokens JWT
+      const accessToken = generateToken(user.id, user.email);
+      const refreshToken = generateRefreshToken(user.id);
+
+      // Redirigir al frontend con los tokens
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      const redirectUrl = `${frontendUrl}/auth/callback?token=${accessToken}&refresh=${refreshToken}&user=${encodeURIComponent(JSON.stringify(user))}`;
+      
+      res.redirect(redirectUrl);
+    } catch (error) {
+      console.error('Error en OAuth success:', error);
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      res.redirect(`${frontendUrl}/login?error=oauth_error`);
+    }
+  }
+
+  /**
+   * Manejar error de autenticación OAuth
+   * @param {Request} req - Objeto de request
+   * @param {Response} res - Objeto de response
+   */
+  async oauthError(req, res) {
+    try {
+      console.error('Error de OAuth:', req.query.error);
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      res.redirect(`${frontendUrl}/login?error=oauth_error&details=${encodeURIComponent(req.query.error || 'Error desconocido')}`);
+    } catch (error) {
+      console.error('Error en OAuth error handler:', error);
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      res.redirect(`${frontendUrl}/login?error=oauth_error`);
     }
   }
 }

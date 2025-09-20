@@ -7,7 +7,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ContributeWordForm from '@/components/ContributeWordForm';
 import { getContributionStats, type ContributionStats } from '@/lib/contributionStats';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuthBackend } from '@/hooks/useAuthBackend';
 
 interface UserContribution {
   id: string;
@@ -23,7 +23,7 @@ interface UserContribution {
 }
 
 export default function ContributePage() {
-  const { user, profile, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuthBackend();
   const [contributions, setContributions] = useState<UserContribution[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'contribute' | 'history'>('contribute');
@@ -64,9 +64,9 @@ export default function ContributePage() {
 
   useEffect(() => {
     if (!authLoading) {
-      if (user && profile) {
-        loadUserContributions(profile.id);
-        loadStats(profile.id); // Cargar estadísticas con ID del usuario
+      if (user) {
+        loadUserContributions(user.id);
+        loadStats(user.id); // Cargar estadísticas con ID del usuario
       } else {
         setLoading(false);
         loadStats(); // Cargar estadísticas sin usuario
@@ -285,12 +285,12 @@ export default function ContributePage() {
           >
             {activeTab === 'contribute' && (
               <ContributeWordForm
-                userId={profile?.id}
-                userEmail={profile?.email}
+                userId={user?.id}
+                userEmail={user?.email}
                 onSuccess={() => {
-                  if (profile) {
-                    loadUserContributions(profile.id);
-                    loadStats(profile.id); // Recargar estadísticas
+                  if (user) {
+                    loadUserContributions(user.id);
+                    loadStats(user.id); // Recargar estadísticas
                   }
                   setActiveTab('history');
                 }}

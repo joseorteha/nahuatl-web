@@ -8,7 +8,7 @@ import Avatar from 'boring-avatars';
 import Header from '@/components/Header';
 import Recompensas from '@/components/Recompensas';
 import Image from 'next/image';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuthBackend } from '@/hooks/useAuthBackend';
 
 interface SavedWord {
   id: string;
@@ -26,7 +26,7 @@ interface AvatarData {
 }
 
 export default function ProfilePage() {
-  const { profile, loading, isAuthenticated } = useAuth();
+  const { user: profile, loading, isAuthenticated } = useAuthBackend();
   const [isEditing, setIsEditing] = useState(false);
   const [showAvatarSelector, setShowAvatarSelector] = useState(false);
   const [generatedAvatars, setGeneratedAvatars] = useState<AvatarData[]>([]);

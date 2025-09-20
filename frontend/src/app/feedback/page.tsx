@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuthBackend } from '@/hooks/useAuthBackend';
 import Header from '@/components/Header';
 import ApiService from '@/services/apiService';
 
@@ -146,7 +146,7 @@ const formatSafeDate = (dateString: string | null | undefined): string => {
 };
 
 export default function FeedbackPage() {
-  const { user, profile, loading } = useAuth();
+  const { user, loading } = useAuthBackend();
   const router = useRouter();
   
   // Estados principales
@@ -184,11 +184,11 @@ export default function FeedbackPage() {
 
   // Otorgar puntos al usuario
   const awardPoints = async (action: string, points: number, description: string) => {
-    if (!profile?.id) return false;
+    if (!user?.id) return false;
     
     try {
       const response = await ApiService.awardPoints({
-        userId: profile.id,
+        userId: user.id,
         points,
         motivo: action,
         descripcion: description
@@ -210,10 +210,10 @@ export default function FeedbackPage() {
 
   // Fetch user stats
   const fetchUserStats = useCallback(async () => {
-    if (!profile?.id) return;
+    if (!user?.id) return;
     
     try {
-      const response = await ApiService.getUserStats(profile.id);
+      const response = await ApiService.getUserStats(user.id);
       if (response.success && response.data) {
         setUserStats(response.data);
       } else {
@@ -263,7 +263,7 @@ export default function FeedbackPage() {
 
     try {
       const response = await ApiService.createFeedback({
-        user_id: profile.id,
+        user_id: user.id,
         title: formData.subject,
         content: formData.message,
         category: formData.type,
@@ -301,7 +301,7 @@ export default function FeedbackPage() {
 
     try {
       const response = await ApiService.likeFeedback({
-        user_id: profile.id,
+        user_id: user.id,
         feedback_id: feedbackId
       });
 
@@ -330,7 +330,7 @@ export default function FeedbackPage() {
     
     try {
       const response = await ApiService.replyToFeedback({
-        user_id: profile.id,
+        user_id: user.id,
         feedback_id: feedbackId,
         content: replyContent
       });
@@ -384,10 +384,10 @@ export default function FeedbackPage() {
 
   // Delete feedback
   const handleDeleteFeedback = async (feedbackId: string) => {
-    if (!profile?.id) return;
+    if (!user?.id) return;
     
     try {
-      const response = await ApiService.deleteFeedback(feedbackId, profile.id);
+      const response = await ApiService.deleteFeedback(feedbackId, user.id);
 
       if (!response.success) {
         throw new Error(response.error || 'Error al eliminar feedback');
@@ -403,11 +403,11 @@ export default function FeedbackPage() {
 
   // Verificar permisos
   const canEdit = (feedback: Feedback) => {
-    return profile && (profile.id === feedback.usuario_id || profile.rol === 'admin');
+    return user && (user.id === feedback.usuario_id || user.rol === 'admin');
   };
 
   const canDelete = (feedback: Feedback) => {
-    return profile && (profile.id === feedback.usuario_id || profile.rol === 'admin');
+    return user && (user.id === feedback.usuario_id || user.rol === 'admin');
   };
 
   // Filtrar y ordenar feedbacks

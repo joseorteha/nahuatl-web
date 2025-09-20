@@ -25,6 +25,43 @@ const config = {
   // Pagination
   DEFAULT_LIMIT: 20,
   MAX_LIMIT: 100,
+  
+  // JWT Configuration
+  JWT_SECRET: process.env.JWT_SECRET,
+  JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,
+  JWT_EXPIRY: process.env.JWT_EXPIRY || '7d',
+  JWT_REFRESH_EXPIRY: process.env.JWT_REFRESH_EXPIRY || '30d',
+  
+  // Google OAuth Configuration
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+  GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL,
+  
+  // Frontend URL
+  FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
+  
+  // Session Configuration
+  SESSION_SECRET: process.env.SESSION_SECRET,
 };
+
+// Validar variables críticas en producción
+if (process.env.NODE_ENV === 'production') {
+  const requiredVars = [
+    'JWT_SECRET',
+    'JWT_REFRESH_SECRET', 
+    'GOOGLE_CLIENT_ID',
+    'GOOGLE_CLIENT_SECRET',
+    'GOOGLE_CALLBACK_URL',
+    'SESSION_SECRET'
+  ];
+  
+  const missingVars = requiredVars.filter(varName => !process.env[varName]);
+  
+  if (missingVars.length > 0) {
+    console.error('❌ ERROR: Variables de entorno críticas no configuradas en producción:');
+    missingVars.forEach(varName => console.error(`  - ${varName}`));
+    process.exit(1);
+  }
+}
 
 module.exports = config;

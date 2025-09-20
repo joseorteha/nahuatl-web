@@ -3,12 +3,14 @@ const express = require('express');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const session = require('express-session');
 
 // Configuración
 const config = require('./config/environment');
 
 // Middleware
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
+const { passport } = require('./config/googleOAuth');
 
 // Rutas
 const authRoutes = require('./routes/authRoutes');
@@ -46,6 +48,21 @@ app.use(cors({
 // Parsing de JSON
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
+
+// Configuración de sesiones para OAuth
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'nahuatl_web_session_secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 24 * 60 * 60 * 1000 // 24 horas
+  }
+}));
+
+// Inicializar Passport
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Logging en desarrollo
 if (config.NODE_ENV === 'development') {

@@ -1,6 +1,6 @@
 'use client';
 
-import AuthForm from '@/app/login/auth-form';
+import AuthFormBackend from '@/app/login/auth-form-backend';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
@@ -167,7 +167,7 @@ export default function LoginPage() {
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                 </div>
               }>
-                <AuthForm />
+                <AuthFormBackend />
               </Suspense>
             </div>
 
