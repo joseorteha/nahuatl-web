@@ -2,13 +2,11 @@
 import { useState, Fragment } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import Avatar from 'boring-avatars';
+// import Avatar from 'boring-avatars';
 import { Menu, Transition } from '@headlessui/react';
 import { User as UserIcon, LogOut, LayoutDashboard, Menu as MenuIcon, X, BookOpen, Users, MessageCircle, Plus } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { useAuthBackend } from '@/hooks/useAuthBackend';
-
-type AvatarVariant = 'marble' | 'beam' | 'pixel' | 'sunset' | 'ring' | 'bauhaus';
 
 export default function Header() {
   const { user, loading, signOut } = useAuthBackend();
@@ -40,18 +38,18 @@ export default function Header() {
     const finalAvatarString = avatarString || avatarUrl;
 
     if (finalAvatarString?.startsWith('boring-avatar:')) {
+      // Generar un avatar simple basado en el nombre
       const parts = finalAvatarString.split(':');
-      const name = parts[1];
-      const variant = parts[2];
-      const colors = parts[3].split(',');
+      const name = parts[1] || 'Usuario';
+      const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
       
       return (
-        <Avatar
-          size={size}
-          name={name}
-          variant={variant as AvatarVariant}
-          colors={colors}
-        />
+        <div 
+          className="rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold"
+          style={{ width: size, height: size }}
+        >
+          {initials}
+        </div>
       );
     }
 
@@ -98,7 +96,7 @@ export default function Header() {
       {user?.rol === 'admin' && (
         <Link href="/admin" className="flex items-center gap-2 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 15H12.01M9 12H15M12 3C7 3 3 7 3 12C3 17 7 21 12 21C17 21 21 17 3 12 3Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M12 15H12.01M9 12H15M12 3C7 3 3 7 3 12C3 17 7 21 12 21C17 21 21 17 12 3Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
           <span>Admin</span>
         </Link>

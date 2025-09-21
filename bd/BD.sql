@@ -48,6 +48,37 @@ CREATE TABLE public.diccionario (
   CONSTRAINT diccionario_pkey PRIMARY KEY (id),
   CONSTRAINT diccionario_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id)
 );
+CREATE TABLE public.feedback_compartidos (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  usuario_id uuid NOT NULL,
+  retroalimentacion_id uuid NOT NULL,
+  comentario_compartir text,
+  fecha_compartido timestamp with time zone DEFAULT now(),
+  CONSTRAINT feedback_compartidos_pkey PRIMARY KEY (id),
+  CONSTRAINT fc_usuario_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id),
+  CONSTRAINT fc_retroalimentacion_fkey FOREIGN KEY (retroalimentacion_id) REFERENCES public.retroalimentacion(id)
+);
+CREATE TABLE public.feedback_guardados (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  usuario_id uuid NOT NULL,
+  retroalimentacion_id uuid NOT NULL,
+  fecha_guardado timestamp with time zone DEFAULT now(),
+  notas_personales text,
+  CONSTRAINT feedback_guardados_pkey PRIMARY KEY (id),
+  CONSTRAINT fg_usuario_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id),
+  CONSTRAINT fg_retroalimentacion_fkey FOREIGN KEY (retroalimentacion_id) REFERENCES public.retroalimentacion(id)
+);
+CREATE TABLE public.hashtags (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  nombre text NOT NULL UNIQUE CHECK (nombre ~ '^[a-zA-Z0-9_]+$'::text),
+  descripcion text,
+  color text DEFAULT '#3B82F6'::text,
+  uso_contador integer DEFAULT 0,
+  fecha_creacion timestamp with time zone DEFAULT now(),
+  creado_por_id uuid,
+  CONSTRAINT hashtags_pkey PRIMARY KEY (id),
+  CONSTRAINT hashtags_creador_fkey FOREIGN KEY (creado_por_id) REFERENCES public.perfiles(id)
+);
 CREATE TABLE public.historial_puntos (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   usuario_id uuid NOT NULL,
@@ -80,6 +111,21 @@ CREATE TABLE public.logros_usuario (
   CONSTRAINT logros_usuario_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id),
   CONSTRAINT logros_usuario_logro_id_fkey FOREIGN KEY (logro_id) REFERENCES public.logros(id)
 );
+CREATE TABLE public.menciones (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  mencionador_id uuid NOT NULL,
+  mencionado_id uuid NOT NULL,
+  retroalimentacion_id uuid,
+  respuesta_id uuid,
+  tipo_mencion text NOT NULL CHECK (tipo_mencion = ANY (ARRAY['post'::text, 'respuesta'::text, 'like'::text])),
+  fecha_mencion timestamp with time zone DEFAULT now(),
+  visto boolean DEFAULT false,
+  CONSTRAINT menciones_pkey PRIMARY KEY (id),
+  CONSTRAINT menciones_mencionador_fkey FOREIGN KEY (mencionador_id) REFERENCES public.perfiles(id),
+  CONSTRAINT menciones_mencionado_fkey FOREIGN KEY (mencionado_id) REFERENCES public.perfiles(id),
+  CONSTRAINT menciones_retroalimentacion_fkey FOREIGN KEY (retroalimentacion_id) REFERENCES public.retroalimentacion(id),
+  CONSTRAINT menciones_respuesta_fkey FOREIGN KEY (respuesta_id) REFERENCES public.retroalimentacion_respuestas(id)
+);
 CREATE TABLE public.mensajes_contacto (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   nombre text NOT NULL,
@@ -97,6 +143,20 @@ CREATE TABLE public.mensajes_contacto (
   fecha_leido timestamp with time zone,
   fecha_respondido timestamp with time zone,
   CONSTRAINT mensajes_contacto_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.notificaciones (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  usuario_id uuid NOT NULL,
+  tipo_notificacion text NOT NULL CHECK (tipo_notificacion = ANY (ARRAY['like_recibido'::text, 'respuesta_recibida'::text, 'mencion'::text, 'nuevo_seguidor'::text, 'logro_obtenido'::text, 'feedback_aprobado'::text, 'feedback_rechazado'::text, 'puntos_ganados'::text])),
+  titulo text NOT NULL,
+  mensaje text NOT NULL,
+  relacionado_id uuid,
+  relacionado_tipo text CHECK (relacionado_tipo = ANY (ARRAY['feedback'::text, 'respuesta'::text, 'usuario'::text, 'logro'::text])),
+  fecha_creacion timestamp with time zone DEFAULT now(),
+  leida boolean DEFAULT false,
+  fecha_leida timestamp with time zone,
+  CONSTRAINT notificaciones_pkey PRIMARY KEY (id),
+  CONSTRAINT notificaciones_usuario_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id)
 );
 CREATE TABLE public.palabras_guardadas (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -119,6 +179,15 @@ CREATE TABLE public.perfiles (
   contador_feedback integer DEFAULT 0,
   password text,
   rol text DEFAULT 'usuario'::text CHECK (rol = ANY (ARRAY['usuario'::text, 'moderador'::text, 'admin'::text])),
+  biografia text,
+  ubicacion text,
+  sitio_web text,
+  verificado boolean DEFAULT false,
+  privacidad_perfil text DEFAULT 'publico'::text CHECK (privacidad_perfil = ANY (ARRAY['publico'::text, 'amigos'::text, 'privado'::text])),
+  mostrar_puntos boolean DEFAULT true,
+  mostrar_nivel boolean DEFAULT true,
+  notificaciones_email boolean DEFAULT true,
+  notificaciones_push boolean DEFAULT true,
   CONSTRAINT perfiles_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.recompensas_usuario (
@@ -158,8 +227,24 @@ CREATE TABLE public.retroalimentacion (
   contador_likes integer DEFAULT 0,
   fecha_creacion timestamp with time zone DEFAULT now(),
   fecha_actualizacion timestamp with time zone DEFAULT now(),
+  hashtags ARRAY,
+  compartido_contador integer DEFAULT 0,
+  guardado_contador integer DEFAULT 0,
+  trending_score numeric DEFAULT 0,
+  visibilidad text DEFAULT 'publico'::text CHECK (visibilidad = ANY (ARRAY['publico'::text, 'seguidores'::text, 'privado'::text])),
+  permite_compartir boolean DEFAULT true,
+  archivado boolean DEFAULT false,
   CONSTRAINT retroalimentacion_pkey PRIMARY KEY (id),
   CONSTRAINT retroalimentacion_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id)
+);
+CREATE TABLE public.retroalimentacion_hashtags (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  retroalimentacion_id uuid NOT NULL,
+  hashtag_id uuid NOT NULL,
+  fecha_asociacion timestamp with time zone DEFAULT now(),
+  CONSTRAINT retroalimentacion_hashtags_pkey PRIMARY KEY (id),
+  CONSTRAINT rh_retroalimentacion_fkey FOREIGN KEY (retroalimentacion_id) REFERENCES public.retroalimentacion(id),
+  CONSTRAINT rh_hashtag_fkey FOREIGN KEY (hashtag_id) REFERENCES public.hashtags(id)
 );
 CREATE TABLE public.retroalimentacion_likes (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -181,6 +266,16 @@ CREATE TABLE public.retroalimentacion_respuestas (
   CONSTRAINT retroalimentacion_respuestas_pkey PRIMARY KEY (id),
   CONSTRAINT retroalimentacion_respuestas_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id),
   CONSTRAINT retroalimentacion_respuestas_retroalimentacion_id_fkey FOREIGN KEY (retroalimentacion_id) REFERENCES public.retroalimentacion(id)
+);
+CREATE TABLE public.seguimientos_usuarios (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  seguidor_id uuid NOT NULL,
+  seguido_id uuid NOT NULL,
+  fecha_seguimiento timestamp with time zone DEFAULT now(),
+  notificaciones_activas boolean DEFAULT true,
+  CONSTRAINT seguimientos_usuarios_pkey PRIMARY KEY (id),
+  CONSTRAINT seguimientos_seguidor_fkey FOREIGN KEY (seguidor_id) REFERENCES public.perfiles(id),
+  CONSTRAINT seguimientos_seguido_fkey FOREIGN KEY (seguido_id) REFERENCES public.perfiles(id)
 );
 CREATE TABLE public.solicitudes_union (
   id uuid NOT NULL DEFAULT gen_random_uuid(),

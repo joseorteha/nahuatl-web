@@ -2,10 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import Avatar from 'boring-avatars';
+// import Avatar from 'boring-avatars';
 import { Trophy, Star, Award, TrendingUp } from 'lucide-react';
-
-type AvatarVariant = 'marble' | 'beam' | 'pixel' | 'sunset' | 'ring' | 'bauhaus';
 
 interface UsuarioRanking {
   id: string;
@@ -61,18 +59,18 @@ const renderAvatar = (avatarString: string | undefined, size: number = 48) => {
   }
 
   if (avatarString.startsWith('boring-avatar:')) {
+    // Generar un avatar simple basado en el nombre
     const parts = avatarString.split(':');
-    const name = parts[1];
-    const variant = parts[2];
-    const colors = parts[3].split(',');
+    const name = parts[1] || 'Usuario';
+    const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
     
     return (
-      <Avatar
-        size={size}
-        name={name}
-        variant={variant as AvatarVariant}
-        colors={colors}
-      />
+      <div 
+        className="rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold"
+        style={{ width: size, height: size }}
+      >
+        {initials}
+      </div>
     );
   }
 

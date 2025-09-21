@@ -6,9 +6,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   MessageCircle, 
   Send, 
-  Edit, 
-  Trash2, 
-  ChevronDown, 
   X, 
   Check, 
   Plus,
@@ -21,13 +18,17 @@ import {
   AlertCircle,
   CheckCircle,
   XCircle,
-  Zap
+  Zap,
+  Bell
 } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
-import { es } from 'date-fns/locale';
 import { useAuthBackend } from '@/hooks/useAuthBackend';
+import { useSocial, Notificacion, Hashtag } from '@/hooks/useSocial';
 import Header from '@/components/Header';
 import ApiService from '@/services/apiService';
+import { UserStats } from '@/types';
+import { FeedbackCard } from '@/components/social/FeedbackCard';
+import { HashtagList } from '@/components/social/HashtagChip';
+import { NotificationList } from '@/components/social/NotificationItem';
 
 interface Feedback {
   id: string;
@@ -37,13 +38,30 @@ interface Feedback {
   estado: string;
   prioridad: string;
   contador_likes: number;
+  compartido_contador: number;
+  guardado_contador: number;
+  trending_score: number;
+  visibilidad: string;
+  permite_compartir: boolean;
+  archivado: boolean;
+  hashtags?: Array<{
+    id: string;
+    nombre: string;
+    color: string;
+  }>;
   fecha_creacion: string;
   fecha_actualizacion: string;
   usuario_id: string;
   perfiles?: {
+    id: string;
     nombre_completo: string;
     username?: string;
     url_avatar?: string;
+    verificado: boolean;
+    recompensas_usuario?: {
+      nivel: string;
+      puntos_totales: number;
+    };
   };
   retroalimentacion_respuestas?: Array<{
     id: string;
@@ -51,21 +69,20 @@ interface Feedback {
     fecha_creacion: string;
     es_respuesta_admin: boolean;
     perfiles?: {
+      id: string;
       nombre_completo: string;
+      username?: string;
       url_avatar?: string;
+      verificado: boolean;
     };
   }>;
   retroalimentacion_likes?: Array<{
     usuario_id: string;
   }>;
+  total_likes?: number;
+  total_respuestas?: number;
 }
 
-interface UserStats {
-  puntos_totales: number;
-  nivel: string;
-  contribuciones_aprobadas: number;
-  likes_recibidos: number;
-}
 
 // Categorías con iconos y colores
 const categoryConfig = {
@@ -129,30 +146,28 @@ const priorityConfig = {
   critical: { label: 'Crítica', color: 'text-red-600 dark:text-red-400' }
 };
 
-// Helper function para fechas
-const formatSafeDate = (dateString: string | null | undefined): string => {
-  if (!dateString) return 'Fecha no disponible';
-  
-  try {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) {
-      return 'Fecha inválida';
-    }
-    return formatDistanceToNow(date, { addSuffix: true, locale: es });
-  } catch (error) {
-    console.error('Error formatting date:', dateString, error);
-    return 'Fecha inválida';
-  }
-};
 
 export default function FeedbackPage() {
   const { user, loading } = useAuthBackend();
+  const { 
+    obtenerNotificaciones, 
+    marcarNotificacionLeida, 
+    marcarTodasLeidas,
+    obtenerHashtagsPopulares,
+    compartirFeedback,
+    guardarFeedback
+  } = useSocial();
   const router = useRouter();
   
   // Estados principales
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
   const [userStats, setUserStats] = useState<UserStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Estados sociales
+  const [notifications, setNotifications] = useState<Notificacion[]>([]);
+  const [hashtags, setHashtags] = useState<Hashtag[]>([]);
+  const [showNotifications, setShowNotifications] = useState(false);
   
   // Estados del formulario
   const [formData, setFormData] = useState({
@@ -166,11 +181,9 @@ export default function FeedbackPage() {
   // Estados de interacción
   const [filter, setFilter] = useState({ category: 'all', status: 'all', priority: 'all' });
   const [sortBy, setSortBy] = useState<'recent' | 'popular' | 'priority'>('recent');
-  const [expandedFeedback, setExpandedFeedback] = useState<string | null>(null);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyContent, setReplyContent] = useState('');
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editContent, setEditContent] = useState('');
+  const [isSubmittingReply, setIsSubmittingReply] = useState(false);
   
   // Estados de UI
   const [showForm, setShowForm] = useState(false);
@@ -224,12 +237,62 @@ export default function FeedbackPage() {
     }
   }, [user?.id]);
 
+  // Función para mapear FeedbackItem a Feedback
+  const mapFeedbackItemToFeedback = (item: unknown): Feedback => {
+    const feedbackItem = item as Record<string, unknown>;
+    return {
+      id: feedbackItem.id as string,
+      titulo: feedbackItem.titulo as string,
+      contenido: feedbackItem.contenido as string,
+      categoria: feedbackItem.categoria as string,
+      estado: feedbackItem.estado as string,
+      prioridad: feedbackItem.prioridad as string,
+      contador_likes: (feedbackItem.total_likes as number) || (feedbackItem.contador_likes as number) || 0,
+      compartido_contador: (feedbackItem.compartido_contador as number) || 0,
+      guardado_contador: (feedbackItem.guardado_contador as number) || 0,
+      trending_score: (feedbackItem.trending_score as number) || 0,
+      visibilidad: (feedbackItem.visibilidad as string) || 'publico',
+      permite_compartir: (feedbackItem.permite_compartir as boolean) || true,
+      archivado: (feedbackItem.archivado as boolean) || false,
+      hashtags: ((feedbackItem.hashtags as { id: string; nombre: string; color: string; }[]) || []).map(hashtag => ({
+        ...hashtag,
+        uso_contador: 0 // Add default uso_contador
+      })),
+      fecha_creacion: feedbackItem.fecha_creacion as string,
+      fecha_actualizacion: feedbackItem.fecha_actualizacion as string,
+      usuario_id: feedbackItem.usuario_id as string,
+      perfiles: feedbackItem.perfiles as Feedback['perfiles'],
+      retroalimentacion_respuestas: ((feedbackItem.retroalimentacion_respuestas as unknown[]) || []).map(respuesta => {
+        const respuestaData = respuesta as Record<string, unknown>;
+        return {
+          id: respuestaData.id as string,
+          contenido: respuestaData.contenido as string,
+          fecha_creacion: respuestaData.fecha_creacion as string,
+          es_respuesta_admin: respuestaData.es_respuesta_admin as boolean,
+          usuario: {
+            id: (respuestaData.perfiles as Record<string, unknown>)?.id as string || '',
+            nombre_completo: (respuestaData.perfiles as Record<string, unknown>)?.nombre_completo as string || '',
+            username: (respuestaData.perfiles as Record<string, unknown>)?.username as string,
+            url_avatar: (respuestaData.perfiles as Record<string, unknown>)?.url_avatar as string,
+            verificado: (respuestaData.perfiles as Record<string, unknown>)?.verificado as boolean || false
+          }
+        };
+      }),
+      retroalimentacion_likes: feedbackItem.retroalimentacion_likes as Feedback['retroalimentacion_likes'],
+      total_likes: (feedbackItem.total_likes as number) || (feedbackItem.contador_likes as number) || 0,
+      total_respuestas: (feedbackItem.total_respuestas as number) || (feedbackItem.retroalimentacion_respuestas as unknown[])?.length || 0
+    };
+  };
+
   // Fetch feedbacks
   const fetchFeedbacks = useCallback(async () => {
     try {
       const response = await ApiService.getFeedbacks();
       if (response.success && response.data) {
-        setFeedbacks(response.data);
+        console.log('📊 Datos del backend:', response.data[0]); // Debug: primer feedback
+        const mappedFeedbacks = response.data.map(mapFeedbackItemToFeedback);
+        console.log('📊 Datos mapeados:', mappedFeedbacks[0]); // Debug: primer feedback mapeado
+        setFeedbacks(mappedFeedbacks);
       } else {
         showNotification('error', response.error || 'Error al cargar los feedbacks');
       }
@@ -240,6 +303,38 @@ export default function FeedbackPage() {
       setIsLoading(false);
     }
   }, []);
+
+  // Fetch notifications
+  const fetchNotifications = useCallback(async () => {
+    try {
+      const response = await obtenerNotificaciones(1, 10, true);
+      if (response && Array.isArray(response)) {
+        setNotifications(response as Notificacion[]);
+      }
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    }
+  }, [obtenerNotificaciones]);
+
+  // Fetch hashtags
+  const fetchHashtags = useCallback(async () => {
+    try {
+      const response = await obtenerHashtagsPopulares(20);
+      if (response && Array.isArray(response)) {
+        // Add missing uso_contador property with default value
+        const hashtagsWithCounter = response.map((hashtag: unknown) => {
+          const hashtagData = hashtag as Record<string, unknown>;
+          return {
+            ...hashtagData,
+            uso_contador: (hashtagData.uso_contador as number) || 0
+          };
+        });
+        setHashtags(hashtagsWithCounter as Hashtag[]);
+      }
+    } catch (error) {
+      console.error('Error fetching hashtags:', error);
+    }
+  }, [obtenerHashtagsPopulares]);
 
   // Effect para cargar datos
   useEffect(() => {
@@ -252,7 +347,9 @@ export default function FeedbackPage() {
     
     fetchFeedbacks();
     fetchUserStats();
-  }, [user, loading, router, fetchFeedbacks, fetchUserStats]);
+    fetchNotifications();
+    fetchHashtags();
+  }, [user, loading, router, fetchFeedbacks, fetchUserStats, fetchNotifications, fetchHashtags]);
 
   // Submit feedback
   const handleSubmit = async (e: React.FormEvent) => {
@@ -311,7 +408,7 @@ export default function FeedbackPage() {
 
       // Si dio like (no quitó), otorgar puntos
       if (response.data?.action === 'liked') {
-        const pointsAwarded = await awardPoints('like_dado', 2, 'Like dado a feedback');
+        const pointsAwarded = await awardPoints('like_recibido', 2, 'Like dado a feedback');
         if (pointsAwarded) {
           showNotification('success', '+2 puntos por dar like! ❤️');
         }
@@ -324,98 +421,108 @@ export default function FeedbackPage() {
     }
   };
 
-  // Reply to feedback
-  const handleReply = async (feedbackId: string) => {
+
+  // Handlers para acciones sociales
+  const handleShareFeedback = async (feedbackId: string) => {
+    try {
+      await compartirFeedback(feedbackId);
+      showNotification('success', 'Feedback compartido exitosamente');
+      fetchFeedbacks(); // Recargar para actualizar contadores
+    } catch (error) {
+      console.error('Error sharing feedback:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Error al compartir feedback';
+      
+      // Si ya se compartió, mostrar mensaje informativo en lugar de error
+      if (errorMessage.includes('Ya has compartido este feedback')) {
+        showNotification('success', 'Este feedback ya fue compartido anteriormente');
+      } else {
+        showNotification('error', errorMessage);
+      }
+    }
+  };
+
+  const handleSaveFeedback = async (feedbackId: string) => {
+    try {
+      await guardarFeedback(feedbackId);
+      showNotification('success', 'Feedback guardado exitosamente');
+      fetchFeedbacks(); // Recargar para actualizar contadores
+    } catch (error) {
+      console.error('Error saving feedback:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Error al guardar feedback';
+      
+      // Si ya se guardó, mostrar mensaje informativo en lugar de error
+      if (errorMessage.includes('Ya has guardado este feedback')) {
+        showNotification('success', 'Este feedback ya fue guardado anteriormente');
+      } else {
+        showNotification('error', errorMessage);
+      }
+    }
+  };
+
+  const handleMarkNotificationAsRead = async (notificationId: string) => {
+    try {
+      await marcarNotificacionLeida(notificationId);
+      fetchNotifications(); // Recargar notificaciones
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+    }
+  };
+
+  const handleMarkAllNotificationsAsRead = async () => {
+    try {
+      await marcarTodasLeidas();
+      fetchNotifications(); // Recargar notificaciones
+      showNotification('success', 'Todas las notificaciones marcadas como leídas');
+    } catch (error) {
+      console.error('Error marking all notifications as read:', error);
+      showNotification('error', 'Error al marcar notificaciones');
+    }
+  };
+
+  // Handler para enviar respuesta
+  const handleReplySubmit = async (feedbackId: string) => {
     if (!user?.id || !replyContent.trim()) return;
+    
+    setIsSubmittingReply(true);
     
     try {
       const response = await ApiService.replyToFeedback({
         user_id: user.id,
         feedback_id: feedbackId,
-        content: replyContent
+        content: replyContent.trim()
       });
 
       if (!response.success) {
-        throw new Error(response.error || 'Error al responder');
+        throw new Error(response.error || 'Error al enviar respuesta');
       }
 
       // Otorgar puntos por responder
-      const pointsAwarded = await awardPoints('respuesta_feedback', 5, 'Respuesta a feedback');
+      const pointsAwarded = await awardPoints('respuesta_enviada', 5, 'Respuesta enviada a feedback');
       
       setReplyContent('');
       setReplyingTo(null);
       
       if (pointsAwarded) {
-        showNotification('success', '¡Respuesta enviada! Has ganado 5 puntos 💬');
+        showNotification('success', '¡Respuesta enviada! Has ganado 5 puntos 🎉');
       } else {
         showNotification('success', '¡Respuesta enviada exitosamente!');
       }
       
-      fetchFeedbacks();
+      fetchFeedbacks(); // Recargar para mostrar la nueva respuesta
     } catch (error) {
-      console.error('Error replying:', error);
-      showNotification('error', 'Error al enviar la respuesta');
+      console.error('Error submitting reply:', error);
+      showNotification('error', error instanceof Error ? error.message : 'Error al enviar respuesta');
+    } finally {
+      setIsSubmittingReply(false);
     }
-  };
-
-  // Edit feedback
-  const handleEditFeedback = async (feedbackId: string) => {
-    if (!user?.id || !editContent.trim()) return;
-    
-    try {
-      const response = await ApiService.updateFeedback(feedbackId, {
-        content: editContent,
-        user_id: user.id
-      });
-
-      if (!response.success) {
-        throw new Error(response.error || 'Error al editar feedback');
-      }
-
-      setEditingId(null);
-      setEditContent('');
-      showNotification('success', '¡Feedback actualizado exitosamente!');
-      fetchFeedbacks();
-    } catch (error) {
-      console.error('Error editing feedback:', error);
-      showNotification('error', 'Error al editar feedback');
-    }
-  };
-
-  // Delete feedback
-  const handleDeleteFeedback = async (feedbackId: string) => {
-    if (!user?.id) return;
-    
-    try {
-      const response = await ApiService.deleteFeedback(feedbackId, user.id);
-
-      if (!response.success) {
-        throw new Error(response.error || 'Error al eliminar feedback');
-      }
-
-      showNotification('success', 'Feedback eliminado exitosamente');
-      fetchFeedbacks();
-    } catch (error) {
-      console.error('Error deleting feedback:', error);
-      showNotification('error', 'Error al eliminar feedback');
-    }
-  };
-
-  // Verificar permisos
-  const canEdit = (feedback: Feedback) => {
-    return user && (user.id === feedback.usuario_id || user.rol === 'admin');
-  };
-
-  const canDelete = (feedback: Feedback) => {
-    return user && (user.id === feedback.usuario_id || user.rol === 'admin');
   };
 
   // Filtrar y ordenar feedbacks
   const filteredAndSortedFeedbacks = feedbacks
-    .filter(fb => {
-      if (filter.category !== 'all' && fb.categoria !== filter.category) return false;
-      if (filter.status !== 'all' && fb.estado !== filter.status) return false;
-      if (filter.priority !== 'all' && fb.prioridad !== filter.priority) return false;
+    .filter((feedback) => {
+      if (filter.category !== 'all' && feedback.categoria !== filter.category) return false;
+      if (filter.status !== 'all' && feedback.estado !== filter.status) return false;
+      if (filter.priority !== 'all' && feedback.prioridad !== filter.priority) return false;
       return true;
     })
     .sort((a, b) => {
@@ -534,7 +641,59 @@ export default function FeedbackPage() {
               </div>
             </motion.div>
           )}
+
+          {/* Notifications and Hashtags */}
+          <div className="flex flex-wrap items-center justify-center gap-4 mt-6">
+            {/* Notifications Button */}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="relative flex items-center gap-2 px-4 py-2 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-xl border border-white/20 dark:border-gray-700/20 hover:shadow-md transition-all duration-200"
+            >
+              <Bell className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Notificaciones</span>
+              {notifications.filter((n) => !n.leida).length > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                  {notifications.filter((n) => !n.leida).length}
+                </span>
+              )}
+            </motion.button>
+
+            {/* Hashtags */}
+            {hashtags.length > 0 && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-600 dark:text-gray-400">Trending:</span>
+                <HashtagList
+                  hashtags={hashtags.slice(0, 3)}
+                  size="sm"
+                  variant="outline"
+                />
+              </div>
+            )}
+          </div>
         </motion.div>
+
+        {/* Notifications Panel */}
+        <AnimatePresence>
+          {showNotifications && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mb-8"
+            >
+              <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl p-6 border border-white/20 dark:border-gray-700/20">
+                <NotificationList
+                  notifications={notifications}
+                  onMarkAsRead={handleMarkNotificationAsRead}
+                  onMarkAllAsRead={handleMarkAllNotificationsAsRead}
+                  showMarkAllButton={true}
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar */}
@@ -798,12 +957,8 @@ export default function FeedbackPage() {
               ) : (
                 <div className="space-y-4">
                   {filteredAndSortedFeedbacks.map((feedback, index) => {
-                    const category = categoryConfig[feedback.categoria as keyof typeof categoryConfig] || categoryConfig.general;
-                    const status = statusConfig[feedback.estado as keyof typeof statusConfig] || statusConfig.pending;
-                    const priority = priorityConfig[feedback.prioridad as keyof typeof priorityConfig] || priorityConfig.medium;
-                    const isLiked = feedback.retroalimentacion_likes?.some(like => like.usuario_id === user?.id);
-                    const isExpanded = expandedFeedback === feedback.id;
-                    const StatusIcon = status.icon;
+                    const isLiked = feedback.retroalimentacion_likes?.some((like) => like.usuario_id === user?.id);
+                    const isSaved = false; // TODO: Implementar lógica de guardado
 
                     return (
                       <motion.div
@@ -811,251 +966,98 @@ export default function FeedbackPage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl border border-white/20 dark:border-gray-700/20 overflow-hidden hover:shadow-lg transition-all duration-300"
                       >
-                        <div className="p-6">
-                          {/* Header */}
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="flex items-start gap-4 flex-1">
-                              {/* Avatar */}
-                              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold text-lg">
-                                {feedback.perfiles?.nombre_completo?.[0] || user?.nombre_completo?.[0] || 'U'}
-                              </div>
-                              
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <h3 className="font-semibold text-gray-900 dark:text-white text-lg">
-                                    {feedback.titulo}
-                                  </h3>
-                                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${category.bgColor} ${category.textColor}`}>
-                                    {category.icon} {category.label}
-                                  </span>
+                        <div>
+                          <FeedbackCard
+                            feedback={{
+                              ...feedback,
+                              perfiles: feedback.perfiles || {
+                                id: feedback.usuario_id,
+                                nombre_completo: 'Usuario',
+                                username: undefined,
+                                url_avatar: undefined,
+                                verificado: false
+                              },
+                              retroalimentacion_respuestas: feedback.retroalimentacion_respuestas?.map(respuesta => ({
+                                ...respuesta,
+                                perfiles: respuesta.perfiles || {
+                                  id: 'unknown',
+                                  nombre_completo: 'Usuario',
+                                  username: undefined,
+                                  url_avatar: undefined,
+                                  verificado: false
+                                }
+                              }))
+                            }}
+                            total_likes={feedback.total_likes || feedback.contador_likes}
+                            total_respuestas={feedback.total_respuestas || feedback.retroalimentacion_respuestas?.length || 0}
+                            isLiked={isLiked}
+                            isSaved={isSaved}
+                            onLike={handleLike}
+                            onReply={(feedbackId) => setReplyingTo(replyingTo === feedbackId ? null : feedbackId)}
+                            onShare={handleShareFeedback}
+                            onSave={handleSaveFeedback}
+                            onUserClick={(userId) => {
+                              router.push(`/profile/${userId}`);
+                            }}
+                            onHashtagClick={(hashtag) => {
+                              // TODO: Filtrar por hashtag
+                              console.log('Filter by hashtag:', hashtag);
+                            }}
+                            showActions={true}
+                          />
+                          
+                          {/* Formulario de respuesta */}
+                          {replyingTo === feedback.id && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              exit={{ opacity: 0, height: 0 }}
+                              className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700"
+                            >
+                              <div className="flex items-start gap-3">
+                                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                                  {user?.email?.charAt(0).toUpperCase() || 'U'}
                                 </div>
-                                
-                                <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-                                  <span>
-                                    por {feedback.perfiles?.nombre_completo || 'Usuario'}
-                                  </span>
-                                  <span>•</span>
-                                  <span>{formatSafeDate(feedback.fecha_creacion)}</span>
-                                  <span>•</span>
-                                  <div className="flex items-center gap-1">
-                                    <StatusIcon className={`w-4 h-4 ${status.color}`} />
-                                    <span className={status.color}>{status.label}</span>
-                                  </div>
-                                  <span>•</span>
-                                  <span className={priority.color}>
-                                    Prioridad {priority.label}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Actions */}
-                            {canEdit(feedback) && (
-                              <div className="flex items-center gap-2">
-                                <button
-                                  onClick={() => {
-                                    setEditingId(feedback.id);
-                                    setEditContent(feedback.contenido);
-                                  }}
-                                  className="p-2 text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors"
-                                >
-                                  <Edit className="w-4 h-4" />
-                                </button>
-                                {canDelete(feedback) && (
-                                  <button
-                                    onClick={() => {
-                                      if (confirm('¿Estás seguro de que quieres eliminar este feedback?')) {
-                                        handleDeleteFeedback(feedback.id);
-                                      }
-                                    }}
-                                    className="p-2 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 transition-colors"
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </button>
-                                )}
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Content */}
-                          <div className="mb-4">
-                            {editingId === feedback.id ? (
-                              <div className="space-y-3">
-                                <textarea
-                                  value={editContent}
-                                  onChange={(e) => setEditContent(e.target.value)}
-                                  rows={4}
-                                  className="w-full px-4 py-3 bg-white/50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
-                                  placeholder="Edita tu feedback..."
-                                />
-                                <div className="flex gap-2">
-                                  <button
-                                    onClick={() => handleEditFeedback(feedback.id)}
-                                    disabled={!editContent.trim()}
-                                    className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
-                                  >
-                                    Guardar
-                                  </button>
-                                  <button
-                                    onClick={() => {
-                                      setEditingId(null);
-                                      setEditContent('');
-                                    }}
-                                    className="text-gray-600 dark:text-gray-400 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors text-sm"
-                                  >
-                                    Cancelar
-                                  </button>
-                                </div>
-                              </div>
-                            ) : (
-                              <>
-                                <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                                  {feedback.contenido.length > 200 && !isExpanded
-                                    ? `${feedback.contenido.substring(0, 200)}...`
-                                    : feedback.contenido
-                                  }
-                                </p>
-                                
-                                {feedback.contenido.length > 200 && (
-                                  <button
-                                    onClick={() => setExpandedFeedback(isExpanded ? null : feedback.id)}
-                                    className="mt-2 text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium"
-                                  >
-                                    {isExpanded ? 'Ver menos' : 'Ver más'}
-                                  </button>
-                                )}
-                              </>
-                            )}
-                          </div>
-
-                          {/* Actions Bar */}
-                          <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
-                            <div className="flex items-center gap-4">
-                              <motion.button
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={() => handleLike(feedback.id)}
-                                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${
-                                  isLiked
-                                    ? 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400'
-                                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/50'
-                                }`}
-                              >
-                                <Heart className={`w-4 h-4 ${isLiked ? 'fill-current' : ''}`} />
-                                <span className="font-medium">{feedback.contador_likes}</span>
-                              </motion.button>
-
-                              <button
-                                onClick={() => setReplyingTo(replyingTo === feedback.id ? null : feedback.id)}
-                                className="flex items-center gap-2 px-3 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/50 rounded-lg transition-all duration-200"
-                              >
-                                <MessageCircle className="w-4 h-4" />
-                                <span className="font-medium">
-                                  {feedback.retroalimentacion_respuestas?.length || 0}
-                                </span>
-                              </button>
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                              <button
-                                onClick={() => setExpandedFeedback(isExpanded ? null : feedback.id)}
-                                className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
-                              >
-                                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
-                              </button>
-                            </div>
-                          </div>
-
-                          {/* Reply Form */}
-                          <AnimatePresence>
-                            {replyingTo === feedback.id && (
-                              <motion.div
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: 'auto' }}
-                                exit={{ opacity: 0, height: 0 }}
-                                className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700"
-                              >
-                                <div className="flex gap-3">
-                                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                                    {user?.nombre_completo?.[0] || 'U'}
-                                  </div>
-                                  <div className="flex-1">
-                                    <textarea
-                                      value={replyContent}
-                                      onChange={(e) => setReplyContent(e.target.value)}
-                                      placeholder="Escribe tu respuesta..."
-                                      rows={3}
-                                      className="w-full px-3 py-2 bg-white/50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
-                                    />
-                                    <div className="flex gap-2 mt-2">
-                                      <button
-                                        onClick={() => handleReply(feedback.id)}
-                                        disabled={!replyContent.trim()}
-                                        className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
-                                      >
-                                        Responder (+5 puntos)
-                                      </button>
-                                      <button
-                                        onClick={() => {
-                                          setReplyingTo(null);
-                                          setReplyContent('');
-                                        }}
-                                        className="text-gray-600 dark:text-gray-400 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors text-sm"
-                                      >
-                                        Cancelar
-                                      </button>
-                                    </div>
-                                  </div>
-                                </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-
-                          {/* Replies */}
-                          <AnimatePresence>
-                            {isExpanded && feedback.retroalimentacion_respuestas && feedback.retroalimentacion_respuestas.length > 0 && (
-                              <motion.div
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: 'auto' }}
-                                exit={{ opacity: 0, height: 0 }}
-                                className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700"
-                              >
-                                <div className="space-y-4">
-                                  {feedback.retroalimentacion_respuestas.map((reply) => (
-                                    <div key={reply.id} className="flex gap-3">
-                                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold text-sm ${
-                                        reply.es_respuesta_admin 
-                                          ? 'bg-gradient-to-r from-orange-500 to-red-500' 
-                                          : 'bg-gradient-to-br from-gray-500 to-gray-600'
-                                      }`}>
-                                        {reply.perfiles?.nombre_completo?.[0] || 'U'}
-                                      </div>
-                                      <div className="flex-1">
-                                        <div className="flex items-center gap-2 mb-1">
-                                          <span className="font-medium text-gray-900 dark:text-white text-sm">
-                                            {reply.perfiles?.nombre_completo || 'Usuario'}
-                                          </span>
-                                          {reply.es_respuesta_admin && (
-                                            <span className="px-2 py-0.5 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 text-xs rounded-full font-medium">
-                                              Admin
-                                            </span>
-                                          )}
-                                          <span className="text-xs text-gray-500 dark:text-gray-400">
-                                            {formatSafeDate(reply.fecha_creacion)}
-                                          </span>
+                                <div className="flex-1">
+                                  <textarea
+                                    value={replyContent}
+                                    onChange={(e) => setReplyContent(e.target.value)}
+                                    placeholder="Escribe tu respuesta..."
+                                    className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                                    rows={3}
+                                    disabled={isSubmittingReply}
+                                  />
+                                  <div className="flex justify-end gap-2 mt-3">
+                                    <button
+                                      onClick={() => {
+                                        setReplyingTo(null);
+                                        setReplyContent('');
+                                      }}
+                                      className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+                                      disabled={isSubmittingReply}
+                                    >
+                                      Cancelar
+                                    </button>
+                                    <button
+                                      onClick={() => handleReplySubmit(feedback.id)}
+                                      disabled={!replyContent.trim() || isSubmittingReply}
+                                      className="px-4 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed rounded-lg transition-colors"
+                                    >
+                                      {isSubmittingReply ? (
+                                        <div className="flex items-center gap-2">
+                                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                          Enviando...
                                         </div>
-                                        <p className="text-gray-700 dark:text-gray-300 text-sm">
-                                          {reply.contenido}
-                                        </p>
-                                      </div>
-                                    </div>
-                                  ))}
+                                      ) : (
+                                        'Responder'
+                                      )}
+                                    </button>
+                                  </div>
                                 </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
+                              </div>
+                            </motion.div>
+                          )}
                         </div>
                       </motion.div>
                     );

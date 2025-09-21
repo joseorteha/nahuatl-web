@@ -21,8 +21,17 @@ const nextConfig: NextConfig = {
         hostname: 'graph.facebook.com',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'boring-avatar.id32vt-beam-1.beam',
+        port: '',
+        pathname: '/**',
       }
     ],
+    // Permitir imágenes de boring-avatars
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   
   // Configuración experimental para Next.js 15

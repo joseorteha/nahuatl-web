@@ -6,9 +6,21 @@ interface User {
   email: string;
   username?: string;
   nombre_completo: string;
-  rol: string;
+  rol: 'usuario' | 'moderador' | 'admin';
   fecha_creacion: string;
+  fecha_actualizacion: string;
   url_avatar?: string;
+  es_beta_tester: boolean;
+  contador_feedback: number;
+  biografia?: string;
+  ubicacion?: string;
+  sitio_web?: string;
+  verificado: boolean;
+  privacidad_perfil: 'publico' | 'amigos' | 'privado';
+  mostrar_puntos: boolean;
+  mostrar_nivel: boolean;
+  notificaciones_email: boolean;
+  notificaciones_push: boolean;
 }
 
 interface AuthTokens {

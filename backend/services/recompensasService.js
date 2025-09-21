@@ -91,9 +91,9 @@ class RecompensasService {
         }]);
 
       // Actualizar puntos totales y experiencia
-      const { data: recompensas } = await this.obtenerRecompensasUsuario(userId);
-      const nuevosPuntos = recompensas.puntos_totales + puntos;
-      const nuevaExperiencia = recompensas.experiencia + puntos;
+      const recompensas = await this.obtenerRecompensasUsuario(userId);
+      const nuevosPuntos = (recompensas?.puntos_totales || 0) + puntos;
+      const nuevaExperiencia = (recompensas?.experiencia || 0) + puntos;
       
       // Calcular nuevo nivel
       const nuevoNivel = this.calcularNivel(nuevaExperiencia);

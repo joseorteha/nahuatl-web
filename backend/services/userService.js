@@ -107,7 +107,27 @@ class UserService {
     try {
       const { data: user, error } = await supabase
         .from('perfiles')
-        .select('id, email, username, nombre_completo, url_avatar, rol, fecha_creacion, fecha_actualizacion')
+        .select(`
+          id, 
+          email, 
+          username, 
+          nombre_completo, 
+          url_avatar, 
+          rol, 
+          fecha_creacion, 
+          fecha_actualizacion,
+          biografia,
+          ubicacion,
+          sitio_web,
+          verificado,
+          es_beta_tester,
+          contador_feedback,
+          privacidad_perfil,
+          mostrar_puntos,
+          mostrar_nivel,
+          notificaciones_email,
+          notificaciones_push
+        `)
         .eq('id', userId)
         .maybeSingle();
 
@@ -131,7 +151,20 @@ class UserService {
    */
   async updateUserProfile(userId, updateData) {
     try {
-      const allowedFields = ['nombre_completo', 'username', 'email', 'url_avatar'];
+      const allowedFields = [
+        'nombre_completo', 
+        'username', 
+        'email', 
+        'url_avatar',
+        'biografia',
+        'ubicacion',
+        'sitio_web',
+        'privacidad_perfil',
+        'mostrar_puntos',
+        'mostrar_nivel',
+        'notificaciones_email',
+        'notificaciones_push'
+      ];
       const filteredData = {};
       
       // Filtrar solo campos permitidos
@@ -152,7 +185,27 @@ class UserService {
         .from('perfiles')
         .update(filteredData)
         .eq('id', userId)
-        .select('id, email, username, nombre_completo, url_avatar, rol, fecha_creacion, fecha_actualizacion')
+        .select(`
+          id, 
+          email, 
+          username, 
+          nombre_completo, 
+          url_avatar, 
+          rol, 
+          fecha_creacion, 
+          fecha_actualizacion,
+          biografia,
+          ubicacion,
+          sitio_web,
+          verificado,
+          es_beta_tester,
+          contador_feedback,
+          privacidad_perfil,
+          mostrar_puntos,
+          mostrar_nivel,
+          notificaciones_email,
+          notificaciones_push
+        `)
         .single();
 
       if (error) throw error;

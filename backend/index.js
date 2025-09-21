@@ -19,6 +19,7 @@ const feedbackRoutes = require('./routes/feedbackRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const contributionRoutes = require('./routes/contributionRoutes');
 const recompensasRoutes = require('./routes/recompensasRoutes');
+const socialRoutes = require('./routes/socialRoutes');
 
 // Crear aplicación Express
 const app = express();
@@ -28,21 +29,37 @@ const app = express();
 // Seguridad
 app.use(helmet());
 
-// Rate limiting
+// Rate limiting - Configuración más permisiva para desarrollo
 const limiter = rateLimit({
-  windowMs: config.RATE_LIMIT_WINDOW,
-  max: config.RATE_LIMIT_MAX,
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 1000, // 1000 peticiones por ventana de tiempo
   message: {
     error: 'Demasiadas peticiones',
     message: 'Has excedido el límite de peticiones. Intenta de nuevo en 15 minutos.'
-  }
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 app.use(limiter);
 
 // CORS
 app.use(cors({
-  origin: config.CORS_ORIGIN,
-  credentials: true
+  origin: function (origin, callback) {
+    // Permitir requests sin origin (como mobile apps o Postman)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = config.CORS_ORIGIN;
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.log('CORS: Origin no permitido:', origin);
+      callback(new Error('No permitido por CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  optionsSuccessStatus: 200
 }));
 
 // Parsing de JSON
@@ -96,7 +113,8 @@ app.get('/', (req, res) => {
       feedback: '/api/feedback/*',
       admin: '/api/admin/*',
       contributions: '/api/contributions/*',
-      recompensas: '/api/recompensas/*'
+      recompensas: '/api/recompensas/*',
+      social: '/api/social/*'
     },
     docs: 'https://github.com/joseorteha/nahuatl-web/blob/main/backend/README.md'
   });
@@ -109,6 +127,7 @@ app.use('/api/feedback', feedbackRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/contributions', contributionRoutes);
 app.use('/api/recompensas', recompensasRoutes);
+app.use('/api/social', socialRoutes);
 
 // ===== MANEJO DE ERRORES =====
 

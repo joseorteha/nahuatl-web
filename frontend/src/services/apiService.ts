@@ -1,5 +1,7 @@
 // services/apiService.ts
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web.onrender.com';
+import { UserProfile, UserStats, FeedbackCompartido, FeedbackGuardado, LikeDado } from '../types';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 interface ApiResponse<T> {
   data?: T;
@@ -45,13 +47,7 @@ interface UserRewards {
   fecha_actualizacion: string;
 }
 
-interface UserStats {
-  puntos_totales: number;
-  nivel: string;
-  contribuciones_aprobadas: number;
-  likes_recibidos: number;
-  posicion_ranking?: number;
-}
+
 
 export class ApiService {
   // ============ FEEDBACK ENDPOINTS ============
@@ -80,9 +76,16 @@ export class ApiService {
     priority: string;
   }): Promise<ApiResponse<FeedbackItem>> {
     try {
+      // Obtener token del localStorage
+      const storedTokens = localStorage.getItem('auth_tokens');
+      const tokens = storedTokens ? JSON.parse(storedTokens) : null;
+      
       const response = await fetch(`${API_URL}/api/feedback`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(tokens?.accessToken && { Authorization: `Bearer ${tokens.accessToken}` })
+        },
         body: JSON.stringify(feedbackData),
       });
 
@@ -104,10 +107,19 @@ export class ApiService {
     feedback_id: string;
   }): Promise<ApiResponse<{ action: 'liked' | 'unliked' }>> {
     try {
+      // Obtener token del localStorage
+      const storedTokens = localStorage.getItem('auth_tokens');
+      const tokens = storedTokens ? JSON.parse(storedTokens) : null;
+      
       const response = await fetch(`${API_URL}/api/feedback/like`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(tokens?.accessToken && { Authorization: `Bearer ${tokens.accessToken}` })
+        },
+        body: JSON.stringify({
+          feedback_id: data.feedback_id
+        }),
       });
 
       const result = await response.json();
@@ -129,9 +141,16 @@ export class ApiService {
     content: string;
   }): Promise<ApiResponse<Record<string, unknown>>> {
     try {
+      // Obtener token del localStorage
+      const storedTokens = localStorage.getItem('auth_tokens');
+      const tokens = storedTokens ? JSON.parse(storedTokens) : null;
+      
       const response = await fetch(`${API_URL}/api/feedback/reply`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(tokens?.accessToken && { Authorization: `Bearer ${tokens.accessToken}` })
+        },
         body: JSON.stringify(data),
       });
 
@@ -231,11 +250,107 @@ export class ApiService {
           nivel: rewardsResponse.data.nivel,
           contribuciones_aprobadas: 0, // Temporal
           likes_recibidos: 0, // Temporal
-          posicion_ranking: undefined
+          feedbacks_creados: 0, // Temporal
+          seguidores: 0, // Temporal
+          siguiendo: 0 // Temporal
         }
       };
     } catch (error) {
       console.error('Error fetching user stats:', error);
+      return { success: false, error: 'Error de conexión al servidor' };
+    }
+  }
+
+  static async getUserProfile(userId: string): Promise<ApiResponse<UserProfile>> {
+    try {
+      // Obtener token del localStorage
+      const storedTokens = localStorage.getItem('auth_tokens');
+      const tokens = storedTokens ? JSON.parse(storedTokens) : null;
+      
+      const response = await fetch(`${API_URL}/api/auth/profile/${userId}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...(tokens?.accessToken && { Authorization: `Bearer ${tokens.accessToken}` })
+        }
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        return { success: false, error: errorData.error || 'Error al cargar perfil' };
+      }
+      
+      const data = await response.json();
+      return { success: true, data };
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+      return { success: false, error: 'Error de conexión al servidor' };
+    }
+  }
+
+  static async getUserFeedbacks(userId: string): Promise<ApiResponse<FeedbackItem[]>> {
+    try {
+      const response = await fetch(`${API_URL}/api/feedback/usuario/${userId}`);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        return { success: false, error: errorData.error || 'Error al cargar feedbacks del usuario' };
+      }
+      
+      const data = await response.json();
+      return { success: true, data: data || [] };
+    } catch (error) {
+      console.error('Error fetching user feedbacks:', error);
+      return { success: false, error: 'Error de conexión al servidor' };
+    }
+  }
+
+  static async getUserSharedFeedbacks(userId: string): Promise<ApiResponse<FeedbackCompartido[]>> {
+    try {
+      const response = await fetch(`${API_URL}/api/social/feedback/compartidos/${userId}`);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        return { success: false, error: errorData.error || 'Error al cargar feedbacks compartidos' };
+      }
+      
+      const data = await response.json();
+      return { success: true, data: data.data || [] };
+    } catch (error) {
+      console.error('Error fetching shared feedbacks:', error);
+      return { success: false, error: 'Error de conexión al servidor' };
+    }
+  }
+
+  static async getUserSavedFeedbacks(userId: string): Promise<ApiResponse<FeedbackGuardado[]>> {
+    try {
+      const response = await fetch(`${API_URL}/api/social/feedback/guardados/${userId}`);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        return { success: false, error: errorData.error || 'Error al cargar feedbacks guardados' };
+      }
+      
+      const data = await response.json();
+      return { success: true, data: data.data || [] };
+    } catch (error) {
+      console.error('Error fetching saved feedbacks:', error);
+      return { success: false, error: 'Error de conexión al servidor' };
+    }
+  }
+
+  static async getUserLikes(userId: string): Promise<ApiResponse<LikeDado[]>> {
+    try {
+      const response = await fetch(`${API_URL}/api/social/feedback/likes/${userId}`);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        return { success: false, error: errorData.error || 'Error al cargar likes dados' };
+      }
+      
+      const data = await response.json();
+      return { success: true, data: data.data || [] };
+    } catch (error) {
+      console.error('Error fetching user likes:', error);
       return { success: false, error: 'Error de conexión al servidor' };
     }
   }
@@ -251,32 +366,14 @@ export class ApiService {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          usuario_id: data.userId,
+          userId: data.userId,
           accion: data.motivo,
-          puntos: data.points,
-          descripcion: data.descripcion
+          datos: {
+            puntos: data.points,
+            descripcion: data.descripcion
+          }
         }),
       });
-
-      // Si hay error 400, intentar con estructura alternativa
-      if (response.status === 400) {
-        console.warn('Estructura original falló, intentando estructura alternativa');
-        const altResponse = await fetch(`${API_URL}/api/recompensas/procesar`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userId: data.userId,
-            action: data.motivo,
-            points: data.points,
-            description: data.descripcion
-          }),
-        });
-        
-        if (altResponse.ok) {
-          const altResult = await altResponse.json();
-          return { success: true, data: altResult };
-        }
-      }
 
       if (!response.ok) {
         const result = await response.json();

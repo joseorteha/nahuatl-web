@@ -114,6 +114,35 @@ class AuthController {
   }
 
   /**
+   * Obtener perfil público del usuario (sin autenticación)
+   * @param {Request} req - Objeto de request
+   * @param {Response} res - Objeto de response
+   */
+  async getPublicProfile(req, res) {
+    try {
+      const { userId } = req.params;
+
+      if (!userId) {
+        return res.status(400).json({ error: 'ID de usuario requerido' });
+      }
+
+      const userProfile = await userService.getUserProfile(userId);
+      res.json(userProfile);
+    } catch (error) {
+      console.error('Error al obtener perfil público:', error);
+      
+      if (error.message === 'Usuario no encontrado') {
+        return res.status(404).json({ error: error.message });
+      }
+      
+      res.status(500).json({ 
+        error: 'Error al obtener perfil',
+        message: error.message 
+      });
+    }
+  }
+
+  /**
    * Obtener perfil del usuario autenticado
    * @param {Request} req - Objeto de request
    * @param {Response} res - Objeto de response
