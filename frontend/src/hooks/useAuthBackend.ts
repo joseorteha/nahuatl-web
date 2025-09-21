@@ -8,6 +8,7 @@ interface User {
   nombre_completo: string;
   rol: string;
   fecha_creacion: string;
+  url_avatar?: string;
 }
 
 interface AuthTokens {
@@ -35,38 +36,6 @@ export function useAuthBackend() {
 
   // URL base de la API
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-
-  // Función para hacer llamadas a la API con token
-  const apiCall = useCallback(async (endpoint: string, options: RequestInit = {}) => {
-    const token = tokens?.accessToken;
-    
-    const response = await fetch(`${API_URL}${endpoint}`, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token && { Authorization: `Bearer ${token}` }),
-        ...options.headers,
-      },
-    });
-
-    // Si el token expiró, intentar renovarlo
-    if (response.status === 401 && tokens?.refreshToken) {
-      const refreshed = await refreshTokens();
-      if (refreshed) {
-        // Reintentar la llamada con el nuevo token
-        return fetch(`${API_URL}${endpoint}`, {
-          ...options,
-          headers: {
-            'Content-Type': 'application/json',
-            ...(refreshed.accessToken && { Authorization: `Bearer ${refreshed.accessToken}` }),
-            ...options.headers,
-          },
-        });
-      }
-    }
-
-    return response;
-  }, [tokens, API_URL, refreshTokens]);
 
   // Función para renovar tokens
   const refreshTokens = useCallback(async (): Promise<AuthTokens | null> => {
@@ -110,7 +79,39 @@ export function useAuthBackend() {
     } finally {
       refreshing.current = false;
     }
-  }, [tokens?.refreshToken, API_URL, signOut]);
+  }, [tokens?.refreshToken, API_URL]);
+
+  // Función para hacer llamadas a la API con token
+  const apiCall = useCallback(async (endpoint: string, options: RequestInit = {}): Promise<Response> => {
+    const token = tokens?.accessToken;
+    
+    const response = await fetch(`${API_URL}${endpoint}`, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token && { Authorization: `Bearer ${token}` }),
+        ...options.headers,
+      },
+    });
+
+    // Si el token expiró, intentar renovarlo
+    if (response.status === 401 && tokens?.refreshToken) {
+      const refreshed = await refreshTokens();
+      if (refreshed) {
+        // Reintentar la llamada con el nuevo token
+        return fetch(`${API_URL}${endpoint}`, {
+          ...options,
+          headers: {
+            'Content-Type': 'application/json',
+            ...(refreshed.accessToken && { Authorization: `Bearer ${refreshed.accessToken}` }),
+            ...options.headers,
+          },
+        });
+      }
+    }
+
+    return response;
+  }, [tokens, API_URL, refreshTokens]);
 
   // Función de login
   const login = useCallback(async (email: string, password: string) => {
@@ -212,7 +213,7 @@ export function useAuthBackend() {
       localStorage.removeItem('user');
       router.push('/');
     }
-  }, [tokens, apiCall, router]);
+  }, [tokens, router]);
 
   // Función para actualizar perfil
   const updateProfile = useCallback(async (updateData: Partial<User>) => {
@@ -237,7 +238,7 @@ export function useAuthBackend() {
       console.error('Error actualizando perfil:', error);
       return { success: false, error: 'Error de conexión' };
     }
-  }, [user, apiCall]);
+  }, [user]);
 
   // Cargar datos de autenticación al inicializar
   useEffect(() => {

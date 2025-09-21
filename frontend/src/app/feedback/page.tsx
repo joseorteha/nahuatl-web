@@ -257,7 +257,7 @@ export default function FeedbackPage() {
   // Submit feedback
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!profile?.id) return;
+    if (!user?.id) return;
     
     setIsSubmitting(true);
 
@@ -297,7 +297,7 @@ export default function FeedbackPage() {
 
   // Like feedback
   const handleLike = async (feedbackId: string) => {
-    if (!profile?.id) return;
+    if (!user?.id) return;
 
     try {
       const response = await ApiService.likeFeedback({
@@ -326,7 +326,7 @@ export default function FeedbackPage() {
 
   // Reply to feedback
   const handleReply = async (feedbackId: string) => {
-    if (!profile?.id || !replyContent.trim()) return;
+    if (!user?.id || !replyContent.trim()) return;
     
     try {
       const response = await ApiService.replyToFeedback({
@@ -360,12 +360,12 @@ export default function FeedbackPage() {
 
   // Edit feedback
   const handleEditFeedback = async (feedbackId: string) => {
-    if (!profile?.id || !editContent.trim()) return;
+    if (!user?.id || !editContent.trim()) return;
     
     try {
       const response = await ApiService.updateFeedback(feedbackId, {
         content: editContent,
-        user_id: profile.id
+        user_id: user.id
       });
 
       if (!response.success) {
@@ -801,7 +801,7 @@ export default function FeedbackPage() {
                     const category = categoryConfig[feedback.categoria as keyof typeof categoryConfig] || categoryConfig.general;
                     const status = statusConfig[feedback.estado as keyof typeof statusConfig] || statusConfig.pending;
                     const priority = priorityConfig[feedback.prioridad as keyof typeof priorityConfig] || priorityConfig.medium;
-                    const isLiked = feedback.retroalimentacion_likes?.some(like => like.usuario_id === profile?.id);
+                    const isLiked = feedback.retroalimentacion_likes?.some(like => like.usuario_id === user?.id);
                     const isExpanded = expandedFeedback === feedback.id;
                     const StatusIcon = status.icon;
 
@@ -819,7 +819,7 @@ export default function FeedbackPage() {
                             <div className="flex items-start gap-4 flex-1">
                               {/* Avatar */}
                               <div className="w-12 h-12 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold text-lg">
-                                {feedback.perfiles?.nombre_completo?.[0] || profile?.nombre_completo?.[0] || 'U'}
+                                {feedback.perfiles?.nombre_completo?.[0] || user?.nombre_completo?.[0] || 'U'}
                               </div>
                               
                               <div className="flex-1">
@@ -979,7 +979,7 @@ export default function FeedbackPage() {
                               >
                                 <div className="flex gap-3">
                                   <div className="w-8 h-8 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                                    {profile?.nombre_completo?.[0] || 'U'}
+                                    {user?.nombre_completo?.[0] || 'U'}
                                   </div>
                                   <div className="flex-1">
                                     <textarea

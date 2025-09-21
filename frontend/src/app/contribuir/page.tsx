@@ -224,7 +224,7 @@ export default function ContributePage() {
                   )}
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-300">
-                  {profile ? 'Tus contribuciones' : 'Contribuciones promedio'}
+                  {user ? 'Tus contribuciones' : 'Contribuciones promedio'}
                 </div>
               </motion.div>
             </div>
@@ -255,7 +255,7 @@ export default function ContributePage() {
                 <span>Nueva Contribución</span>
               </button>
               
-              {profile && (
+              {user && (
                 <button
                   onClick={() => setActiveTab('history')}
                   className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
@@ -297,7 +297,7 @@ export default function ContributePage() {
               />
             )}
 
-            {activeTab === 'history' && profile && (
+            {activeTab === 'history' && user && (
               <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg p-8 border border-white/20 dark:border-gray-700/50">
                 <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
                   Historial de Contribuciones

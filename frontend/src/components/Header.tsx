@@ -3,7 +3,6 @@ import { useState, Fragment } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Avatar from 'boring-avatars';
-import { useRouter } from 'next/navigation';
 import { Menu, Transition } from '@headlessui/react';
 import { User as UserIcon, LogOut, LayoutDashboard, Menu as MenuIcon, X, BookOpen, Users, MessageCircle, Plus } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
@@ -57,6 +56,14 @@ export default function Header() {
     }
 
     // Si es una URL normal de imagen
+    if (!finalAvatarString) {
+      return (
+        <div className={`w-${size} h-${size} bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold`}>
+          U
+        </div>
+      );
+    }
+    
     return (
       <Image 
         src={finalAvatarString} 

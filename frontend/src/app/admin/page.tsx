@@ -131,7 +131,7 @@ export default function AdminPage() {
   }, [authUser, authLoading, loadContributions, loadMensajesContacto, loadSolicitudesUnion]);
 
   const handleReview = async (contributionId: string, estado: 'aprobada' | 'rechazada', reviewComment: string) => {
-    if (!profile?.id) return;
+    if (!authUser?.id) return;
 
     setReviewing(true);
     try {

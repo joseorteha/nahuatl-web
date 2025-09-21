@@ -26,7 +26,7 @@ interface AvatarData {
 }
 
 export default function ProfilePage() {
-  const { user: profile, loading, isAuthenticated } = useAuthBackend();
+  const { user, loading, isAuthenticated } = useAuthBackend();
   const [isEditing, setIsEditing] = useState(false);
   const [showAvatarSelector, setShowAvatarSelector] = useState(false);
   const [generatedAvatars, setGeneratedAvatars] = useState<AvatarData[]>([]);
@@ -50,12 +50,12 @@ export default function ProfilePage() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
   // Datos combinados del usuario (perfil + auth)
-  const userData = profile ? {
-    id: profile.id,
-    email: profile.email,
-    nombre_completo: profile.nombre_completo,
-    url_avatar: profile.url_avatar,
-    username: profile.email // Usar email como fallback para username
+  const userData = user ? {
+    id: user.id,
+    email: user.email,
+    nombre_completo: user.nombre_completo,
+    url_avatar: user.url_avatar,
+    username: user.username || user.email // Usar username o email como fallback
   } : null;
 
   // Helper para renderizar avatares
@@ -141,18 +141,18 @@ export default function ProfilePage() {
       return;
     }
 
-    // Configurar datos del formulario cuando el perfil esté disponible
-    if (profile) {
+    // Configurar datos del formulario cuando el usuario esté disponible
+    if (user) {
       setFormData({
-        nombre_completo: profile.nombre_completo || '',
-        username: profile.email || '', // Usar email como username
-        email: profile.email || ''
+        nombre_completo: user.nombre_completo || '',
+        username: user.username || user.email || '', // Usar username o email
+        email: user.email || ''
       });
-      generateAvatars(profile.email || 'default');
-      loadUserStats(profile.id);
-      loadSavedWords(profile.id);
+      generateAvatars(user.email || 'default');
+      loadUserStats(user.id);
+      loadSavedWords(user.id);
     }
-  }, [loading, isAuthenticated, profile, router, loadUserStats, loadSavedWords]);
+  }, [loading, isAuthenticated, user, router, loadUserStats, loadSavedWords]);
 
   const generateAvatars = (seed: string) => {
     const variants = ['marble', 'beam', 'pixel', 'sunset', 'ring', 'bauhaus'];
@@ -248,7 +248,7 @@ export default function ProfilePage() {
     router.push('/');
   };
 
-  if (loading || !profile) {
+  if (loading || !user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100">
         <Header />
