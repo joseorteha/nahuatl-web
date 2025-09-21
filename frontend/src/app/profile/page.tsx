@@ -99,7 +99,15 @@ export default function ProfilePage() {
   const loadUserStats = useCallback(async (userId: string) => {
     try {
       setIsLoadingStats(true);
-      const response = await fetch(`${API_URL}/api/auth/stats/${userId}`);
+      const token = localStorage.getItem('auth_tokens');
+      const parsedTokens = token ? JSON.parse(token) : null;
+      
+      const response = await fetch(`${API_URL}/api/auth/stats/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${parsedTokens?.accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
       
       if (!response.ok) {
         throw new Error('Error al cargar estadísticas');
@@ -118,7 +126,15 @@ export default function ProfilePage() {
   const loadSavedWords = useCallback(async (userId: string) => {
     try {
       setIsLoadingSavedWords(true);
-      const response = await fetch(`${API_URL}/api/dictionary/saved/${userId}`);
+      const token = localStorage.getItem('auth_tokens');
+      const parsedTokens = token ? JSON.parse(token) : null;
+      
+      const response = await fetch(`${API_URL}/api/dictionary/saved/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${parsedTokens?.accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
       
       if (!response.ok) {
         throw new Error('Error al cargar palabras guardadas');

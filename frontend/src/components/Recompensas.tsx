@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useAuthBackend } from '@/hooks/useAuthBackend';
 
 interface RecompensasUsuario {
   puntos_totales: number;
@@ -70,16 +70,20 @@ export default function Recompensas({ userId }: { userId: string }) {
   
   type TabKey = 'resumen' | 'logros' | 'historial';
   
-  const supabase = createClientComponentClient();
+  const { } = useAuthBackend();
 
   const obtenerRecompensas = useCallback(async () => {
     try {
       setLoading(true);
       
       // Obtener datos de recompensas
+      const token = localStorage.getItem('auth_tokens');
+      const parsedTokens = token ? JSON.parse(token) : null;
+      
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/recompensas/usuario/${userId}`, {
         headers: {
-          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+          'Authorization': `Bearer ${parsedTokens?.accessToken}`,
+          'Content-Type': 'application/json'
         },
       });
       
@@ -92,7 +96,8 @@ export default function Recompensas({ userId }: { userId: string }) {
       // Obtener historial
       const historialResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/recompensas/historial/${userId}`, {
         headers: {
-          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+          'Authorization': `Bearer ${parsedTokens?.accessToken}`,
+          'Content-Type': 'application/json'
         },
       });
       
@@ -106,7 +111,7 @@ export default function Recompensas({ userId }: { userId: string }) {
     } finally {
       setLoading(false);
     }
-  }, [userId, supabase.auth]);
+  }, [userId]);
 
   useEffect(() => {
     obtenerRecompensas();
