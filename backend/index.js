@@ -66,9 +66,15 @@ app.use(cors({
   optionsSuccessStatus: 200
 }));
 
-// Parsing de JSON
+// Configuración de codificación UTF-8
 app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, charset: 'utf-8' }));
+
+// Middleware para asegurar UTF-8 en todas las respuestas
+app.use((req, res, next) => {
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  next();
+});
 
 // Configuración de sesiones para OAuth
 app.use(session({

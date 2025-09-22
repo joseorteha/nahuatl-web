@@ -381,31 +381,31 @@ export default function TemaPage() {
         )}
       </AnimatePresence>
 
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="container mx-auto px-4 py-4 sm:py-6 lg:py-8 max-w-4xl">
         {/* Header del tema */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="mb-6 sm:mb-8"
         >
-          <div className="flex items-center gap-4 mb-6">
+          <div className="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
             <button
               onClick={() => router.push('/feedback')}
-              className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200"
+              className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 flex-shrink-0"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white leading-tight">
               {tema.titulo}
             </h1>
           </div>
 
           {/* Info del tema */}
-          <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-2xl shadow-lg border border-white/30 dark:border-gray-700/60 p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className={`px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1 ${getCategoriaColor(tema.categoria)}`}>
-                  <Tag className="w-4 h-4" />
+          <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-2xl shadow-lg border border-white/30 dark:border-gray-700/60 p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                <div className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold flex items-center gap-1 ${getCategoriaColor(tema.categoria)}`}>
+                  <Tag className="w-3 h-3 sm:w-4 sm:h-4" />
                   {getCategoriaLabel(tema.categoria)}
                 </div>
                 <div className={`px-2 py-1 rounded-full text-xs font-semibold ${
@@ -417,21 +417,21 @@ export default function TemaPage() {
                 </div>
               </div>
               
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 sm:gap-4">
                 <button
                   onClick={handleLikeTema}
-                  className="flex items-center gap-2 px-4 py-2 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 transition-all duration-200"
+                  className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 transition-all duration-200"
                 >
-                  <Heart className="w-4 h-4" />
-                  <span className="font-semibold">{tema.contador_likes}</span>
+                  <Heart className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="font-semibold text-sm sm:text-base">{tema.contador_likes}</span>
                 </button>
                 
                 <button
                   onClick={handleShareTema}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all duration-200"
+                  className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all duration-200"
                 >
-                  <Share2 className="w-4 h-4" />
-                  <span className="font-semibold">{tema.compartido_contador}</span>
+                  <Share2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="font-semibold text-sm sm:text-base">{tema.compartido_contador}</span>
                 </button>
               </div>
             </div>
@@ -442,10 +442,10 @@ export default function TemaPage() {
               </p>
             )}
 
-            <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
-              <div className="flex items-center gap-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-6 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
                 <div className="flex items-center gap-2">
-                  <User className="w-4 h-4" />
+                  <User className="w-3 h-3 sm:w-4 sm:h-4" />
                   <Link href={`/profile/${tema.creador?.id}`} className="font-medium hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                     {tema.creador?.nombre_completo || 'Usuario'}
                   </Link>
@@ -455,16 +455,17 @@ export default function TemaPage() {
                 </div>
                 
                 <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4" />
+                  <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span>{new Date(tema.fecha_creacion).toLocaleDateString()}</span>
                 </div>
               </div>
               
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3 sm:gap-4">
                 <div className="flex items-center gap-1">
-                  <MessageCircle className="w-4 h-4" />
+                  <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="font-semibold">{tema.respuestas_count}</span>
-                  <span>respuestas</span>
+                  <span className="hidden sm:inline">respuestas</span>
+                  <span className="sm:hidden">resp</span>
                 </div>
                 
                 <div className="flex items-center gap-1">

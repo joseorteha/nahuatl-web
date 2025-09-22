@@ -146,22 +146,22 @@ export default function ExperienciaSocialPage() {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900">
       <Header />
       
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <div className="container mx-auto px-4 py-4 sm:py-6 lg:py-8 max-w-6xl">
         {/* Header Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
+          className="text-center mb-8 sm:mb-12"
         >
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center">
-              <Trophy className="w-8 h-8 text-white" />
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-4">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center">
+              <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
             </div>
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
               Experiencia Social
             </h1>
           </div>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+          <p className="text-sm sm:text-base lg:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto px-4">
             Compite, interactúa y gana experiencia social en la comunidad. 
             ¡Tu impacto social se refleja en tu ranking!
           </p>
@@ -175,7 +175,7 @@ export default function ExperienciaSocialPage() {
           className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl border border-white/20 dark:border-gray-700/20 mb-8"
         >
           <div className="border-b border-gray-200/50 dark:border-gray-700/50">
-            <nav className="flex px-6">
+            <nav className="flex flex-col sm:flex-row px-2 sm:px-6">
               {[
                 { id: 'general', label: 'Vista General', icon: BarChart3 },
                 { id: 'personal', label: 'Mi Progreso', icon: Target },
@@ -184,21 +184,22 @@ export default function ExperienciaSocialPage() {
                 <button
                   key={id}
                   onClick={() => setActiveTab(id as 'general' | 'personal' | 'ranking')}
-                  className={`flex items-center gap-3 py-4 px-6 border-b-2 font-semibold text-sm transition-all duration-300 ${
+                  className={`flex items-center justify-center gap-2 sm:gap-3 py-3 sm:py-4 px-3 sm:px-6 border-b-2 font-semibold text-xs sm:text-sm transition-all duration-300 ${
                     activeTab === id
                       ? 'border-purple-500 text-purple-600 dark:text-purple-400'
                       : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
                   }`}
                 >
-                  <Icon className="w-5 h-5" />
-                  {label}
+                  <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="hidden xs:inline">{label}</span>
+                  <span className="xs:hidden">{label.split(' ')[0]}</span>
                 </button>
               ))}
             </nav>
           </div>
 
           {/* Content */}
-          <div className="p-8">
+          <div className="p-4 sm:p-6 lg:p-8">
             {activeTab === 'general' && (
               <div className="space-y-8">
                 {/* Nivel de experiencia */}

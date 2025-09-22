@@ -24,6 +24,7 @@ export async function GET(request: NextRequest) {
         <!DOCTYPE html>
         <html>
         <head>
+          <meta charset="UTF-8">
           <title>Iniciando sesión...</title>
           <style>
             body { 

@@ -18,6 +18,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning className={inter.variable}>
+      <head>
+        <meta charSet="UTF-8" />
+      </head>
       <body className="bg-neutral-50 dark:bg-gray-900 text-neutral-800 dark:text-gray-100 min-h-screen font-sans transition-colors duration-300">
         <ThemeProvider>
           <div className="flex-1 flex flex-col">
