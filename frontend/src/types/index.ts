@@ -74,7 +74,7 @@ export interface LikeDado {
   retroalimentacion: Feedback;
 }
 
-export type TabType = 'feedbacks' | 'compartidos' | 'guardados' | 'likes' | 'seguidores' | 'siguiendo';
+export type TabType = 'temas' | 'respuestas' | 'compartidos' | 'guardados' | 'likes' | 'seguidores' | 'siguiendo';
 
 export interface Seguidor {
   id: string;

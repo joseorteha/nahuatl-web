@@ -16,10 +16,14 @@ const { passport } = require('./config/googleOAuth');
 const authRoutes = require('./routes/authRoutes');
 const dictionaryRoutes = require('./routes/dictionaryRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
+const temasRoutes = require('./routes/temas');
 const adminRoutes = require('./routes/adminRoutes');
 const contributionRoutes = require('./routes/contributionRoutes');
 const recompensasRoutes = require('./routes/recompensasRoutes');
 const socialRoutes = require('./routes/socialRoutes');
+const temasStatsRoutes = require('./routes/temas-stats');
+const experienciaSocialRoutes = require('./routes/experiencia-social');
+const usuariosRoutes = require('./routes/usuarios');
 
 // Crear aplicación Express
 const app = express();
@@ -111,6 +115,7 @@ app.get('/', (req, res) => {
       auth: '/api/auth/*',
       dictionary: '/api/dictionary/*',
       feedback: '/api/feedback/*',
+      temas: '/api/temas/*',
       admin: '/api/admin/*',
       contributions: '/api/contributions/*',
       recompensas: '/api/recompensas/*',
@@ -124,10 +129,14 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/dictionary', dictionaryRoutes);
 app.use('/api/feedback', feedbackRoutes);
+app.use('/api/temas', temasRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/contributions', contributionRoutes);
 app.use('/api/recompensas', recompensasRoutes);
 app.use('/api/social', socialRoutes);
+app.use('/api/temas-stats', temasStatsRoutes);
+app.use('/api/experiencia-social', experienciaSocialRoutes);
+app.use('/api/usuarios', usuariosRoutes);
 
 // ===== MANEJO DE ERRORES =====
 

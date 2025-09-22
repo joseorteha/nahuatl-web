@@ -106,11 +106,69 @@ class RecompensasController {
           motivo = 'palabra_guardada';
           descripcion = 'Nueva palabra guardada';
           break;
+        case 'tema_creado':
+          puntos = 15;
+          motivo = 'tema_creado';
+          descripcion = 'Nuevo tema de conversación creado';
+          break;
+        case 'like_dado':
+          puntos = 2;
+          motivo = 'like_dado';
+          descripcion = 'Like dado a tema';
+          break;
         default:
           return res.status(400).json({ error: 'Acción no reconocida' });
       }
 
       await recompensasService.otorgarPuntos(userId, puntos, motivo, descripcion);
+      
+      // Actualizar experiencia social si es una acción social
+      if (['tema_creado', 'like_dado', 'share_dado', 'like_recibido', 'share_recibido', 'respuesta_creada'].includes(accion)) {
+        try {
+          const { data: recompensasActuales, error: recompensasError } = await supabase
+            .from('recompensas_usuario')
+            .select('experiencia_social')
+            .eq('usuario_id', userId)
+            .single();
+
+          if (!recompensasError && recompensasActuales) {
+            let puntosExperiencia = 0;
+            switch (accion) {
+              case 'tema_creado':
+                puntosExperiencia = 10;
+                break;
+              case 'like_dado':
+                puntosExperiencia = 2;
+                break;
+              case 'share_dado':
+                puntosExperiencia = 3;
+                break;
+              case 'like_recibido':
+                puntosExperiencia = 1;
+                break;
+              case 'share_recibido':
+                puntosExperiencia = 2;
+                break;
+              case 'respuesta_creada':
+                puntosExperiencia = 5;
+                break;
+            }
+
+            const nuevaExperienciaSocial = (recompensasActuales.experiencia_social || 0) + puntosExperiencia;
+
+            await supabase
+              .from('recompensas_usuario')
+              .update({ 
+                experiencia_social: nuevaExperienciaSocial,
+                fecha_actualizacion: new Date().toISOString()
+              })
+              .eq('usuario_id', userId);
+          }
+        } catch (expError) {
+          console.warn('Error updating experiencia social:', expError);
+          // No fallar la operación principal por esto
+        }
+      }
       
       res.json({
         message: 'Acción procesada exitosamente',

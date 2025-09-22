@@ -15,7 +15,7 @@ export default function LandingHeader() {
           <div className="relative transition-all duration-300 group-hover:scale-105">
             <Image 
               src="/logo.png" 
-              alt="Nawatlajtol Logo" 
+              alt="Nawatlahtol Logo" 
               width={40} 
               height={40} 
               className="transition-transform duration-500 group-hover:scale-110 rounded-lg"

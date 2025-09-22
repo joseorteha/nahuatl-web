@@ -68,7 +68,7 @@ export default function LoginPage() {
               <div className="relative">
                 <Image 
                   src="/logo.png" 
-                  alt="Nawatlajtol Logo" 
+                  alt="Nawatlahtol Logo" 
                   width={60} 
                   height={60} 
                   className="rounded-2xl shadow-lg"
@@ -76,7 +76,7 @@ export default function LoginPage() {
               </div>
               <div>
                 <h1 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  Nawatlajtol
+                  Nawatlahtol
                 </h1>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Tlahtolnemiliztli</p>
               </div>

@@ -318,7 +318,7 @@ export default function DictionaryPage() {
     
     if (navigator.share) {
       navigator.share({
-        title: `${word} - Nawatlajtol`,
+        title: `${word} - Nawatlahtol`,
         text: `Descubre el significado de "${word}" en náhuatl`,
         url: url
       }).catch(err => {

@@ -243,7 +243,7 @@ async function enviarEmailBienvenida(solicitud: SolicitudUnionDB) {
   // Mensajes de bienvenida por tipo de unión
   const obtenerMensajeBienvenida = (tipoUnion: string): string => {
     const mensajes: Record<string, string> = {
-      registro: '¡Bienvenido a Nawatlajtol! Te contactaremos pronto para completar tu registro.',
+      registro: '¡Bienvenido a Nawatlahtol! Te contactaremos pronto para completar tu registro.',
       contribuir: '¡Gracias por querer contribuir! Revisaremos tu solicitud y te contactaremos.',
       comunidad: '¡Bienvenido a nuestra comunidad! Te enviaremos información sobre eventos y actividades.',
       voluntario: '¡Gracias por querer ser voluntario! Te contactaremos con información sobre oportunidades.',
@@ -251,7 +251,7 @@ async function enviarEmailBienvenida(solicitud: SolicitudUnionDB) {
       traductor: '¡Gracias por tu interés en traducir! Te enviaremos información sobre proyectos activos.'
     };
     
-    return mensajes[tipoUnion] || '¡Gracias por unirte a Nawatlajtol! Te contactaremos pronto.';
+    return mensajes[tipoUnion] || '¡Gracias por unirte a Nawatlahtol! Te contactaremos pronto.';
   };
 
   const mensaje = obtenerMensajeBienvenida(solicitud.tipo_union);

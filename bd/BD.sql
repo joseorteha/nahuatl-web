@@ -190,6 +190,22 @@ CREATE TABLE public.perfiles (
   notificaciones_push boolean DEFAULT true,
   CONSTRAINT perfiles_pkey PRIMARY KEY (id)
 );
+CREATE TABLE public.ranking_social (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  usuario_id uuid NOT NULL,
+  periodo text NOT NULL CHECK (periodo = ANY (ARRAY['semanal'::text, 'mensual'::text, 'anual'::text])),
+  fecha_inicio timestamp with time zone NOT NULL,
+  fecha_fin timestamp with time zone NOT NULL,
+  experiencia_social integer DEFAULT 0,
+  posicion integer NOT NULL,
+  likes_dados integer DEFAULT 0,
+  likes_recibidos integer DEFAULT 0,
+  comentarios_realizados integer DEFAULT 0,
+  contenido_compartido integer DEFAULT 0,
+  fecha_actualizacion timestamp with time zone DEFAULT now(),
+  CONSTRAINT ranking_social_pkey PRIMARY KEY (id),
+  CONSTRAINT ranking_social_usuario_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id)
+);
 CREATE TABLE public.recompensas_usuario (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   usuario_id uuid NOT NULL UNIQUE,
@@ -201,6 +217,11 @@ CREATE TABLE public.recompensas_usuario (
   racha_dias integer DEFAULT 0,
   fecha_creacion timestamp with time zone DEFAULT now(),
   fecha_actualizacion timestamp with time zone DEFAULT now(),
+  puntos_conocimiento integer DEFAULT 0,
+  experiencia_social integer DEFAULT 0,
+  ranking_semanal integer DEFAULT 0,
+  ranking_mensual integer DEFAULT 0,
+  ranking_anual integer DEFAULT 0,
   CONSTRAINT recompensas_usuario_pkey PRIMARY KEY (id),
   CONSTRAINT recompensas_usuario_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id)
 );
@@ -234,6 +255,10 @@ CREATE TABLE public.retroalimentacion (
   visibilidad text DEFAULT 'publico'::text CHECK (visibilidad = ANY (ARRAY['publico'::text, 'seguidores'::text, 'privado'::text])),
   permite_compartir boolean DEFAULT true,
   archivado boolean DEFAULT false,
+  es_tema_principal boolean DEFAULT false,
+  tema_padre_id uuid,
+  orden_respuesta integer DEFAULT 0,
+  es_respuesta boolean DEFAULT false,
   CONSTRAINT retroalimentacion_pkey PRIMARY KEY (id),
   CONSTRAINT retroalimentacion_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id)
 );
@@ -298,4 +323,46 @@ CREATE TABLE public.solicitudes_union (
   fecha_revision timestamp with time zone,
   fecha_contacto timestamp with time zone,
   CONSTRAINT solicitudes_union_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.temas_conversacion (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  titulo text NOT NULL,
+  descripcion text,
+  categoria text NOT NULL,
+  creador_id uuid NOT NULL,
+  estado text DEFAULT 'activo'::text CHECK (estado = ANY (ARRAY['activo'::text, 'cerrado'::text, 'archivado'::text])),
+  participantes_count integer DEFAULT 1,
+  respuestas_count integer DEFAULT 0,
+  ultima_actividad timestamp with time zone DEFAULT now(),
+  fecha_creacion timestamp with time zone DEFAULT now(),
+  contador_likes integer DEFAULT 0,
+  compartido_contador integer DEFAULT 0,
+  trending_score integer DEFAULT 0,
+  es_tema_principal boolean DEFAULT true,
+  tema_padre_id uuid,
+  orden_respuesta integer DEFAULT 0,
+  es_respuesta boolean DEFAULT false,
+  contenido text,
+  CONSTRAINT temas_conversacion_pkey PRIMARY KEY (id),
+  CONSTRAINT temas_creador_fkey FOREIGN KEY (creador_id) REFERENCES public.perfiles(id),
+  CONSTRAINT temas_padre_fkey FOREIGN KEY (tema_padre_id) REFERENCES public.temas_conversacion(id)
+);
+CREATE TABLE public.temas_likes (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  tema_id uuid NOT NULL,
+  usuario_id uuid NOT NULL,
+  fecha_creacion timestamp with time zone DEFAULT now(),
+  CONSTRAINT temas_likes_pkey PRIMARY KEY (id),
+  CONSTRAINT temas_likes_tema_id_fkey FOREIGN KEY (tema_id) REFERENCES public.temas_conversacion(id),
+  CONSTRAINT temas_likes_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id)
+);
+CREATE TABLE public.temas_shares (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  tema_id uuid NOT NULL,
+  usuario_id uuid NOT NULL,
+  plataforma text DEFAULT 'interno'::text CHECK (plataforma = ANY (ARRAY['interno'::text, 'facebook'::text, 'twitter'::text, 'whatsapp'::text, 'telegram'::text, 'otro'::text])),
+  fecha_creacion timestamp with time zone DEFAULT now(),
+  CONSTRAINT temas_shares_pkey PRIMARY KEY (id),
+  CONSTRAINT temas_shares_tema_id_fkey FOREIGN KEY (tema_id) REFERENCES public.temas_conversacion(id),
+  CONSTRAINT temas_shares_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id)
 );

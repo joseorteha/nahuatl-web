@@ -141,7 +141,7 @@ export default function RequestModal({ solicitud, onClose }: RequestModalProps) 
           <div className="flex justify-between items-center mt-6 pt-6 border-t">
             <div>
               <a
-                href={`mailto:${solicitud.email}?subject=Re: Solicitud de participación en Nawatlajtol`}
+                href={`mailto:${solicitud.email}?subject=Re: Solicitud de participación en Nawatlahtol`}
                 className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
               >
                 📧 Contactar por Email

@@ -1,16 +1,20 @@
 {
-  "name": "backend",
+  "name": "nahuatl-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "Backend API para Nawatlahtol - Lengua Náhuatl Digital",
   "main": "index.js",
   "scripts": {
-    "start": "node --watch index.js",
+    "start": "node index.js",
+    "dev": "node --watch index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["nahuatl", "language", "api", "education"],
+  "author": "Nawatlahtol Team",
+  "license": "MIT",
   "type": "commonjs",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "@supabase/supabase-js": "^2.50.1",
     "bcrypt": "^6.0.0",

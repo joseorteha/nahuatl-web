@@ -75,7 +75,7 @@ export default function Dashboard() {
               ¡Bienvenido, <span className="bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent">{user?.nombre_completo || user?.email?.split('@')[0] || 'Usuario'}!</span>
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
-              Bienvenido a <span className="font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">Nawatlajtol</span>, tu plataforma para aprender y preservar la lengua náhuatl. 
+              Bienvenido a <span className="font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">Nawatlahtol</span>, tu plataforma para aprender y preservar la lengua náhuatl. 
               Explora nuestras herramientas y únete a nuestra comunidad de aprendizaje.
             </p>
           </motion.div>
@@ -261,7 +261,7 @@ export default function Dashboard() {
                 </div>
               </div>
               <p className="text-gray-600 dark:text-gray-300 mb-4">
-                Descubre la historia detrás de Nawatlajtol y nuestro compromiso con la preservación de la lengua náhuatl.
+                Descubre la historia detrás de Nawatlahtol y nuestro compromiso con la preservación de la lengua náhuatl.
               </p>
               <Link 
                 href="/nosotros" 

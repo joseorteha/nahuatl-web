@@ -7,7 +7,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
-  title: 'Nawatlajtol - Aprende Náhuatl',
+  title: 'Nawatlahtol - Aprende Náhuatl',
   description: 'Tu plataforma para aprender náhuatl con diccionario, lecciones y práctica interactiva.',
 };
 

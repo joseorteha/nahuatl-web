@@ -16,7 +16,7 @@ const Footer = () => {
               <div className="relative overflow-hidden rounded-lg h-10 w-10">
                 <Image 
                   src="/logo.png" 
-                  alt="Nawatlajtol Logo" 
+                  alt="Nawatlahtol Logo" 
                   width={40} 
                   height={40} 
                   className="object-cover"

@@ -204,7 +204,7 @@ export default function JoinModal({ isOpen, onClose }: JoinModalProps) {
               </div>
               <div>
                 <h2 className="text-xl font-bold text-gray-900">
-                  Únete a Nawatlajtol
+                  Únete a Nawatlahtol
                 </h2>
                 <p className="text-sm text-gray-600">
                   Forma parte de nuestra comunidad

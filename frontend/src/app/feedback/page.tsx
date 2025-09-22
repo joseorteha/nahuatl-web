@@ -19,68 +19,45 @@ import {
   CheckCircle,
   XCircle,
   Zap,
-  Bell
+  Bell,
+  TrendingUp,
+  Users,
+  Tag
 } from 'lucide-react';
 import { useAuthBackend } from '@/hooks/useAuthBackend';
 import { useSocial, Notificacion, Hashtag } from '@/hooks/useSocial';
 import Header from '@/components/Header';
 import ApiService from '@/services/apiService';
 import { UserStats } from '@/types';
-import { FeedbackCard } from '@/components/social/FeedbackCard';
 import { HashtagList } from '@/components/social/HashtagChip';
 import { NotificationList } from '@/components/social/NotificationItem';
+import TemaCard from './components/TemaCard';
+import TemaForm from './components/TemaForm';
 
-interface Feedback {
+interface Tema {
   id: string;
   titulo: string;
-  contenido: string;
+  descripcion?: string;
   categoria: string;
-  estado: string;
-  prioridad: string;
+  estado: 'activo' | 'cerrado' | 'archivado';
+  creador: {
+    id: string;
+    nombre_completo: string;
+    username: string;
+    url_avatar?: string;
+  };
+  participantes_count: number;
+  respuestas_count: number;
+  ultima_actividad: string;
+  fecha_creacion: string;
   contador_likes: number;
   compartido_contador: number;
-  guardado_contador: number;
   trending_score: number;
-  visibilidad: string;
-  permite_compartir: boolean;
-  archivado: boolean;
   hashtags?: Array<{
     id: string;
     nombre: string;
     color: string;
   }>;
-  fecha_creacion: string;
-  fecha_actualizacion: string;
-  usuario_id: string;
-  perfiles?: {
-    id: string;
-    nombre_completo: string;
-    username?: string;
-    url_avatar?: string;
-    verificado: boolean;
-    recompensas_usuario?: {
-      nivel: string;
-      puntos_totales: number;
-    };
-  };
-  retroalimentacion_respuestas?: Array<{
-    id: string;
-    contenido: string;
-    fecha_creacion: string;
-    es_respuesta_admin: boolean;
-    perfiles?: {
-      id: string;
-      nombre_completo: string;
-      username?: string;
-      url_avatar?: string;
-      verificado: boolean;
-    };
-  }>;
-  retroalimentacion_likes?: Array<{
-    usuario_id: string;
-  }>;
-  total_likes?: number;
-  total_respuestas?: number;
 }
 
 
@@ -160,7 +137,7 @@ export default function FeedbackPage() {
   const router = useRouter();
   
   // Estados principales
-  const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
+  const [temas, setTemas] = useState<Tema[]>([]);
   const [userStats, setUserStats] = useState<UserStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   
@@ -170,24 +147,17 @@ export default function FeedbackPage() {
   const [showNotifications, setShowNotifications] = useState(false);
   
   // Estados del formulario
-  const [formData, setFormData] = useState({
-    subject: '',
-    message: '',
-    type: 'suggestion',
-    priority: 'medium'
-  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Estados de interacción
-  const [filter, setFilter] = useState({ category: 'all', status: 'all', priority: 'all' });
-  const [sortBy, setSortBy] = useState<'recent' | 'popular' | 'priority'>('recent');
-  const [replyingTo, setReplyingTo] = useState<string | null>(null);
-  const [replyContent, setReplyContent] = useState('');
-  const [isSubmittingReply, setIsSubmittingReply] = useState(false);
+  const [filter, setFilter] = useState({ category: 'all', estado: 'all' });
+  const [sortBy, setSortBy] = useState<'recent' | 'popular' | 'trending'>('recent');
   
   // Estados de UI
   const [showForm, setShowForm] = useState(false);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
   // Mostrar notificación
   const showNotification = (type: 'success' | 'error', message: string) => {
@@ -237,72 +207,64 @@ export default function FeedbackPage() {
     }
   }, [user?.id]);
 
-  // Función para mapear FeedbackItem a Feedback
-  const mapFeedbackItemToFeedback = (item: unknown): Feedback => {
-    const feedbackItem = item as Record<string, unknown>;
+  // Función para mapear datos del backend a Tema
+  const mapBackendToTema = (item: unknown): Tema => {
+    const temaItem = item as Record<string, unknown>;
+    const creador = temaItem.creador as Record<string, unknown> || {};
     return {
-      id: feedbackItem.id as string,
-      titulo: feedbackItem.titulo as string,
-      contenido: feedbackItem.contenido as string,
-      categoria: feedbackItem.categoria as string,
-      estado: feedbackItem.estado as string,
-      prioridad: feedbackItem.prioridad as string,
-      contador_likes: (feedbackItem.total_likes as number) || (feedbackItem.contador_likes as number) || 0,
-      compartido_contador: (feedbackItem.compartido_contador as number) || 0,
-      guardado_contador: (feedbackItem.guardado_contador as number) || 0,
-      trending_score: (feedbackItem.trending_score as number) || 0,
-      visibilidad: (feedbackItem.visibilidad as string) || 'publico',
-      permite_compartir: (feedbackItem.permite_compartir as boolean) || true,
-      archivado: (feedbackItem.archivado as boolean) || false,
-      hashtags: ((feedbackItem.hashtags as { id: string; nombre: string; color: string; }[]) || []).map(hashtag => ({
-        ...hashtag,
-        uso_contador: 0 // Add default uso_contador
-      })),
-      fecha_creacion: feedbackItem.fecha_creacion as string,
-      fecha_actualizacion: feedbackItem.fecha_actualizacion as string,
-      usuario_id: feedbackItem.usuario_id as string,
-      perfiles: feedbackItem.perfiles as Feedback['perfiles'],
-      retroalimentacion_respuestas: ((feedbackItem.retroalimentacion_respuestas as unknown[]) || []).map(respuesta => {
-        const respuestaData = respuesta as Record<string, unknown>;
-        return {
-          id: respuestaData.id as string,
-          contenido: respuestaData.contenido as string,
-          fecha_creacion: respuestaData.fecha_creacion as string,
-          es_respuesta_admin: respuestaData.es_respuesta_admin as boolean,
-          usuario: {
-            id: (respuestaData.perfiles as Record<string, unknown>)?.id as string || '',
-            nombre_completo: (respuestaData.perfiles as Record<string, unknown>)?.nombre_completo as string || '',
-            username: (respuestaData.perfiles as Record<string, unknown>)?.username as string,
-            url_avatar: (respuestaData.perfiles as Record<string, unknown>)?.url_avatar as string,
-            verificado: (respuestaData.perfiles as Record<string, unknown>)?.verificado as boolean || false
-          }
-        };
-      }),
-      retroalimentacion_likes: feedbackItem.retroalimentacion_likes as Feedback['retroalimentacion_likes'],
-      total_likes: (feedbackItem.total_likes as number) || (feedbackItem.contador_likes as number) || 0,
-      total_respuestas: (feedbackItem.total_respuestas as number) || (feedbackItem.retroalimentacion_respuestas as unknown[])?.length || 0
+      id: temaItem.id as string,
+      titulo: temaItem.titulo as string,
+      descripcion: temaItem.descripcion as string,
+      categoria: temaItem.categoria as string,
+      estado: (temaItem.estado as 'activo' | 'cerrado' | 'archivado') || 'activo',
+      creador: {
+        id: creador.id as string || temaItem.creador_id as string || '',
+        nombre_completo: creador.nombre_completo as string || 'Usuario',
+        username: creador.username as string || 'usuario',
+        url_avatar: creador.url_avatar as string || undefined
+      },
+      participantes_count: (temaItem.participantes_count as number) || 1,
+      respuestas_count: (temaItem.respuestas_count as number) || 0,
+      ultima_actividad: temaItem.ultima_actividad as string || temaItem.fecha_creacion as string,
+      fecha_creacion: temaItem.fecha_creacion as string,
+      contador_likes: 0, // Por ahora usamos 0 ya que la columna no existe
+      compartido_contador: 0, // Por ahora usamos 0 ya que la columna no existe
+      trending_score: 0, // Por ahora usamos 0 ya que la columna no existe
+      hashtags: [] // Por ahora vacío
     };
   };
 
-  // Fetch feedbacks
-  const fetchFeedbacks = useCallback(async () => {
+  // Fetch temas
+  const fetchTemas = useCallback(async () => {
     try {
-      const response = await ApiService.getFeedbacks();
-      if (response.success && response.data) {
-        console.log('📊 Datos del backend:', response.data[0]); // Debug: primer feedback
-        const mappedFeedbacks = response.data.map(mapFeedbackItemToFeedback);
-        console.log('📊 Datos mapeados:', mappedFeedbacks[0]); // Debug: primer feedback mapeado
-        setFeedbacks(mappedFeedbacks);
+      const token = localStorage.getItem('auth_tokens');
+      const parsedTokens = token ? JSON.parse(token) : null;
+      
+      const response = await fetch(`${API_URL}/api/temas?categoria=${filter.category}&estado=${filter.estado}&sortBy=${sortBy}`, {
+        headers: {
+          'Authorization': `Bearer ${parsedTokens?.accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Error al cargar temas');
+      }
+      
+      const result = await response.json();
+      if (result.success) {
+        const mappedTemas = result.data.map(mapBackendToTema);
+        setTemas(mappedTemas);
       } else {
-        showNotification('error', response.error || 'Error al cargar los feedbacks');
+        throw new Error(result.error || 'Error al cargar temas');
       }
     } catch (error) {
-      console.error('Error fetching feedbacks:', error);
-      showNotification('error', 'Error al cargar los feedbacks');
+      console.error('Error fetching temas:', error);
+      showNotification('error', 'Error al cargar los temas');
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [filter.category, filter.estado, sortBy, API_URL]);
 
   // Fetch notifications
   const fetchNotifications = useCallback(async () => {
@@ -345,76 +307,109 @@ export default function FeedbackPage() {
       return;
     }
     
-    fetchFeedbacks();
+    fetchTemas();
     fetchUserStats();
     fetchNotifications();
     fetchHashtags();
-  }, [user, loading, router, fetchFeedbacks, fetchUserStats, fetchNotifications, fetchHashtags]);
+  }, [user, loading, router, fetchTemas, fetchUserStats, fetchNotifications, fetchHashtags]);
 
-  // Submit feedback
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Submit tema
+  const handleTemaSubmit = async (tema: { titulo: string; descripcion: string; categoria: string }) => {
     if (!user?.id) return;
     
     setIsSubmitting(true);
 
     try {
-      const response = await ApiService.createFeedback({
-        user_id: user.id,
-        title: formData.subject,
-        content: formData.message,
-        category: formData.type,
-        priority: formData.priority
+      const token = localStorage.getItem('auth_tokens');
+      const parsedTokens = token ? JSON.parse(token) : null;
+      
+      console.log('🔑 Token encontrado:', !!parsedTokens?.accessToken);
+      console.log('👤 Usuario:', user?.id);
+      
+      const response = await fetch(`${API_URL}/api/temas`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${parsedTokens?.accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(tema)
       });
-
-      if (!response.success) {
-        throw new Error(response.error || 'Error al enviar feedback');
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al crear tema');
       }
-
-      // Otorgar puntos por crear feedback
-      const pointsAwarded = await awardPoints('feedback_enviado', 10, `Feedback enviado: ${formData.subject}`);
       
-      setFormData({ subject: '', message: '', type: 'suggestion', priority: 'medium' });
-      setShowForm(false);
-      
-      if (pointsAwarded) {
-        showNotification('success', '¡Feedback enviado! Has ganado 10 puntos 🎉');
+      const result = await response.json();
+      if (result.success) {
+        const newTema = mapBackendToTema(result.data);
+        setTemas(prev => [newTema, ...prev]);
+        setShowForm(false);
+        
+        // Otorgar puntos por crear tema
+        const pointsAwarded = await awardPoints('tema_creado', 15, `Tema creado: ${tema.titulo}`);
+        
+        if (pointsAwarded) {
+          showNotification('success', '¡Tema creado! Has ganado 15 puntos 🎉');
+        } else {
+          showNotification('success', '¡Tema creado exitosamente!');
+        }
       } else {
-        showNotification('success', '¡Feedback enviado exitosamente!');
+        throw new Error(result.error || 'Error al crear tema');
       }
-      
-      fetchFeedbacks();
     } catch (error) {
-      console.error('Error submitting feedback:', error);
-      showNotification('error', error instanceof Error ? error.message : 'Error al enviar feedback');
+      console.error('Error creating tema:', error);
+      showNotification('error', error instanceof Error ? error.message : 'Error al crear tema');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Like feedback
-  const handleLike = async (feedbackId: string) => {
+  // Like tema
+  const handleLikeTema = async (temaId: string) => {
     if (!user?.id) return;
 
     try {
-      const response = await ApiService.likeFeedback({
-        user_id: user.id,
-        feedback_id: feedbackId
-      });
-
-      if (!response.success) {
-        throw new Error(response.error || 'Error al procesar el voto');
-      }
-
-      // Si dio like (no quitó), otorgar puntos
-      if (response.data?.action === 'liked') {
-        const pointsAwarded = await awardPoints('like_recibido', 2, 'Like dado a feedback');
-        if (pointsAwarded) {
-          showNotification('success', '+2 puntos por dar like! ❤️');
+      const token = localStorage.getItem('auth_tokens');
+      const parsedTokens = token ? JSON.parse(token) : null;
+      
+      const response = await fetch(`${API_URL}/api/temas/${temaId}/like`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${parsedTokens?.accessToken}`,
+          'Content-Type': 'application/json'
         }
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al procesar like');
       }
+      
+      const result = await response.json();
+      if (result.success) {
+        // Actualizar el tema en la lista
+        setTemas(prev => prev.map(tema => 
+          tema.id === temaId 
+            ? { 
+                ...tema, 
+                contador_likes: result.data.action === 'liked' 
+                  ? tema.contador_likes + 1 
+                  : tema.contador_likes - 1
+              }
+            : tema
+        ));
 
-      fetchFeedbacks();
+        // Otorgar puntos por dar like
+        if (result.data.action === 'liked') {
+          const pointsAwarded = await awardPoints('like_dado', 2, 'Like dado a tema');
+          if (pointsAwarded) {
+            showNotification('success', '+2 puntos por dar like! ❤️');
+          }
+        }
+      } else {
+        throw new Error(result.error || 'Error al procesar like');
+      }
     } catch (error) {
       console.error('Error toggling like:', error);
       showNotification('error', 'Error al procesar el voto');
@@ -423,39 +418,40 @@ export default function FeedbackPage() {
 
 
   // Handlers para acciones sociales
-  const handleShareFeedback = async (feedbackId: string) => {
+  const handleShareTema = async (temaId: string) => {
     try {
-      await compartirFeedback(feedbackId);
-      showNotification('success', 'Feedback compartido exitosamente');
-      fetchFeedbacks(); // Recargar para actualizar contadores
-    } catch (error) {
-      console.error('Error sharing feedback:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Error al compartir feedback';
+      const token = localStorage.getItem('auth_tokens');
+      const parsedTokens = token ? JSON.parse(token) : null;
       
-      // Si ya se compartió, mostrar mensaje informativo en lugar de error
-      if (errorMessage.includes('Ya has compartido este feedback')) {
-        showNotification('success', 'Este feedback ya fue compartido anteriormente');
-      } else {
-        showNotification('error', errorMessage);
+      const response = await fetch(`${API_URL}/api/temas/${temaId}/share`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${parsedTokens?.accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al compartir tema');
       }
-    }
-  };
+      
+      const result = await response.json();
+      if (result.success) {
+        // Actualizar el tema en la lista
+        setTemas(prev => prev.map(tema => 
+          tema.id === temaId 
+            ? { ...tema, compartido_contador: tema.compartido_contador + 1 }
+            : tema
+        ));
 
-  const handleSaveFeedback = async (feedbackId: string) => {
-    try {
-      await guardarFeedback(feedbackId);
-      showNotification('success', 'Feedback guardado exitosamente');
-      fetchFeedbacks(); // Recargar para actualizar contadores
-    } catch (error) {
-      console.error('Error saving feedback:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Error al guardar feedback';
-      
-      // Si ya se guardó, mostrar mensaje informativo en lugar de error
-      if (errorMessage.includes('Ya has guardado este feedback')) {
-        showNotification('success', 'Este feedback ya fue guardado anteriormente');
+        showNotification('success', 'Tema compartido exitosamente');
       } else {
-        showNotification('error', errorMessage);
+        throw new Error(result.error || 'Error al compartir tema');
       }
+    } catch (error) {
+      console.error('Error sharing tema:', error);
+      showNotification('error', 'Error al compartir tema');
     }
   };
 
@@ -479,60 +475,20 @@ export default function FeedbackPage() {
     }
   };
 
-  // Handler para enviar respuesta
-  const handleReplySubmit = async (feedbackId: string) => {
-    if (!user?.id || !replyContent.trim()) return;
-    
-    setIsSubmittingReply(true);
-    
-    try {
-      const response = await ApiService.replyToFeedback({
-        user_id: user.id,
-        feedback_id: feedbackId,
-        content: replyContent.trim()
-      });
 
-      if (!response.success) {
-        throw new Error(response.error || 'Error al enviar respuesta');
-      }
-
-      // Otorgar puntos por responder
-      const pointsAwarded = await awardPoints('respuesta_enviada', 5, 'Respuesta enviada a feedback');
-      
-      setReplyContent('');
-      setReplyingTo(null);
-      
-      if (pointsAwarded) {
-        showNotification('success', '¡Respuesta enviada! Has ganado 5 puntos 🎉');
-      } else {
-        showNotification('success', '¡Respuesta enviada exitosamente!');
-      }
-      
-      fetchFeedbacks(); // Recargar para mostrar la nueva respuesta
-    } catch (error) {
-      console.error('Error submitting reply:', error);
-      showNotification('error', error instanceof Error ? error.message : 'Error al enviar respuesta');
-    } finally {
-      setIsSubmittingReply(false);
-    }
-  };
-
-  // Filtrar y ordenar feedbacks
-  const filteredAndSortedFeedbacks = feedbacks
-    .filter((feedback) => {
-      if (filter.category !== 'all' && feedback.categoria !== filter.category) return false;
-      if (filter.status !== 'all' && feedback.estado !== filter.status) return false;
-      if (filter.priority !== 'all' && feedback.prioridad !== filter.priority) return false;
+  // Filtrar y ordenar temas
+  const filteredAndSortedTemas = temas
+    .filter((tema) => {
+      if (filter.category !== 'all' && tema.categoria !== filter.category) return false;
+      if (filter.estado !== 'all' && tema.estado !== filter.estado) return false;
       return true;
     })
     .sort((a, b) => {
       switch (sortBy) {
         case 'popular':
           return b.contador_likes - a.contador_likes;
-        case 'priority':
-          const priorityOrder = { critical: 4, high: 3, medium: 2, low: 1 };
-          return (priorityOrder[b.prioridad as keyof typeof priorityOrder] || 0) - 
-                 (priorityOrder[a.prioridad as keyof typeof priorityOrder] || 0);
+        case 'trending':
+          return b.trending_score - a.trending_score;
         case 'recent':
         default:
           return new Date(b.fecha_creacion).getTime() - new Date(a.fecha_creacion).getTime();
@@ -603,11 +559,11 @@ export default function FeedbackPage() {
               <MessageSquare className="w-6 h-6 text-white" />
             </div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Centro de Feedback
+              Temas de Conversación
             </h1>
           </div>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Comparte tus ideas, reporta problemas y ayúdanos a mejorar la plataforma. 
+            Participa en conversaciones, haz preguntas y comparte ideas sobre el náhuatl. 
             ¡Gana puntos por cada contribución!
           </p>
           
@@ -641,6 +597,7 @@ export default function FeedbackPage() {
               </div>
             </motion.div>
           )}
+
 
           {/* Notifications and Hashtags */}
           <div className="flex flex-wrap items-center justify-center gap-4 mt-6">
@@ -699,7 +656,7 @@ export default function FeedbackPage() {
           {/* Sidebar */}
           <div className="lg:col-span-1">
             <div className="sticky top-24 space-y-6">
-              {/* Nuevo Feedback Button */}
+              {/* Nuevo Tema Button */}
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -707,7 +664,7 @@ export default function FeedbackPage() {
                 className="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white px-6 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
-                Nuevo Feedback
+                Nuevo Tema
               </motion.button>
 
               {/* Filters */}
@@ -735,37 +692,20 @@ export default function FeedbackPage() {
                     </select>
                   </div>
 
-                  {/* Status Filter */}
+                  {/* Estado Filter */}
                   <div>
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
                       Estado
                     </label>
                     <select
-                      value={filter.status}
-                      onChange={(e) => setFilter(prev => ({ ...prev, status: e.target.value }))}
+                      value={filter.estado}
+                      onChange={(e) => setFilter(prev => ({ ...prev, estado: e.target.value }))}
                       className="w-full px-3 py-2 bg-white/50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                     >
                       <option value="all">Todos</option>
-                      {Object.entries(statusConfig).map(([key, config]) => (
-                        <option key={key} value={key}>{config.label}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Priority Filter */}
-                  <div>
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
-                      Prioridad
-                    </label>
-                    <select
-                      value={filter.priority}
-                      onChange={(e) => setFilter(prev => ({ ...prev, priority: e.target.value }))}
-                      className="w-full px-3 py-2 bg-white/50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    >
-                      <option value="all">Todas</option>
-                      {Object.entries(priorityConfig).map(([key, config]) => (
-                        <option key={key} value={key}>{config.label}</option>
-                      ))}
+                      <option value="activo">Activo</option>
+                      <option value="cerrado">Cerrado</option>
+                      <option value="archivado">Archivado</option>
                     </select>
                   </div>
                 </div>
@@ -778,11 +718,11 @@ export default function FeedbackPage() {
                   {[
                     { key: 'recent', label: 'Más recientes', icon: Clock },
                     { key: 'popular', label: 'Más populares', icon: Heart },
-                    { key: 'priority', label: 'Prioridad', icon: Zap }
+                    { key: 'trending', label: 'Trending', icon: TrendingUp }
                   ].map(({ key, label, icon: Icon }) => (
                     <button
                       key={key}
-                      onClick={() => setSortBy(key as 'recent' | 'popular' | 'priority')}
+                      onClick={() => setSortBy(key as 'recent' | 'popular' | 'trending')}
                       className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
                         sortBy === key
                           ? 'bg-blue-500 text-white shadow-md'
@@ -800,139 +740,23 @@ export default function FeedbackPage() {
 
           {/* Main Content */}
           <div className="lg:col-span-3">
-            {/* New Feedback Form */}
-            <AnimatePresence>
-              {showForm && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="mb-8"
-                >
-                  <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl p-6 border border-white/20 dark:border-gray-700/20">
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                          Nuevo Feedback
-                        </h3>
-                        <button
-                          type="button"
-                          onClick={() => setShowForm(false)}
-                          className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
-                        >
-                          <X className="w-5 h-5" />
-                        </button>
-                      </div>
+            {/* New Tema Form */}
+            <TemaForm
+              isOpen={showForm}
+              onClose={() => setShowForm(false)}
+              onSubmit={handleTemaSubmit}
+              isSubmitting={isSubmitting}
+            />
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
-                            Categoría
-                          </label>
-                          <select
-                            name="type"
-                            value={formData.type}
-                            onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value }))}
-                            className="w-full px-4 py-3 bg-white/50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                            required
-                          >
-                            {Object.entries(categoryConfig).map(([key, config]) => (
-                              <option key={key} value={key}>
-                                {config.icon} {config.label}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-
-                        <div>
-                          <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
-                            Prioridad
-                          </label>
-                          <select
-                            name="priority"
-                            value={formData.priority}
-                            onChange={(e) => setFormData(prev => ({ ...prev, priority: e.target.value }))}
-                            className="w-full px-4 py-3 bg-white/50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                            required
-                          >
-                            {Object.entries(priorityConfig).map(([key, config]) => (
-                              <option key={key} value={key}>{config.label}</option>
-                            ))}
-                          </select>
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
-                          Título
-                        </label>
-                        <input
-                          type="text"
-                          name="subject"
-                          value={formData.subject}
-                          onChange={(e) => setFormData(prev => ({ ...prev, subject: e.target.value }))}
-                          placeholder="Resumen breve de tu feedback..."
-                          className="w-full px-4 py-3 bg-white/50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
-                          Descripción
-                        </label>
-                        <textarea
-                          name="message"
-                          value={formData.message}
-                          onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
-                          placeholder="Describe tu sugerencia, problema o pregunta en detalle..."
-                          rows={4}
-                          className="w-full px-4 py-3 bg-white/50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
-                          required
-                        />
-                      </div>
-
-                      <div className="flex gap-3">
-                        <motion.button
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          type="submit"
-                          disabled={isSubmitting}
-                          className="flex-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {isSubmitting ? (
-                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          ) : (
-                            <>
-                              <Send className="w-5 h-5" />
-                              Enviar Feedback (+10 puntos)
-                            </>
-                          )}
-                        </motion.button>
-                        
-                        <button
-                          type="button"
-                          onClick={() => setShowForm(false)}
-                          className="px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-white/50 dark:hover:bg-gray-700/50 transition-all duration-200"
-                        >
-                          Cancelar
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Feedback List */}
+            {/* Temas List */}
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  Feedback ({filteredAndSortedFeedbacks.length})
+                  Temas ({filteredAndSortedTemas.length})
                 </h2>
               </div>
 
-              {filteredAndSortedFeedbacks.length === 0 ? (
+              {filteredAndSortedTemas.length === 0 ? (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -942,126 +766,34 @@ export default function FeedbackPage() {
                     <MessageCircle className="w-12 h-12 text-white" />
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                    No hay feedback para mostrar
+                    No hay temas para mostrar
                   </h3>
                   <p className="text-gray-600 dark:text-gray-300 mb-6">
-                    Sé el primero en compartir tus ideas y ayudarnos a mejorar.
+                    Sé el primero en iniciar una conversación sobre el náhuatl.
                   </p>
                   <button
                     onClick={() => setShowForm(true)}
                     className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
                   >
-                    Crear primer feedback
+                    Crear primer tema
                   </button>
                 </motion.div>
               ) : (
                 <div className="space-y-4">
-                  {filteredAndSortedFeedbacks.map((feedback, index) => {
-                    const isLiked = feedback.retroalimentacion_likes?.some((like) => like.usuario_id === user?.id);
-                    const isSaved = false; // TODO: Implementar lógica de guardado
-
-                    return (
-                      <motion.div
-                        key={feedback.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                      >
-                        <div>
-                          <FeedbackCard
-                            feedback={{
-                              ...feedback,
-                              perfiles: feedback.perfiles || {
-                                id: feedback.usuario_id,
-                                nombre_completo: 'Usuario',
-                                username: undefined,
-                                url_avatar: undefined,
-                                verificado: false
-                              },
-                              retroalimentacion_respuestas: feedback.retroalimentacion_respuestas?.map(respuesta => ({
-                                ...respuesta,
-                                perfiles: respuesta.perfiles || {
-                                  id: 'unknown',
-                                  nombre_completo: 'Usuario',
-                                  username: undefined,
-                                  url_avatar: undefined,
-                                  verificado: false
-                                }
-                              }))
-                            }}
-                            total_likes={feedback.total_likes || feedback.contador_likes}
-                            total_respuestas={feedback.total_respuestas || feedback.retroalimentacion_respuestas?.length || 0}
-                            isLiked={isLiked}
-                            isSaved={isSaved}
-                            onLike={handleLike}
-                            onReply={(feedbackId) => setReplyingTo(replyingTo === feedbackId ? null : feedbackId)}
-                            onShare={handleShareFeedback}
-                            onSave={handleSaveFeedback}
-                            onUserClick={(userId) => {
-                              router.push(`/profile/${userId}`);
-                            }}
-                            onHashtagClick={(hashtag) => {
-                              // TODO: Filtrar por hashtag
-                              console.log('Filter by hashtag:', hashtag);
-                            }}
-                            showActions={true}
-                          />
-                          
-                          {/* Formulario de respuesta */}
-                          {replyingTo === feedback.id && (
-                            <motion.div
-                              initial={{ opacity: 0, height: 0 }}
-                              animate={{ opacity: 1, height: 'auto' }}
-                              exit={{ opacity: 0, height: 0 }}
-                              className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700"
-                            >
-                              <div className="flex items-start gap-3">
-                                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
-                                  {user?.email?.charAt(0).toUpperCase() || 'U'}
-                                </div>
-                                <div className="flex-1">
-                                  <textarea
-                                    value={replyContent}
-                                    onChange={(e) => setReplyContent(e.target.value)}
-                                    placeholder="Escribe tu respuesta..."
-                                    className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                                    rows={3}
-                                    disabled={isSubmittingReply}
-                                  />
-                                  <div className="flex justify-end gap-2 mt-3">
-                                    <button
-                                      onClick={() => {
-                                        setReplyingTo(null);
-                                        setReplyContent('');
-                                      }}
-                                      className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
-                                      disabled={isSubmittingReply}
-                                    >
-                                      Cancelar
-                                    </button>
-                                    <button
-                                      onClick={() => handleReplySubmit(feedback.id)}
-                                      disabled={!replyContent.trim() || isSubmittingReply}
-                                      className="px-4 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed rounded-lg transition-colors"
-                                    >
-                                      {isSubmittingReply ? (
-                                        <div className="flex items-center gap-2">
-                                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                          Enviando...
-                                        </div>
-                                      ) : (
-                                        'Responder'
-                                      )}
-                                    </button>
-                                  </div>
-                                </div>
-                              </div>
-                            </motion.div>
-                          )}
-                        </div>
-                      </motion.div>
-                    );
-                  })}
+                  {filteredAndSortedTemas.map((tema, index) => (
+                    <motion.div
+                      key={tema.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                    >
+                      <TemaCard
+                        tema={tema}
+                        onLike={handleLikeTema}
+                        onShare={handleShareTema}
+                      />
+                    </motion.div>
+                  ))}
                 </div>
               )}
             </div>
