@@ -24,31 +24,38 @@ export async function GET(request: NextRequest) {
         <!DOCTYPE html>
         <html>
         <head>
-          <title>Procesando autenticación...</title>
+          <title>Iniciando sesión...</title>
           <style>
             body { 
               font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              background: #f8fafc;
               margin: 0; padding: 0; height: 100vh; display: flex; align-items: center; justify-content: center;
             }
             .container { 
-              background: white; border-radius: 16px; padding: 2rem; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+              background: white; 
+              border-radius: 12px; 
+              padding: 2rem; 
+              text-align: center; 
+              box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
               max-width: 400px; width: 90%;
+              border: 1px solid #e2e8f0;
             }
             .spinner { 
-              width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #667eea; 
+              width: 32px; height: 32px; border: 3px solid #e2e8f0; border-top: 3px solid #3b82f6; 
               border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem;
             }
             @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
             .success { color: #10b981; }
             .error { color: #ef4444; }
+            h2 { color: #1e293b; margin: 0 0 0.5rem 0; font-size: 1.25rem; font-weight: 600; }
+            p { color: #64748b; margin: 0; font-size: 0.875rem; }
           </style>
         </head>
         <body>
           <div class="container">
             <div class="spinner"></div>
-            <h2>Procesando autenticación...</h2>
-            <p>Redirigiendo al dashboard...</p>
+            <h2>Iniciando sesión...</h2>
+            <p>Un momento, por favor</p>
           </div>
           <script>
             try {

@@ -25,7 +25,7 @@ const Footer = () => {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-400">Nahuatlajtol</h2>
+                  <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-400">Nawatlahtol</h2>
                   <span className="px-2 py-0.5 text-xs bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/40 dark:to-purple-900/40 text-blue-800 dark:text-blue-200 rounded-full font-medium">Beta</span>
                 </div>
                 <span className="text-xs text-slate-500 dark:text-slate-400 block">Tlahtolnemiliztli</span>

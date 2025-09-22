@@ -293,7 +293,7 @@ export default function NosotrosPage() {
                       José Ortega
                     </h2>
                     <p className="text-xl text-amber-700 dark:text-amber-400 font-semibold mb-6">
-                      Fundador de Nahuatlajtol
+                      Fundador de Nahuatlahtol
                     </p>
                     
                     <div className="prose prose-lg max-w-none text-slate-700 dark:text-slate-300 mb-8">
