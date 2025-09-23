@@ -12,23 +12,37 @@
 }
 
 :root {
-  --color-primary: #f97316;
-  --color-primary-hover: #ea580c;
-  --color-primary-light: #fff7ed;
-  --color-primary-dark: #9a3412;
-  --color-secondary: #6d28d9;
-  --color-secondary-hover: #5b21b6;
-  --color-secondary-light: #f5f3ff;
-  --color-text: #1e293b;
+  /* Paleta principal - Cian/Azul/Slate */
+  --color-primary: #06b6d4;
+  --color-primary-hover: #0891b2;
+  --color-primary-light: #ecfeff;
+  --color-primary-dark: #0e7490;
+  --color-secondary: #3b82f6;
+  --color-secondary-hover: #2563eb;
+  --color-secondary-light: #eff6ff;
+  --color-accent: #0ea5e9;
+  --color-accent-hover: #0284c7;
+  
+  /* Colores de texto */
+  --color-text: #0f172a;
   --color-text-secondary: #64748b;
-  --color-background: #fafafa;
+  --color-text-muted: #94a3b8;
+  
+  /* Fondos */
+  --color-background: #f8fafc;
   --color-surface: #ffffff;
+  --color-surface-secondary: #f1f5f9;
+  
+  /* Bordes */
   --color-border: #e2e8f0;
   --color-border-hover: #cbd5e1;
+  --color-border-focus: #06b6d4;
+  
+  /* Estados */
   --color-success: #10b981;
   --color-error: #ef4444;
   --color-warning: #f59e0b;
-  --color-info: #3b82f6;
+  --color-info: #06b6d4;
 }
 
 @layer base {
@@ -43,37 +57,46 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     @apply bg-slate-50 text-slate-800;
+    background-color: var(--color-background);
+    color: var(--color-text);
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-medium tracking-tight text-slate-900;
+    @apply font-medium tracking-tight;
+    color: var(--color-text);
   }
 
   p {
-    @apply leading-relaxed text-slate-700;
+    @apply leading-relaxed;
+    color: var(--color-text-secondary);
   }
 }
 
 @layer components {
   /* Tipografía */
   .title-xl {
-    @apply text-4xl md:text-5xl font-medium tracking-tight text-slate-900;
+    @apply text-4xl md:text-5xl font-medium tracking-tight;
+    color: var(--color-text);
   }
   
   .title-lg {
-    @apply text-3xl md:text-4xl font-medium tracking-tight text-slate-900;
+    @apply text-3xl md:text-4xl font-medium tracking-tight;
+    color: var(--color-text);
   }
   
   .title-md {
-    @apply text-2xl md:text-3xl font-medium tracking-tight text-slate-900;
+    @apply text-2xl md:text-3xl font-medium tracking-tight;
+    color: var(--color-text);
   }
   
   .title-sm {
-    @apply text-xl md:text-2xl font-medium tracking-tight text-slate-900;
+    @apply text-xl md:text-2xl font-medium tracking-tight;
+    color: var(--color-text);
   }
   
   .subtitle {
-    @apply text-lg text-slate-600;
+    @apply text-lg;
+    color: var(--color-text-secondary);
   }
 
   /* Contenedores */
@@ -91,46 +114,101 @@
   
   /* Efectos y componentes */
   .card {
-    @apply bg-white p-6 rounded-lg border border-slate-200 transition-all shadow-sm;
+    @apply p-6 rounded-lg border transition-all shadow-sm;
+    background-color: var(--color-surface);
+    border-color: var(--color-border);
   }
   
   .card-hover {
-    @apply hover:border-slate-300 hover:shadow-md transition-all duration-200;
+    @apply hover:shadow-md transition-all duration-200;
+    border-color: var(--color-border);
+  }
+  
+  .card-hover:hover {
+    border-color: var(--color-primary);
   }
   
   /* Botones */
   .button-primary {
-    @apply px-5 py-2.5 bg-orange-500 text-white rounded-md font-medium hover:bg-orange-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 shadow-sm;
+    @apply px-5 py-2.5 text-white rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-sm;
+    background-color: var(--color-primary);
+  }
+  
+  .button-primary:hover {
+    background-color: var(--color-primary-hover);
+  }
+  
+  .button-primary:focus {
+    ring-color: var(--color-primary);
   }
   
   .button-secondary {
-    @apply px-5 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-md font-medium hover:bg-slate-50 hover:border-slate-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 shadow-sm;
+    @apply px-5 py-2.5 border rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-sm;
+    background-color: var(--color-surface);
+    border-color: var(--color-border);
+    color: var(--color-text);
+  }
+  
+  .button-secondary:hover {
+    background-color: var(--color-surface-secondary);
+    border-color: var(--color-border-hover);
   }
   
   .button-accent {
-    @apply px-5 py-2.5 bg-violet-600 text-white rounded-md font-medium hover:bg-violet-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 shadow-sm;
+    @apply px-5 py-2.5 text-white rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-sm;
+    background-color: var(--color-secondary);
+  }
+  
+  .button-accent:hover {
+    background-color: var(--color-secondary-hover);
   }
   
   .button-text {
-    @apply px-2 py-1 text-orange-600 hover:text-orange-800 font-medium transition-colors duration-200 rounded focus:outline-none focus:ring-2 focus:ring-orange-400;
+    @apply px-2 py-1 font-medium transition-colors duration-200 rounded focus:outline-none focus:ring-2;
+    color: var(--color-primary);
+  }
+  
+  .button-text:hover {
+    color: var(--color-primary-hover);
   }
 
   /* Links */
   .link-primary {
-    @apply text-orange-600 hover:text-orange-700 transition-colors duration-200 border-b border-transparent hover:border-orange-600;
+    @apply transition-colors duration-200 border-b border-transparent;
+    color: var(--color-primary);
+  }
+  
+  .link-primary:hover {
+    color: var(--color-primary-hover);
+    border-color: var(--color-primary);
   }
   
   .link-secondary {
-    @apply text-violet-600 hover:text-violet-700 transition-colors duration-200 border-b border-transparent hover:border-violet-600;
+    @apply transition-colors duration-200 border-b border-transparent;
+    color: var(--color-secondary);
+  }
+  
+  .link-secondary:hover {
+    color: var(--color-secondary-hover);
+    border-color: var(--color-secondary);
   }
   
   /* Inputs y Forms */
   .input-modern {
-    @apply w-full px-3 py-2.5 bg-white border border-slate-300 rounded-md text-slate-700 shadow-sm focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200;
+    @apply w-full px-3 py-2.5 rounded-md shadow-sm focus:outline-none focus:ring-1 transition-all duration-200;
+    background-color: var(--color-surface);
+    border-color: var(--color-border);
+    color: var(--color-text);
+  }
+  
+  .input-modern:focus {
+    ring-color: var(--color-primary);
+    border-color: var(--color-primary);
   }
   
   .label-modern {
-    @apply block text-sm font-medium text-slate-700 mb-1;
+    @apply block text-sm font-medium mb-1;
+    color: var(--color-text);
   }
 }
 
@@ -163,28 +241,37 @@
   
   /* Tags y badges */
   .tag {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-slate-100 text-slate-800;
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium;
+    background-color: var(--color-surface-secondary);
+    color: var(--color-text);
   }
   
-  .tag-orange {
-    @apply bg-orange-50 text-orange-800;
+  .tag-primary {
+    background-color: var(--color-primary-light);
+    color: var(--color-primary-dark);
   }
   
-  .tag-violet {
-    @apply bg-violet-50 text-violet-800;
+  .tag-secondary {
+    background-color: var(--color-secondary-light);
+    color: var(--color-secondary-hover);
   }
   
-  .tag-teal {
-    @apply bg-teal-50 text-teal-800;
+  .tag-accent {
+    background-color: var(--color-primary-light);
+    color: var(--color-accent-hover);
   }
   
   /* Glassmorphism */
   .glass {
-    @apply bg-white/80 backdrop-blur-sm border border-white/20;
+    @apply backdrop-blur-sm border;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-color: rgba(255, 255, 255, 0.2);
   }
   
   .glass-dark {
-    @apply bg-slate-900/80 backdrop-blur-sm border border-slate-700/20;
+    @apply backdrop-blur-sm border;
+    background-color: rgba(15, 23, 42, 0.8);
+    border-color: rgba(51, 65, 85, 0.2);
   }
 }
 
@@ -222,27 +309,27 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #f8fafc;
+  background: var(--color-background);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--color-border);
   border-radius: 8px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--color-border-hover);
 }
 
 /* Focus styles mejorados */
 *:focus-visible {
-  outline: 2px solid #f97316;
+  outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 
 /* Selection styles */
 ::selection {
-  background-color: #f97316;
+  background-color: var(--color-primary);
   color: white;
 }
 
@@ -273,84 +360,19 @@
     @apply py-8 md:py-10;
   }
   
-  /* Inputs */
+  /* Inputs minimalistas */
   .input-minimal {
-    @apply w-full px-3 py-2 bg-white border border-neutral-300 rounded-md focus:outline-none focus:ring-1 focus:ring-amber-500 focus:border-amber-500 transition-colors duration-200;
+    @apply w-full px-3 py-2 rounded-md focus:outline-none focus:ring-1 transition-colors duration-200;
+    background-color: var(--color-surface);
+    border-color: var(--color-border);
+    color: var(--color-text);
   }
   
-  /* Tags y badges */
-  .tag {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-neutral-100 text-neutral-800;
-  }
-  
-  .tag-amber {
-    @apply bg-amber-50 text-amber-800;
-  }
-  
-  .tag-green {
-    @apply bg-green-50 text-green-800;
-  }
-  
-  .tag-blue {
-    @apply bg-blue-50 text-blue-800;
+  .input-minimal:focus {
+    ring-color: var(--color-primary);
+    border-color: var(--color-primary);
   }
 }
 
-/* Animaciones sutiles */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
-  from { 
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to { 
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* Custom scrollbar minimalista */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f5f5f5;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #d4d4d4;
-  border-radius: 6px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #a3a3a3;
-}
-
-/* Focus styles mejorados */
-*:focus-visible {
-  outline: 2px solid #f59e0b;
-  outline-offset: 2px;
-}
-
-/* Selection styles */
-::selection {
-  background-color: #f59e0b;
-  color: white;
-}
+/* Animaciones sutiles - ya definidas arriba */
 

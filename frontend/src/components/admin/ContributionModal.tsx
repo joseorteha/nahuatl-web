@@ -51,15 +51,15 @@ export default function ContributionModal({ contribution, onClose, onReview, rev
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-slate-200/60 dark:border-slate-700/60 shadow-2xl">
         <div className="p-6">
           <div className="flex justify-between items-start mb-6">
-            <h3 className="text-xl font-semibold text-gray-800">
+            <h3 className="text-xl font-semibold text-slate-800 dark:text-white">
               Revisar Contribución: {contribution.word}
             </h3>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
             >
               ✕
             </button>
@@ -67,7 +67,7 @@ export default function ContributionModal({ contribution, onClose, onReview, rev
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <h4 className="font-medium text-gray-700 mb-2">Información de la Palabra</h4>
+              <h4 className="font-medium text-slate-700 dark:text-slate-300 mb-2">Información de la Palabra</h4>
               <div className="space-y-2 text-sm">
                 <div><strong>Palabra:</strong> {contribution.word}</div>
                 <div><strong>Definición:</strong> {contribution.definition}</div>
@@ -78,7 +78,7 @@ export default function ContributionModal({ contribution, onClose, onReview, rev
             </div>
 
             <div>
-              <h4 className="font-medium text-gray-700 mb-2">Información del Contribuidor</h4>
+              <h4 className="font-medium text-slate-700 dark:text-slate-300 mb-2">Información del Contribuidor</h4>
               <div className="space-y-2 text-sm">
                 <div><strong>Nombre:</strong> {contribution.perfiles.nombre_completo}</div>
                 <div><strong>Email:</strong> {contribution.perfiles.email}</div>
@@ -90,8 +90,8 @@ export default function ContributionModal({ contribution, onClose, onReview, rev
 
           {contribution.razon_contribucion && (
             <div className="mb-6">
-              <h4 className="font-medium text-gray-700 mb-2">Razón de la Contribución</h4>
-              <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded">
+              <h4 className="font-medium text-slate-700 dark:text-slate-300 mb-2">Razón de la Contribución</h4>
+              <p className="text-sm text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-700/50 p-3 rounded">
                 {contribution.razon_contribucion}
               </p>
             </div>
@@ -99,8 +99,8 @@ export default function ContributionModal({ contribution, onClose, onReview, rev
 
           {contribution.fuente && (
             <div className="mb-6">
-              <h4 className="font-medium text-gray-700 mb-2">Fuente</h4>
-              <p className="text-sm text-gray-600">
+              <h4 className="font-medium text-slate-700 dark:text-slate-300 mb-2">Fuente</h4>
+              <p className="text-sm text-slate-600 dark:text-slate-300">
                 {contribution.fuente}
               </p>
             </div>
@@ -121,14 +121,14 @@ export default function ContributionModal({ contribution, onClose, onReview, rev
                 <button
                   onClick={() => handleReview('rechazada')}
                   disabled={reviewing}
-                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50"
+                  className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 disabled:opacity-50 transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
                   {reviewing ? 'Procesando...' : 'Rechazar'}
                 </button>
                 <button
                   onClick={() => handleReview('aprobada')}
                   disabled={reviewing}
-                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
+                  className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-lg hover:from-cyan-600 hover:to-blue-700 disabled:opacity-50 transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
                   {reviewing ? 'Procesando...' : 'Aprobar y Publicar'}
                 </button>
@@ -138,8 +138,8 @@ export default function ContributionModal({ contribution, onClose, onReview, rev
 
           {contribution.estado !== 'pendiente' && contribution.comentarios_admin && (
             <div className="border-t pt-6">
-              <h4 className="font-medium text-gray-700 mb-2">Comentarios del Moderador</h4>
-              <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded">
+              <h4 className="font-medium text-slate-700 dark:text-slate-300 mb-2">Comentarios del Moderador</h4>
+              <p className="text-sm text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-700/50 p-3 rounded">
                 {contribution.comentarios_admin}
               </p>
               {contribution.admin_revisor && (

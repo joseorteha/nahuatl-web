@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Settings, Users, MessageCircle, FileText, Shield } from 'lucide-react';
-import Header from '@/components/Header';
+import ConditionalHeader from '@/components/ConditionalHeader';
 import ContributionsTab from '@/components/admin/ContributionsTab';
 import MessagesTab from '@/components/admin/MessagesTab';
 import RequestsTab from '@/components/admin/RequestsTab';
@@ -173,8 +173,8 @@ export default function AdminPage() {
 
   if (loading || authLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900">
-        <Header />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
+        <ConditionalHeader />
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
             <motion.div
@@ -182,9 +182,9 @@ export default function AdminPage() {
               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
               className="inline-block"
             >
-              <div className="w-12 h-12 border-4 border-blue-600/20 border-t-blue-600 rounded-full"></div>
+              <div className="w-12 h-12 border-4 border-cyan-600/20 border-t-cyan-600 rounded-full"></div>
             </motion.div>
-            <p className="mt-4 text-gray-600 dark:text-gray-300">Cargando panel de administración...</p>
+            <p className="mt-4 text-slate-600 dark:text-slate-300">Cargando panel de administración...</p>
           </div>
         </div>
       </div>
@@ -193,8 +193,8 @@ export default function AdminPage() {
 
   if (!authUser || !authUser.rol || !['admin', 'moderador'].includes(authUser.rol)) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-red-900">
-        <Header />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
+        <ConditionalHeader />
         <div className="container mx-auto px-4 py-8">
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
@@ -202,14 +202,14 @@ export default function AdminPage() {
             className="max-w-md mx-auto text-center"
           >
             <div className="mb-6">
-              <div className="mx-auto w-20 h-20 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center">
+              <div className="mx-auto w-20 h-20 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full flex items-center justify-center">
                 <Shield className="h-10 w-10 text-white" />
               </div>
             </div>
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
+            <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-4">
               Acceso Denegado
             </h2>
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-slate-600 dark:text-slate-300">
               No tienes permisos para acceder al panel de administración.
             </p>
           </motion.div>
@@ -219,12 +219,12 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900">
-      <Header />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
+      <ConditionalHeader />
       
       {/* Hero Section */}
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 dark:from-blue-400/10 dark:to-purple-400/10"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 dark:from-cyan-400/10 dark:to-blue-400/10"></div>
         <div className="relative container mx-auto px-4 py-16">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -233,16 +233,16 @@ export default function AdminPage() {
             className="max-w-4xl mx-auto text-center"
           >
             <div className="flex justify-center mb-6">
-              <div className="p-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl shadow-lg">
+              <div className="p-4 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-2xl shadow-lg">
                 <Settings className="h-8 w-8 text-white" />
               </div>
             </div>
             
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent mb-4">
               Panel de Administración
             </h1>
             
-            <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
+            <p className="text-xl text-slate-600 dark:text-slate-300 mb-8 max-w-2xl mx-auto">
               Gestiona contribuciones, mensajes de contacto y solicitudes de unión desde un solo lugar.
             </p>
 
@@ -252,35 +252,35 @@ export default function AdminPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 rounded-xl border border-white/20 dark:border-gray-700/50"
+                className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm p-4 rounded-xl border border-slate-200/60 dark:border-slate-700/60 shadow-lg hover:shadow-xl transition-all duration-300"
               >
-                <FileText className="h-6 w-6 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-gray-800 dark:text-white">
+                <FileText className="h-6 w-6 text-cyan-600 dark:text-cyan-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-slate-800 dark:text-white">
                   {contributions.filter(c => c.estado === 'pendiente').length}
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-300">Contribuciones Pendientes</div>
+                <div className="text-sm text-slate-600 dark:text-slate-300">Contribuciones Pendientes</div>
               </motion.div>
               
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 rounded-xl border border-white/20 dark:border-gray-700/50"
+                className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm p-4 rounded-xl border border-slate-200/60 dark:border-slate-700/60 shadow-lg hover:shadow-xl transition-all duration-300"
               >
-                <MessageCircle className="h-6 w-6 text-purple-600 dark:text-purple-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-gray-800 dark:text-white">{mensajesContacto.length}</div>
-                <div className="text-sm text-gray-600 dark:text-gray-300">Mensajes Nuevos</div>
+                <MessageCircle className="h-6 w-6 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-slate-800 dark:text-white">{mensajesContacto.length}</div>
+                <div className="text-sm text-slate-600 dark:text-slate-300">Mensajes Nuevos</div>
               </motion.div>
               
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 rounded-xl border border-white/20 dark:border-gray-700/50"
+                className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm p-4 rounded-xl border border-slate-200/60 dark:border-slate-700/60 shadow-lg hover:shadow-xl transition-all duration-300"
               >
-                <Users className="h-6 w-6 text-green-600 dark:text-green-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-gray-800 dark:text-white">{solicitudesUnion.length}</div>
-                <div className="text-sm text-gray-600 dark:text-gray-300">Solicitudes Pendientes</div>
+                <Users className="h-6 w-6 text-slate-600 dark:text-slate-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-slate-800 dark:text-white">{solicitudesUnion.length}</div>
+                <div className="text-sm text-slate-600 dark:text-slate-300">Solicitudes Pendientes</div>
               </motion.div>
             </div>
           </motion.div>
@@ -294,15 +294,15 @@ export default function AdminPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-2 mb-8 border border-white/20 dark:border-gray-700/50 shadow-lg"
+            className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl p-2 mb-8 border border-slate-200/60 dark:border-slate-700/60 shadow-lg"
           >
             <div className="flex flex-col sm:flex-row gap-2">
               <button
                 onClick={() => setActiveTab('contribuciones')}
                 className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
                   activeTab === 'contribuciones'
-                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg'
-                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700/50'
+                    ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700/50'
                 }`}
               >
                 <FileText className="h-5 w-5" />
@@ -318,8 +318,8 @@ export default function AdminPage() {
                 onClick={() => setActiveTab('mensajes')}
                 className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
                   activeTab === 'mensajes'
-                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg'
-                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700/50'
+                    ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700/50'
                 }`}
               >
                 <MessageCircle className="h-5 w-5" />
@@ -335,8 +335,8 @@ export default function AdminPage() {
                 onClick={() => setActiveTab('solicitudes')}
                 className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
                   activeTab === 'solicitudes'
-                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg'
-                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700/50'
+                    ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700/50'
                 }`}
               >
                 <Users className="h-5 w-5" />

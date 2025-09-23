@@ -3,9 +3,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, History, Users, BookOpen, Sparkles } from 'lucide-react';
-import Header from '@/components/Header';
+import ConditionalHeader from '@/components/ConditionalHeader';
 import Footer from '@/components/Footer';
-import ContributeWordForm from '@/components/ContributeWordForm';
+import ContributeWordForm from '@/components/contribuir/ContributeWordForm';
 import { getContributionStats, type ContributionStats } from '@/lib/contributionStats';
 import { useAuthBackend } from '@/hooks/useAuthBackend';
 
@@ -108,8 +108,8 @@ export default function ContributePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900">
-        <Header />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
+        <ConditionalHeader />
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
             <motion.div
@@ -117,9 +117,9 @@ export default function ContributePage() {
               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
               className="inline-block"
             >
-              <div className="w-12 h-12 border-4 border-blue-600/20 border-t-blue-600 rounded-full"></div>
+              <div className="w-12 h-12 border-4 border-cyan-600/20 border-t-cyan-600 rounded-full"></div>
             </motion.div>
-            <p className="mt-4 text-gray-600 dark:text-gray-300">Cargando...</p>
+            <p className="mt-4 text-slate-600 dark:text-slate-300">Cargando...</p>
           </div>
         </div>
         <Footer />
@@ -128,12 +128,12 @@ export default function ContributePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900">
-      <Header />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
+      <ConditionalHeader />
       
       {/* Hero Section */}
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 dark:from-blue-400/10 dark:to-purple-400/10"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 dark:from-cyan-400/10 dark:to-blue-400/10"></div>
         <div className="relative container mx-auto px-4 py-16">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -142,16 +142,16 @@ export default function ContributePage() {
             className="max-w-4xl mx-auto text-center"
           >
             <div className="flex justify-center mb-6">
-              <div className="p-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl shadow-lg">
+              <div className="p-4 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-2xl shadow-lg">
                 <Sparkles className="h-8 w-8 text-white" />
               </div>
             </div>
             
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent mb-4">
               Contribuir al Diccionario
             </h1>
             
-            <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
+            <p className="text-xl text-slate-600 dark:text-slate-300 mb-8 max-w-2xl mx-auto">
               Ayuda a preservar y expandir el náhuatl. Tu conocimiento es invaluable para nuestra comunidad.
             </p>
 
@@ -161,12 +161,12 @@ export default function ContributePage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 rounded-xl border border-white/20 dark:border-gray-700/50"
+                className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm p-4 rounded-xl border border-slate-200/60 dark:border-slate-700/60 shadow-lg hover:shadow-xl transition-all duration-300"
               >
-                <BookOpen className="h-6 w-6 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-gray-800 dark:text-white">
+                <BookOpen className="h-6 w-6 text-cyan-600 dark:text-cyan-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-slate-800 dark:text-white">
                   {statsLoading ? (
-                    <div className="animate-pulse bg-gray-300 dark:bg-gray-600 h-6 w-16 mx-auto rounded"></div>
+                    <div className="animate-pulse bg-slate-300 dark:bg-slate-600 h-6 w-16 mx-auto rounded"></div>
                   ) : (
                     <motion.span
                       initial={{ opacity: 0 }}
@@ -177,19 +177,19 @@ export default function ContributePage() {
                     </motion.span>
                   )}
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-300">Palabras</div>
+                <div className="text-sm text-slate-600 dark:text-slate-300">Palabras</div>
               </motion.div>
               
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 rounded-xl border border-white/20 dark:border-gray-700/50"
+                className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm p-4 rounded-xl border border-slate-200/60 dark:border-slate-700/60 shadow-lg hover:shadow-xl transition-all duration-300"
               >
-                <Users className="h-6 w-6 text-purple-600 dark:text-purple-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-gray-800 dark:text-white">
+                <Users className="h-6 w-6 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-slate-800 dark:text-white">
                   {statsLoading ? (
-                    <div className="animate-pulse bg-gray-300 dark:bg-gray-600 h-6 w-16 mx-auto rounded"></div>
+                    <div className="animate-pulse bg-slate-300 dark:bg-slate-600 h-6 w-16 mx-auto rounded"></div>
                   ) : (
                     <motion.span
                       initial={{ opacity: 0 }}
@@ -200,19 +200,19 @@ export default function ContributePage() {
                     </motion.span>
                   )}
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-300">Contribuyentes</div>
+                <div className="text-sm text-slate-600 dark:text-slate-300">Contribuyentes</div>
               </motion.div>
               
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 rounded-xl border border-white/20 dark:border-gray-700/50"
+                className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm p-4 rounded-xl border border-slate-200/60 dark:border-slate-700/60 shadow-lg hover:shadow-xl transition-all duration-300"
               >
-                <History className="h-6 w-6 text-green-600 dark:text-green-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-gray-800 dark:text-white">
+                <History className="h-6 w-6 text-slate-600 dark:text-slate-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-slate-800 dark:text-white">
                   {statsLoading ? (
-                    <div className="animate-pulse bg-gray-300 dark:bg-gray-600 h-6 w-16 mx-auto rounded"></div>
+                    <div className="animate-pulse bg-slate-300 dark:bg-slate-600 h-6 w-16 mx-auto rounded"></div>
                   ) : (
                     <motion.span
                       initial={{ opacity: 0 }}
@@ -223,7 +223,7 @@ export default function ContributePage() {
                     </motion.span>
                   )}
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-300">
+                <div className="text-sm text-slate-600 dark:text-slate-300">
                   {user ? 'Tus contribuciones' : 'Contribuciones promedio'}
                 </div>
               </motion.div>
@@ -240,15 +240,15 @@ export default function ContributePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-2 mb-8 border border-white/20 dark:border-gray-700/50 shadow-lg"
+            className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl p-2 mb-8 border border-slate-200/60 dark:border-slate-700/60 shadow-lg"
           >
             <div className="flex flex-col sm:flex-row gap-2">
               <button
                 onClick={() => setActiveTab('contribute')}
                 className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
                   activeTab === 'contribute'
-                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg'
-                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700/50'
+                    ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700/50'
                 }`}
               >
                 <Plus className="h-5 w-5" />
@@ -260,8 +260,8 @@ export default function ContributePage() {
                   onClick={() => setActiveTab('history')}
                   className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
                     activeTab === 'history'
-                      ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg'
-                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700/50'
+                      ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg'
+                      : 'text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700/50'
                   }`}
                 >
                   <History className="h-5 w-5" />
@@ -298,8 +298,8 @@ export default function ContributePage() {
             )}
 
             {activeTab === 'history' && user && (
-              <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg p-8 border border-white/20 dark:border-gray-700/50">
-                <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
+              <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 border border-slate-200/60 dark:border-slate-700/60">
+                <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-6">
                   Historial de Contribuciones
                 </h2>
 
@@ -310,19 +310,19 @@ export default function ContributePage() {
                     className="text-center py-16"
                   >
                     <div className="mb-6">
-                      <div className="mx-auto w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mb-4">
+                      <div className="mx-auto w-24 h-24 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full flex items-center justify-center mb-4">
                         <BookOpen className="h-12 w-12 text-white" />
                       </div>
                     </div>
-                    <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
+                    <h3 className="text-xl font-semibold text-slate-800 dark:text-white mb-2">
                       No tienes contribuciones aún
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-md mx-auto">
+                    <p className="text-slate-600 dark:text-slate-300 mb-6 max-w-md mx-auto">
                       Envía tu primera palabra al diccionario para comenzar a contribuir con la preservación del náhuatl.
                     </p>
                     <button
                       onClick={() => setActiveTab('contribute')}
-                      className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-xl font-medium hover:from-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl"
                     >
                       <Plus className="h-5 w-5" />
                       Contribuir Ahora
@@ -336,14 +336,14 @@ export default function ContributePage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="bg-white dark:bg-gray-700 rounded-xl p-6 border border-gray-200 dark:border-gray-600 hover:shadow-lg transition-all duration-200"
+                        className="bg-white dark:bg-slate-700 rounded-xl p-6 border border-slate-200 dark:border-slate-600 hover:shadow-lg transition-all duration-200"
                       >
                         <div className="flex justify-between items-start mb-4">
                           <div className="flex-1">
-                            <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-1">
+                            <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-1">
                               {contribution.word}
                             </h3>
-                            <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-2">
+                            <p className="text-slate-600 dark:text-slate-300 text-sm line-clamp-2">
                               {contribution.definition}
                             </p>
                           </div>
@@ -352,7 +352,7 @@ export default function ContributePage() {
                           </div>
                         </div>
 
-                        <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400 mb-3">
+                        <div className="flex justify-between items-center text-sm text-slate-500 dark:text-slate-400 mb-3">
                           <span>
                             Enviada: {formatDate(contribution.fecha_creacion)}
                           </span>
@@ -364,15 +364,15 @@ export default function ContributePage() {
                         </div>
 
                         {contribution.comentarios_admin && (
-                          <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border-l-4 border-blue-200 dark:border-blue-400">
-                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          <div className="mt-4 p-4 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg border-l-4 border-cyan-200 dark:border-cyan-400">
+                            <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                               Comentarios del moderador:
                             </p>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                            <p className="text-sm text-slate-600 dark:text-slate-400">
                               {contribution.comentarios_admin}
                             </p>
                             {contribution.perfiles && (
-                              <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
+                              <p className="text-xs text-slate-500 dark:text-slate-500 mt-2">
                                 — {contribution.perfiles.nombre_completo}
                               </p>
                             )}

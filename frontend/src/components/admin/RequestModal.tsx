@@ -33,15 +33,15 @@ export default function RequestModal({ solicitud, onClose }: RequestModalProps) 
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-slate-200/60 dark:border-slate-700/60 shadow-2xl">
         <div className="p-6">
           <div className="flex justify-between items-start mb-6">
-            <h3 className="text-xl font-semibold text-gray-800">
+            <h3 className="text-xl font-semibold text-slate-800 dark:text-white">
               Solicitud de Unirse
             </h3>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
             >
               ✕
             </button>
@@ -50,28 +50,28 @@ export default function RequestModal({ solicitud, onClose }: RequestModalProps) 
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Nombre</label>
-                <p className="text-sm text-gray-900">{solicitud.nombre}</p>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Nombre</label>
+                <p className="text-sm text-slate-900 dark:text-white">{solicitud.nombre}</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Email</label>
-                <p className="text-sm text-gray-900">{solicitud.email}</p>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Email</label>
+                <p className="text-sm text-slate-900 dark:text-white">{solicitud.email}</p>
               </div>
               {solicitud.telefono && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Teléfono</label>
-                  <p className="text-sm text-gray-900">{solicitud.telefono}</p>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Teléfono</label>
+                  <p className="text-sm text-slate-900 dark:text-white">{solicitud.telefono}</p>
                 </div>
               )}
               <div>
-                <label className="block text-sm font-medium text-gray-700">Fecha</label>
-                <p className="text-sm text-gray-900">{formatDate(solicitud.fecha_creacion)}</p>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Fecha</label>
+                <p className="text-sm text-slate-900 dark:text-white">{formatDate(solicitud.fecha_creacion)}</p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Tipo de Participación</label>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Tipo de Participación</label>
                 <span className={`inline-block px-3 py-1 text-sm font-medium rounded-full ${
                   solicitud.tipo_union === 'maestro' 
                     ? 'bg-purple-100 text-purple-800'
@@ -92,7 +92,7 @@ export default function RequestModal({ solicitud, onClose }: RequestModalProps) 
                 </span>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Nivel de Experiencia</label>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Nivel de Experiencia</label>
                 <span className={`inline-block px-3 py-1 text-sm font-medium rounded-full ${
                   solicitud.nivel_experiencia === 'nativo' 
                     ? 'bg-green-100 text-green-800'
@@ -112,8 +112,8 @@ export default function RequestModal({ solicitud, onClose }: RequestModalProps) 
 
             {solicitud.motivacion && (
               <div>
-                <label className="block text-sm font-medium text-gray-700">Motivación</label>
-                <div className="bg-gray-50 p-4 rounded-md">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Motivación</label>
+                <div className="bg-slate-50 dark:bg-slate-700/50 p-4 rounded-md">
                   <p className="text-sm text-gray-900 whitespace-pre-wrap">{solicitud.motivacion}</p>
                 </div>
               </div>
@@ -121,8 +121,8 @@ export default function RequestModal({ solicitud, onClose }: RequestModalProps) 
 
             {solicitud.habilidades && (
               <div>
-                <label className="block text-sm font-medium text-gray-700">Habilidades</label>
-                <div className="bg-gray-50 p-4 rounded-md">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Habilidades</label>
+                <div className="bg-slate-50 dark:bg-slate-700/50 p-4 rounded-md">
                   <p className="text-sm text-gray-900 whitespace-pre-wrap">{solicitud.habilidades}</p>
                 </div>
               </div>
@@ -130,8 +130,8 @@ export default function RequestModal({ solicitud, onClose }: RequestModalProps) 
 
             {solicitud.disponibilidad && (
               <div>
-                <label className="block text-sm font-medium text-gray-700">Disponibilidad</label>
-                <div className="bg-gray-50 p-4 rounded-md">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Disponibilidad</label>
+                <div className="bg-slate-50 dark:bg-slate-700/50 p-4 rounded-md">
                   <p className="text-sm text-gray-900 whitespace-pre-wrap">{solicitud.disponibilidad}</p>
                 </div>
               </div>

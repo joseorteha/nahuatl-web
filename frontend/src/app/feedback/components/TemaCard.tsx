@@ -127,7 +127,7 @@ export default function TemaCard({ tema, onLike, onShare }: TemaCardProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -2 }}
-      className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-white/30 dark:border-gray-700/60 overflow-hidden group"
+      className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200/60 dark:border-slate-700/60 overflow-hidden group"
     >
       <div 
         onClick={handleCardClick}
@@ -138,7 +138,7 @@ export default function TemaCard({ tema, onLike, onShare }: TemaCardProps) {
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 mb-2">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-2">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors line-clamp-2">
                   {tema.titulo}
                 </h3>
                 <div className={`px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${getEstadoColor(tema.estado)}`}>
@@ -148,7 +148,7 @@ export default function TemaCard({ tema, onLike, onShare }: TemaCardProps) {
               </div>
               
               {tema.descripcion && (
-                <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed line-clamp-2 mb-3">
+                <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed line-clamp-2 mb-3">
                   {tema.descripcion}
                 </p>
               )}
@@ -164,12 +164,12 @@ export default function TemaCard({ tema, onLike, onShare }: TemaCardProps) {
               {getCategoriaLabel(tema.categoria)}
             </div>
             
-            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+            <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
               <User className="w-4 h-4" />
-              <Link href={`/profile/${tema.creador.id}`} className="font-medium hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+              <Link href={`/profile/${tema.creador.id}`} className="font-medium hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors">
                 {tema.creador.nombre_completo}
               </Link>
-              <Link href={`/profile/${tema.creador.id}`} className="text-xs hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+              <Link href={`/profile/${tema.creador.id}`} className="text-xs hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors">
                 @{tema.creador.username}
               </Link>
             </div>
@@ -177,7 +177,7 @@ export default function TemaCard({ tema, onLike, onShare }: TemaCardProps) {
 
           {/* Stats del tema */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-6 text-sm text-gray-500 dark:text-gray-400">
+            <div className="flex items-center gap-6 text-sm text-slate-500 dark:text-slate-400">
               <div className="flex items-center gap-1">
                 <MessageCircle className="w-4 h-4" />
                 <span className="font-semibold">{tema.respuestas_count}</span>
@@ -206,7 +206,7 @@ export default function TemaCard({ tema, onLike, onShare }: TemaCardProps) {
                 className={`p-2 rounded-lg transition-all duration-200 ${
                   isLiked 
                     ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' 
-                    : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400'
+                    : 'hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400'
                 }`}
               >
                 <Heart className={`w-4 h-4 ${isLiked ? 'fill-current' : ''}`} />
@@ -220,7 +220,7 @@ export default function TemaCard({ tema, onLike, onShare }: TemaCardProps) {
                 className={`p-2 rounded-lg transition-all duration-200 ${
                   isShared 
                     ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' 
-                    : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400'
+                    : 'hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400'
                 }`}
               >
                 <Share2 className={`w-4 h-4 ${isShared ? 'fill-current' : ''}`} />

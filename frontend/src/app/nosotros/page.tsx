@@ -1,10 +1,10 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Heart, Globe, Users, BookOpen, Target, Lightbulb, Feather, Star, ArrowRight, Mail } from 'lucide-react';
+import { Heart, Globe, Users, BookOpen, Target, Lightbulb, Feather, Star, ArrowRight, Mail, Shield, Zap, Languages, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import Image from 'next/image';
-import Header from '@/components/Header';
+import ConditionalHeader from '@/components/ConditionalHeader';
 import JoinModal from '@/components/JoinModal';
 
 export default function NosotrosPage() {
@@ -15,33 +15,37 @@ export default function NosotrosPage() {
       icon: Heart,
       title: "Preservación Cultural",
       description: "Mantener viva la riqueza del náhuatl para las futuras generaciones",
-      color: "red"
+      color: "red",
+      gradient: "from-red-500 to-pink-500"
     },
     {
       icon: Globe,
       title: "Accesibilidad Global",
       description: "Hacer el náhuatl accesible a cualquier persona, en cualquier lugar del mundo",
-      color: "blue"
+      color: "cyan",
+      gradient: "from-cyan-500 to-blue-500"
     },
     {
       icon: Users,
       title: "Comunidad Inclusiva",
       description: "Crear espacios donde todos puedan aprender y contribuir",
-      color: "green"
+      color: "green",
+      gradient: "from-green-500 to-emerald-500"
     },
     {
       icon: BookOpen,
       title: "Educación de Calidad",
       description: "Proporcionar recursos educativos rigurosos y efectivos",
-      color: "purple"
+      color: "blue",
+      gradient: "from-blue-500 to-indigo-500"
     }
   ];
 
   const stats = [
-    { number: "1000+", label: "Palabras en el diccionario", color: "blue" },
-    { number: "50+", label: "Lecciones estructuradas", color: "green" },
-    { number: "24/7", label: "Acceso disponible", color: "purple" },
-    { number: "100%", label: "Gratuito y libre", color: "red" }
+    { number: "3,500+", label: "Palabras en el diccionario", color: "cyan", icon: BookOpen },
+    { number: "Beta", label: "Lecciones estructuradas", color: "blue", icon: Target },
+    { number: "24/7", label: "Acceso disponible", color: "green", icon: Globe },
+    { number: "100%", label: "Gratuito y libre", color: "red", icon: Shield }
   ];
 
   const team = [
@@ -64,11 +68,11 @@ export default function NosotrosPage() {
 
   return (
     <>
-      <Header />
+      <ConditionalHeader />
       <main className="min-h-screen bg-slate-50 dark:bg-slate-900">
         {/* Hero Section */}
         <section className="relative pt-20 pb-16 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-green-600/10 dark:from-blue-400/5 dark:via-purple-400/5 dark:to-green-400/5"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-blue-500/10 to-slate-500/10 dark:from-cyan-400/5 dark:via-blue-400/5 dark:to-slate-400/5"></div>
           
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
@@ -77,20 +81,20 @@ export default function NosotrosPage() {
               transition={{ duration: 0.8 }}
               className="text-center mb-16"
             >
-              <div className="inline-flex items-center gap-3 bg-blue-100 dark:bg-blue-900/30 px-6 py-3 rounded-full mb-8">
-                <Feather className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-                <span className="text-blue-800 dark:text-blue-200 font-medium">Sobre Nosotros</span>
+              <div className="inline-flex items-center gap-3 bg-cyan-50 dark:bg-cyan-900/30 px-6 py-3 rounded-full mb-8 border border-cyan-200/50 dark:border-cyan-700/30">
+                <Feather className="h-6 w-6 text-cyan-600 dark:text-cyan-400" />
+                <span className="text-cyan-800 dark:text-cyan-200 font-medium">Sobre Nosotros</span>
               </div>
               
               <h1 className="text-5xl md:text-6xl font-bold text-slate-900 dark:text-slate-100 mb-6">
                 Construyendo puentes entre
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
+                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 to-blue-600 dark:from-cyan-400 dark:to-blue-400">
                   tradición y futuro
                 </span>
               </h1>
               
               <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed">
-                En <strong className="text-slate-900 dark:text-slate-100">Nahuatlajtol</strong>, creemos que la tecnología puede ser un aliado poderoso 
+                En <strong className="text-slate-900 dark:text-slate-100">Nawatlahtol</strong>, creemos que la tecnología puede ser un aliado poderoso 
                 para preservar y revitalizar las lenguas originarias de América.
               </p>
             </motion.div>
@@ -103,14 +107,23 @@ export default function NosotrosPage() {
               className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-20"
             >
               {stats.map((stat, index) => (
-                <div key={index} className="text-center">
-                  <div className={`text-3xl md:text-4xl font-bold text-${stat.color}-600 dark:text-${stat.color}-400 mb-2`}>
+                <motion.div 
+                  key={index} 
+                  className="text-center bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-xl p-6 border border-slate-200/60 dark:border-slate-700/60 hover:border-cyan-300/60 dark:hover:border-cyan-600/60 transition-all duration-300"
+                  whileHover={{ y: -5, scale: 1.02 }}
+                >
+                  <div className="flex justify-center mb-3">
+                    <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-lg flex items-center justify-center">
+                      <stat.icon className="h-6 w-6 text-white" />
+                    </div>
+                  </div>
+                  <div className="text-3xl md:text-4xl font-bold text-cyan-600 dark:text-cyan-400 mb-2">
                     {stat.number}
                   </div>
                   <div className="text-sm text-slate-600 dark:text-slate-400">
                     {stat.label}
                   </div>
-                </div>
+                </motion.div>
               ))}
             </motion.div>
           </div>
@@ -124,10 +137,10 @@ export default function NosotrosPage() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
-              className="border-l-4 border-blue-600 pl-8 mb-16"
+              className="border-l-4 border-cyan-600 pl-8 mb-16"
             >
               <div className="flex items-center gap-4 mb-8">
-                <Target className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+                <Target className="h-8 w-8 text-cyan-600 dark:text-cyan-400" />
                 <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
                   Nuestra Misión
                 </h2>
@@ -139,8 +152,8 @@ export default function NosotrosPage() {
                   que respeta la tradición oral mientras abraza las posibilidades de la era digital.
                 </p>
                 
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-8 rounded-xl border border-blue-200 dark:border-blue-800">
-                  <h3 className="text-xl font-semibold text-blue-800 dark:text-blue-200 mb-4">
+                <div className="bg-cyan-50 dark:bg-cyan-900/20 p-8 rounded-xl border border-cyan-200 dark:border-cyan-800">
+                  <h3 className="text-xl font-semibold text-cyan-800 dark:text-cyan-200 mb-4">
                     ¿Por qué es importante?
                   </h3>
                   <div className="space-y-4 text-blue-700 dark:text-blue-300">
@@ -189,10 +202,10 @@ export default function NosotrosPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
                   viewport={{ once: true }}
-                  className="bg-white dark:bg-slate-900 p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                  className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-slate-200/60 dark:border-slate-700/60"
                 >
-                  <div className={`w-16 h-16 rounded-full bg-${value.color}-100 dark:bg-${value.color}-900/30 flex items-center justify-center mb-6`}>
-                    <value.icon className={`h-8 w-8 text-${value.color}-600 dark:text-${value.color}-400`} />
+                  <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${value.gradient} flex items-center justify-center mb-6`}>
+                    <value.icon className="h-8 w-8 text-white" />
                   </div>
                   <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-4">
                     {value.title}
@@ -214,10 +227,10 @@ export default function NosotrosPage() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
-              className="border-l-4 border-green-600 pl-8 mb-16"
+              className="border-l-4 border-cyan-600 pl-8 mb-16"
             >
               <div className="flex items-center gap-4 mb-8">
-                <Users className="h-8 w-8 text-green-600 dark:text-green-400" />
+                <Users className="h-8 w-8 text-cyan-600 dark:text-cyan-400" />
                 <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
                   Nuestro Equipo
                 </h2>
@@ -236,15 +249,15 @@ export default function NosotrosPage() {
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: index * 0.1 }}
                     viewport={{ once: true }}
-                    className="bg-green-50 dark:bg-green-900/20 p-8 rounded-xl border border-green-200 dark:border-green-800"
+                    className="bg-cyan-50 dark:bg-cyan-900/20 p-8 rounded-xl border border-cyan-200 dark:border-cyan-800 hover:border-cyan-300 dark:hover:border-cyan-700 transition-all duration-300"
                   >
-                    <h3 className="text-xl font-semibold text-green-800 dark:text-green-200 mb-2">
+                    <h3 className="text-xl font-semibold text-cyan-800 dark:text-cyan-200 mb-2">
                       {member.name}
                     </h3>
-                    <p className="text-green-600 dark:text-green-400 font-medium mb-4">
+                    <p className="text-cyan-600 dark:text-cyan-400 font-medium mb-4">
                       {member.role}
                     </p>
-                    <p className="text-green-700 dark:text-green-300 leading-relaxed">
+                    <p className="text-cyan-700 dark:text-cyan-300 leading-relaxed">
                       {member.description}
                     </p>
                   </motion.div>
@@ -255,28 +268,28 @@ export default function NosotrosPage() {
         </section>
 
         {/* José Ortega Section */}
-        <section className="py-20 bg-gradient-to-br from-amber-50 via-emerald-50 to-white dark:from-slate-800 dark:via-slate-700 dark:to-slate-900">
+        <section className="py-20 bg-gradient-to-br from-cyan-50 via-blue-50 to-slate-50 dark:from-slate-800 dark:via-slate-700 dark:to-slate-900">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
-              className="bg-white dark:bg-slate-800 rounded-3xl p-8 md:p-12 shadow-2xl border border-amber-200 dark:border-slate-700"
+              className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-3xl p-8 md:p-12 shadow-2xl border border-cyan-200/60 dark:border-slate-700/60"
             >
               <div className="flex flex-col lg:flex-row items-center gap-12">
                 {/* Profile Image */}
                 <div className="relative">
-                  <div className="w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-4 border-emerald-500 shadow-xl">
+                  <div className="w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-4 border-cyan-500 shadow-xl">
                     <Image 
                       src="/jose.jpeg" 
-                      alt="José Ortega - Fundador de Nahuatlajtol"
+                      alt="José Ortega - Fundador de Nawatlahtol"
                       width={224}
                       height={224}
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-white p-3 rounded-full shadow-lg">
+                  <div className="absolute -bottom-2 -right-2 bg-gradient-to-br from-cyan-500 to-blue-500 text-white p-3 rounded-full shadow-lg">
                     <Heart className="h-6 w-6 fill-current" />
                   </div>
                 </div>

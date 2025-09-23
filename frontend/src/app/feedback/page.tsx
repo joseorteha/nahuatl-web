@@ -22,17 +22,19 @@ import {
   Bell,
   TrendingUp,
   Users,
-  Tag
+  Tag,
+  Trophy
 } from 'lucide-react';
 import { useAuthBackend } from '@/hooks/useAuthBackend';
 import { useSocial, Notificacion, Hashtag } from '@/hooks/useSocial';
-import Header from '@/components/Header';
+import ConditionalHeader from '@/components/ConditionalHeader';
 import ApiService from '@/services/apiService';
 import { UserStats } from '@/types';
 import { HashtagList } from '@/components/social/HashtagChip';
 import { NotificationList } from '@/components/social/NotificationItem';
 import TemaCard from './components/TemaCard';
 import TemaForm from './components/TemaForm';
+import ExperienciaSocialTab from './components/ExperienciaSocialTab';
 
 interface Tema {
   id: string;
@@ -156,6 +158,7 @@ export default function FeedbackPage() {
   // Estados de UI
   const [showForm, setShowForm] = useState(false);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [activeTab, setActiveTab] = useState<'temas' | 'experiencia'>('temas');
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -344,16 +347,16 @@ export default function FeedbackPage() {
       if (result.success) {
         const newTema = mapBackendToTema(result.data);
         setTemas(prev => [newTema, ...prev]);
-        setShowForm(false);
+      setShowForm(false);
         
         // Otorgar puntos por crear tema
         const pointsAwarded = await awardPoints('tema_creado', 15, `Tema creado: ${tema.titulo}`);
-        
-        if (pointsAwarded) {
+      
+      if (pointsAwarded) {
           showNotification('success', '¡Tema creado! Has ganado 15 puntos 🎉');
-        } else {
+      } else {
           showNotification('success', '¡Tema creado exitosamente!');
-        }
+      }
       } else {
         throw new Error(result.error || 'Error al crear tema');
       }
@@ -403,10 +406,10 @@ export default function FeedbackPage() {
         // Otorgar puntos por dar like
         if (result.data.action === 'liked') {
           const pointsAwarded = await awardPoints('like_dado', 2, 'Like dado a tema');
-          if (pointsAwarded) {
-            showNotification('success', '+2 puntos por dar like! ❤️');
-          }
+        if (pointsAwarded) {
+          showNotification('success', '+2 puntos por dar like! ❤️');
         }
+      }
       } else {
         throw new Error(result.error || 'Error al procesar like');
       }
@@ -498,8 +501,8 @@ export default function FeedbackPage() {
   // Loading state
   if (loading || isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900">
-        <Header />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
+        <ConditionalHeader />
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
             <motion.div
@@ -507,9 +510,9 @@ export default function FeedbackPage() {
               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
               className="inline-block"
             >
-              <div className="w-12 h-12 border-4 border-blue-600/20 border-t-blue-600 rounded-full"></div>
+              <div className="w-12 h-12 border-4 border-cyan-600/20 border-t-cyan-600 rounded-full"></div>
             </motion.div>
-            <p className="mt-4 text-gray-600 dark:text-gray-300">Cargando feedback...</p>
+            <p className="mt-4 text-slate-600 dark:text-slate-300">Cargando feedback...</p>
           </div>
         </div>
       </div>
@@ -517,8 +520,8 @@ export default function FeedbackPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900">
-      <Header />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
+      <ConditionalHeader />
       
       {/* Notification */}
       <AnimatePresence>
@@ -555,14 +558,14 @@ export default function FeedbackPage() {
           className="text-center mb-12"
         >
           <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center">
               <MessageSquare className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Temas de Conversación
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-600 via-blue-600 to-slate-600 bg-clip-text text-transparent">
+              Comunidad Nawatlahtol
             </h1>
           </div>
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          <p className="text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
             Participa en conversaciones, haz preguntas y comparte ideas sobre el náhuatl. 
             ¡Gana puntos por cada contribución!
           </p>
@@ -572,28 +575,28 @@ export default function FeedbackPage() {
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="flex items-center justify-center gap-6 mt-6 p-4 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl border border-white/20 dark:border-gray-700/20 max-w-md mx-auto"
+              className="flex items-center justify-center gap-6 mt-6 p-4 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl border border-slate-200/60 dark:border-slate-700/60 shadow-lg max-w-md mx-auto"
             >
               <div className="text-center">
                 <div className="flex items-center gap-1 text-yellow-500">
                   <Star className="w-4 h-4" />
                   <span className="font-bold">{userStats.puntos_totales}</span>
                 </div>
-                <span className="text-xs text-gray-500 dark:text-gray-400">Puntos</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">Puntos</span>
               </div>
               <div className="text-center">
-                <div className="flex items-center gap-1 text-purple-500">
+                <div className="flex items-center gap-1 text-cyan-500">
                   <Award className="w-4 h-4" />
                   <span className="font-bold capitalize">{userStats.nivel}</span>
                 </div>
-                <span className="text-xs text-gray-500 dark:text-gray-400">Nivel</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">Nivel</span>
               </div>
               <div className="text-center">
                 <div className="flex items-center gap-1 text-pink-500">
                   <Heart className="w-4 h-4" />
                   <span className="font-bold">{userStats.likes_recibidos}</span>
                 </div>
-                <span className="text-xs text-gray-500 dark:text-gray-400">Likes</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">Likes</span>
               </div>
             </motion.div>
           )}
@@ -640,7 +643,7 @@ export default function FeedbackPage() {
               exit={{ opacity: 0, height: 0 }}
               className="mb-8"
             >
-              <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl p-6 border border-white/20 dark:border-gray-700/20">
+              <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl p-6 border border-slate-200/60 dark:border-slate-700/60 shadow-lg">
                 <NotificationList
                   notifications={notifications}
                   onMarkAsRead={handleMarkNotificationAsRead}
@@ -652,7 +655,43 @@ export default function FeedbackPage() {
           )}
         </AnimatePresence>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {/* Navigation Tabs */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl p-2 mb-8 border border-slate-200/60 dark:border-slate-700/60 shadow-lg"
+        >
+          <div className="flex flex-col sm:flex-row gap-2">
+            <button
+              onClick={() => setActiveTab('temas')}
+              className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
+                activeTab === 'temas'
+                  ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700/50'
+              }`}
+            >
+              <MessageSquare className="w-5 h-5" />
+              <span>Temas</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('experiencia')}
+              className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
+                activeTab === 'experiencia'
+                  ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700/50'
+              }`}
+            >
+              <Trophy className="w-5 h-5" />
+              <span>Experiencia Social</span>
+            </button>
+          </div>
+        </motion.div>
+
+        {activeTab === 'experiencia' ? (
+          <ExperienciaSocialTab />
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar */}
           <div className="lg:col-span-1">
             <div className="sticky top-24 space-y-6">
@@ -661,23 +700,23 @@ export default function FeedbackPage() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setShowForm(!showForm)}
-                className="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white px-6 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2"
+                className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-6 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
                 Nuevo Tema
               </motion.button>
 
               {/* Filters */}
-              <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl p-6 border border-white/20 dark:border-gray-700/20">
+              <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl p-6 border border-slate-200/60 dark:border-slate-700/60 shadow-lg">
                 <div className="flex items-center gap-2 mb-4">
-                  <Filter className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-                  <h3 className="font-semibold text-gray-900 dark:text-white">Filtros</h3>
+                  <Filter className="w-5 h-5 text-slate-600 dark:text-slate-300" />
+                  <h3 className="font-semibold text-slate-900 dark:text-white">Filtros</h3>
                 </div>
                 
                 <div className="space-y-4">
                   {/* Category Filter */}
                   <div>
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 block">
                       Categoría
                     </label>
                     <select
@@ -694,7 +733,7 @@ export default function FeedbackPage() {
 
                   {/* Estado Filter */}
                   <div>
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 block">
                       Estado
                     </label>
                     <select
@@ -712,8 +751,8 @@ export default function FeedbackPage() {
               </div>
 
               {/* Sort Options */}
-              <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl p-6 border border-white/20 dark:border-gray-700/20">
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Ordenar por</h3>
+              <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl p-6 border border-slate-200/60 dark:border-slate-700/60 shadow-lg">
+                <h3 className="font-semibold text-slate-900 dark:text-white mb-4">Ordenar por</h3>
                 <div className="space-y-2">
                   {[
                     { key: 'recent', label: 'Más recientes', icon: Clock },
@@ -725,8 +764,8 @@ export default function FeedbackPage() {
                       onClick={() => setSortBy(key as 'recent' | 'popular' | 'trending')}
                       className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
                         sortBy === key
-                          ? 'bg-blue-500 text-white shadow-md'
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-700/50'
+                          ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50'
                       }`}
                     >
                       <Icon className="w-4 h-4" />
@@ -781,24 +820,25 @@ export default function FeedbackPage() {
               ) : (
                 <div className="space-y-4">
                   {filteredAndSortedTemas.map((tema, index) => (
-                    <motion.div
+                      <motion.div
                       key={tema.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                    >
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                      >
                       <TemaCard
                         tema={tema}
                         onLike={handleLikeTema}
                         onShare={handleShareTema}
-                      />
-                    </motion.div>
+                        />
+                      </motion.div>
                   ))}
                 </div>
               )}
             </div>
           </div>
         </div>
+        )}
       </div>
     </div>
   );

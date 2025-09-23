@@ -16,7 +16,10 @@ import {
   Trophy,
   Settings,
   HelpCircle,
-  Sparkles
+  Sparkles,
+  ChevronDown,
+  Home,
+  Shield
 } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { useAuthBackend } from '@/hooks/useAuthBackend';
@@ -55,7 +58,7 @@ export default function Header() {
       
       return (
         <div 
-          className="rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold shadow-lg"
+          className="rounded-full bg-gradient-to-br from-cyan-500 via-blue-500 to-slate-500 flex items-center justify-center text-white font-bold shadow-lg"
           style={{ width: size, height: size }}
         >
           {initials}
@@ -66,7 +69,7 @@ export default function Header() {
     if (!finalAvatarString) {
       return (
         <div 
-          className="rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold shadow-lg"
+          className="rounded-full bg-gradient-to-br from-cyan-500 via-blue-500 to-slate-500 flex items-center justify-center text-white font-bold shadow-lg"
           style={{ width: size, height: size }}
         >
           U
@@ -85,71 +88,79 @@ export default function Header() {
     );
   };
 
-  const navLinks = (
-    <>
-      <Link href="/diccionario" className="group flex items-center gap-2 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300">
-        <BookOpen size={18} className="group-hover:scale-110 transition-transform duration-300" />
-        <span className="font-medium text-sm">Diccionario</span>
-      </Link>
-      <Link href="/faq" className="group flex items-center gap-2 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all duration-300">
-        <MessageCircle size={18} className="group-hover:scale-110 transition-transform duration-300" />
-        <span className="font-medium text-sm">FAQ</span>
-      </Link>
-      <Link href="/nosotros" className="group flex items-center gap-2 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all duration-300">
-        <Users size={18} className="group-hover:scale-110 transition-transform duration-300" />
-        <span className="font-medium text-sm">Nosotros</span>
-      </Link>
-      {user && (
-        <>
-          <Link href="/contribuir" className="group flex items-center gap-2 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-all duration-300">
-            <Plus size={18} className="group-hover:scale-110 transition-transform duration-300" />
-            <span className="font-medium text-sm">Contribuir</span>
-          </Link>
-          <Link href="/experiencia-social" className="group flex items-center gap-2 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all duration-300">
-            <Trophy size={18} className="group-hover:scale-110 transition-transform duration-300" />
-            <span className="font-medium text-sm">Experiencia Social</span>
-          </Link>
-        </>
-      )}
-      {user?.rol === 'admin' && (
-        <Link href="/admin" className="group flex items-center gap-2 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300">
-          <Settings size={18} className="group-hover:scale-110 transition-transform duration-300" />
-          <span className="font-medium text-sm">Admin</span>
-        </Link>
-      )}
-      <div className="group flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 dark:text-slate-500 cursor-not-allowed">
-        <HelpCircle size={18} />
-        <div className="flex flex-col">
-          <span className="font-medium text-sm">Lecciones</span>
-          <span className="text-xs">(Próximamente)</span>
-        </div>
-      </div>
-    </>
-  );
+  // Navegación principal organizada
+  const mainNavLinks = [
+    {
+      name: 'Diccionario',
+      href: '/diccionario',
+      icon: BookOpen,
+      color: 'text-blue-600 dark:text-blue-400',
+      hoverColor: 'hover:text-blue-600 dark:hover:text-blue-400',
+      bgColor: 'hover:bg-blue-50 dark:hover:bg-blue-900/20'
+    }
+  ];
+
+  // Navegación de usuario (solo para logueados)
+  const userNavLinks = [
+    {
+      name: 'Contribuir',
+      href: '/contribuir',
+      icon: Plus,
+      color: 'text-orange-600 dark:text-orange-400',
+      hoverColor: 'hover:text-orange-600 dark:hover:text-orange-400',
+      bgColor: 'hover:bg-orange-50 dark:hover:bg-orange-900/20'
+    },
+    {
+      name: 'Comunidad',
+      href: '/feedback',
+      icon: MessageCircle,
+      color: 'text-cyan-600 dark:text-cyan-400',
+      hoverColor: 'hover:text-cyan-600 dark:hover:text-cyan-400',
+      bgColor: 'hover:bg-cyan-50 dark:hover:bg-cyan-900/20'
+    }
+  ];
+
+  // Navegación de admin (solo para admins)
+  const adminNavLinks = [
+    {
+      name: 'Admin',
+      href: '/admin',
+      icon: Settings,
+      color: 'text-red-600 dark:text-red-400',
+      hoverColor: 'hover:text-red-600 dark:hover:text-red-400',
+      bgColor: 'hover:bg-red-50 dark:hover:bg-red-900/20'
+    }
+  ];
+
+  // Lecciones (próximamente)
+  const comingSoonLinks = [
+    {
+      name: 'Lecciones',
+      icon: HelpCircle,
+      comingSoon: true,
+      color: 'text-slate-400 dark:text-slate-500',
+      bgColor: 'cursor-not-allowed'
+    }
+  ];
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-700/50 shadow-lg">
+    <header className="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-700/50 shadow-sm">
       <div className="container-wide">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo y brand minimalista */}
+        <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
+          {/* Logo y brand - Rediseñado */}
           <Link href={user ? "/dashboard" : "/"} className="group flex items-center gap-3">
             <div className="relative">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-                <Image 
-                  src="/logo.png" 
-                  alt="Nawatlahtol Logo" 
-                  width={24} 
-                  height={24} 
-                  className="object-contain filter brightness-0 invert"
-                  priority
-                />
-              </div>
-              <div className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-md">
-                <Sparkles className="w-2 h-2 text-white" />
-              </div>
+              <Image 
+                src="/logo.png" 
+                alt="Nawatlahtol Logo" 
+                width={40} 
+                height={40} 
+                className="object-contain group-hover:scale-105 transition-transform duration-300"
+                priority
+              />
             </div>
             <div className="flex flex-col">
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent group-hover:from-blue-700 group-hover:via-purple-700 group-hover:to-pink-700 transition-all duration-300">
+              <span className="text-xl font-bold bg-gradient-to-r from-cyan-600 via-blue-600 to-slate-600 bg-clip-text text-transparent group-hover:from-cyan-500 group-hover:via-blue-500 group-hover:to-slate-500 transition-all duration-300">
                 NAWATLAHTOL
               </span>
               <span className="text-xs text-slate-500 dark:text-slate-400 font-medium tracking-wide">
@@ -158,31 +169,83 @@ export default function Header() {
             </div>
           </Link>
 
-          {/* Desktop Navigation mejorado */}
-          <nav className="hidden lg:flex items-center gap-2">
-            {navLinks}
+          {/* Desktop Navigation - Reorganizado */}
+          <nav className="hidden lg:flex items-center gap-1">
+            {/* Navegación principal */}
+            {mainNavLinks.map((link) => (
+              <Link 
+                key={link.name}
+                href={link.href} 
+                className={`group flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${link.color} ${link.hoverColor} ${link.bgColor} border border-transparent hover:border-cyan-200/50 dark:hover:border-cyan-700/50`}
+              >
+                <link.icon size={16} className="group-hover:scale-110 transition-transform duration-300" />
+                <span>{link.name}</span>
+              </Link>
+            ))}
+
+            {/* Separador visual */}
+            <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-2"></div>
+
+            {/* Navegación de usuario */}
+            {user && userNavLinks.map((link) => (
+              <Link 
+                key={link.name}
+                href={link.href} 
+                className={`group flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${link.color} ${link.hoverColor} ${link.bgColor} border border-transparent hover:border-cyan-200/50 dark:hover:border-cyan-700/50`}
+              >
+                <link.icon size={16} className="group-hover:scale-110 transition-transform duration-300" />
+                <span>{link.name}</span>
+              </Link>
+            ))}
+
+            {/* Navegación de admin */}
+            {user?.rol === 'admin' && adminNavLinks.map((link) => (
+              <Link 
+                key={link.name}
+                href={link.href} 
+                className={`group flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${link.color} ${link.hoverColor} ${link.bgColor} border border-transparent hover:border-cyan-200/50 dark:hover:border-cyan-700/50`}
+              >
+                <link.icon size={16} className="group-hover:scale-110 transition-transform duration-300" />
+                <span>{link.name}</span>
+              </Link>
+            ))}
+
+            {/* Lecciones (próximamente) */}
+            {comingSoonLinks.map((link) => (
+              <div 
+                key={link.name}
+                className={`group flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium ${link.color} ${link.bgColor}`}
+              >
+                <link.icon size={16} />
+                <div className="flex flex-col">
+                  <span>{link.name}</span>
+                  <span className="text-xs text-slate-400 dark:text-slate-500">(Próximamente)</span>
+                </div>
+              </div>
+            ))}
           </nav>
 
-          {/* User menu / Auth mejorado */}
-          <div className="flex items-center gap-4">
+          {/* User menu / Auth - Rediseñado */}
+          <div className="flex items-center gap-3">
             <ThemeToggle />
             {loading ? (
-              <div className="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded-2xl animate-pulse"></div>
+              <div className="w-10 h-10 bg-slate-200 dark:bg-slate-700 rounded-xl animate-pulse"></div>
             ) : user ? (
               <>
-                {/* Desktop user menu mejorado */}
+                {/* Desktop user menu - Mejorado */}
                 <div className="hidden lg:block">
                   <Menu as="div" className="relative">
-                    <Menu.Button className="group flex items-center gap-2 p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-300">
+                    <Menu.Button className="group flex items-center gap-3 p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-300 border border-transparent hover:border-cyan-200/50 dark:hover:border-cyan-700/50">
                       {renderAvatar(user.url_avatar, 36)}
                       <div className="text-left">
-                        <div className="text-sm font-semibold text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
+                        <div className="text-sm font-semibold text-slate-900 dark:text-slate-100 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors duration-300">
                           {user.nombre_completo || 'Usuario'}
                         </div>
                         <div className="text-xs text-slate-500 dark:text-slate-400">
                           @{user.username || 'usuario'}
                         </div>
                       </div>
+                      <ChevronDown size={16} className="text-slate-400 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors duration-300" />
                     </Menu.Button>
                     <Transition
                       as={Fragment}
@@ -206,17 +269,9 @@ export default function Header() {
                           </div>
                           <Menu.Item>
                             {({ active }) => (
-                              <Link href="/profile" className={`${active ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300'} group flex rounded-xl items-center w-full px-4 py-3 text-sm transition-all duration-200`}>
+                              <Link href="/profile" className={`${active ? 'bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400' : 'text-slate-700 dark:text-slate-300'} group flex rounded-xl items-center w-full px-4 py-3 text-sm transition-all duration-200`}>
                                 <UserIcon className="mr-3 h-5 w-5" />
                                 Mi Perfil
-                              </Link>
-                            )}
-                          </Menu.Item>
-                          <Menu.Item>
-                            {({ active }) => (
-                              <Link href="/dashboard" className={`${active ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400' : 'text-slate-700 dark:text-slate-300'} group flex rounded-xl items-center w-full px-4 py-3 text-sm transition-all duration-200`}>
-                                <LayoutDashboard className="mr-3 h-5 w-5" />
-                                Dashboard
                               </Link>
                             )}
                           </Menu.Item>
@@ -239,10 +294,10 @@ export default function Header() {
                   </Menu>
                 </div>
 
-                {/* Mobile menu button mejorado */}
+                {/* Mobile menu button - Mejorado */}
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="lg:hidden p-3 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all duration-300"
+                  className="lg:hidden p-3 text-slate-600 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all duration-300"
                 >
                   {mobileMenuOpen ? <X size={24} /> : <MenuIcon size={24} />}
                 </button>
@@ -250,7 +305,7 @@ export default function Header() {
             ) : (
               <Link 
                 href="/login" 
-                className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white px-4 py-2 rounded-lg font-semibold hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm"
+                className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:from-cyan-700 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm"
               >
                 Iniciar Sesión
               </Link>
@@ -258,12 +313,12 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile Menu mejorado */}
+        {/* Mobile Menu - Completamente rediseñado */}
         {mobileMenuOpen && user && (
-          <div className="lg:hidden py-6 border-t border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm">
-            <div className="flex flex-col space-y-2">
-              {/* User info mejorado */}
-              <div className="flex items-center gap-4 px-4 py-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-2xl mb-4">
+          <div className="lg:hidden border-t border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm">
+            <div className="px-4 py-6">
+              {/* User info - Mejorado */}
+              <div className="flex items-center gap-4 px-4 py-4 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-2xl mb-6">
                 {renderAvatar(user.url_avatar, 48)}
                 <div className="flex flex-col">
                   <span className="text-lg font-semibold text-slate-900 dark:text-slate-100">{user.nombre_completo || user.email || 'Usuario'}</span>
@@ -271,31 +326,103 @@ export default function Header() {
                 </div>
               </div>
 
-              {/* Navigation links mejorados */}
-              <div className="flex flex-col space-y-1">
-                <Link 
-                  href="/profile" 
-                  className="flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300 rounded-xl"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <UserIcon size={20} />
-                  <span className="font-medium">Mi Perfil</span>
-                </Link>
-                <Link 
-                  href="/dashboard" 
-                  className="flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-300 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all duration-300 rounded-xl"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <LayoutDashboard size={20} />
-                  <span className="font-medium">Dashboard</span>
-                </Link>
-                {navLinks}
+              {/* Navigation links - Organizados por secciones */}
+              <div className="space-y-6">
+                {/* Sección Principal */}
+                <div>
+                  <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">PRINCIPAL</h3>
+                  <div className="space-y-1">
+                    <Link 
+                      href="/profile" 
+                      className="flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 transition-all duration-300 rounded-xl"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <UserIcon size={20} />
+                      <span className="font-medium">Mi Perfil</span>
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Sección Navegación */}
+                <div>
+                  <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">NAVEGACIÓN</h3>
+                  <div className="space-y-1">
+                    {mainNavLinks.map((link) => (
+                      <Link 
+                        key={link.name}
+                        href={link.href} 
+                        className={`flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-300 rounded-xl`}
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <link.icon size={20} />
+                        <span className="font-medium">{link.name}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Sección Usuario */}
+                <div>
+                  <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">USUARIO</h3>
+                  <div className="space-y-1">
+                    {userNavLinks.map((link) => (
+                      <Link 
+                        key={link.name}
+                        href={link.href} 
+                        className={`flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-300 rounded-xl`}
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <link.icon size={20} />
+                        <span className="font-medium">{link.name}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Sección Admin */}
+                {user?.rol === 'admin' && (
+                  <div>
+                    <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">ADMINISTRACIÓN</h3>
+                    <div className="space-y-1">
+                      {adminNavLinks.map((link) => (
+                        <Link 
+                          key={link.name}
+                          href={link.href} 
+                          className={`flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-300 rounded-xl`}
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <link.icon size={20} />
+                          <span className="font-medium">{link.name}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Lecciones (próximamente) */}
+                <div>
+                  <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">PRÓXIMAMENTE</h3>
+                  <div className="space-y-1">
+                    {comingSoonLinks.map((link) => (
+                      <div 
+                        key={link.name}
+                        className={`flex items-center gap-3 px-4 py-3 text-slate-400 dark:text-slate-500 cursor-not-allowed rounded-xl`}
+                      >
+                        <link.icon size={20} />
+                        <div className="flex flex-col">
+                          <span className="font-medium">{link.name}</span>
+                          <span className="text-xs text-slate-400 dark:text-slate-500">(Próximamente)</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
 
-              {/* Logout button mejorado */}
+              {/* Logout button - Mejorado */}
               <button 
                 onClick={handleLogout}
-                className="flex items-center gap-3 px-4 py-3 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300 border-t border-slate-200 dark:border-slate-700 pt-4 rounded-xl"
+                className="flex items-center gap-3 px-4 py-3 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300 border-t border-slate-200 dark:border-slate-700 pt-4 mt-6 rounded-xl w-full"
               >
                 <LogOut size={20} />
                 <span className="font-medium">Cerrar Sesión</span>

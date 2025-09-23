@@ -1,14 +1,21 @@
 'use client';
 import { motion } from 'framer-motion';
-import Header from '@/components/Header';
-import { Scale, CheckCircle, Users, Book, AlertTriangle, Mail, Shield, FileText, Globe, Clock } from 'lucide-react';
+import ConditionalHeader from '@/components/ConditionalHeader';
+import { Scale, CheckCircle, Users, Book, AlertTriangle, Mail, Shield, FileText, Globe, Clock, Heart, Zap } from 'lucide-react';
 
 export default function TermsOfService() {
   return (
     <>
-      <Header />
-      <main className="min-h-screen bg-white dark:bg-slate-900">
-        <div className="container mx-auto px-4 py-16 max-w-4xl">
+      <ConditionalHeader />
+      <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
+        {/* Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-tr from-blue-500/10 to-cyan-500/10 rounded-full blur-3xl"></div>
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(6,182,212,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(6,182,212,0.02)_1px,transparent_1px)] bg-[size:64px_64px]"></div>
+        </div>
+
+        <div className="relative z-10 container mx-auto px-4 py-16 max-w-4xl">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -16,16 +23,17 @@ export default function TermsOfService() {
             transition={{ duration: 0.6 }}
             className="text-center mb-16"
           >
-            <div className="w-20 h-20 bg-green-600 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-lg">
+            <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-xl">
               <Scale className="h-10 w-10 text-white" />
             </div>
             <h1 className="text-4xl lg:text-5xl font-bold text-slate-900 dark:text-slate-100 mb-6">
-              Términos de Servicio
+              Términos de <span className="bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">Servicio</span>
             </h1>
             <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed">
-              Estos términos establecen las reglas y responsabilidades para el uso de Nahuatlajtol, una plataforma educativa dedicada a la preservación y enseñanza del idioma náhuatl.
+              Estos términos establecen las reglas y responsabilidades para el uso de <strong className="text-slate-900 dark:text-slate-100">Nawatlahtol</strong>, una plataforma educativa dedicada a la preservación y enseñanza del idioma náhuatl.
             </p>
-            <div className="mt-6 text-sm text-slate-500 dark:text-slate-400">
+            <div className="mt-6 inline-flex items-center gap-2 bg-cyan-50 dark:bg-cyan-900/20 px-4 py-2 rounded-full text-sm text-cyan-700 dark:text-cyan-300 border border-cyan-200/50 dark:border-cyan-700/30">
+              <Clock className="h-4 w-4" />
               Fecha de vigencia: 16 de septiembre de 2025
             </div>
           </motion.div>
@@ -37,10 +45,12 @@ export default function TermsOfService() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="border-l-4 border-green-600 pl-8"
+              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-200/60 dark:border-slate-700/60 shadow-lg"
             >
               <div className="flex items-center gap-4 mb-8">
-                <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
+                <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-xl flex items-center justify-center">
+                  <CheckCircle className="h-6 w-6 text-white" />
+                </div>
                 <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
                   Aceptación de los Términos
                 </h2>
@@ -121,10 +131,12 @@ export default function TermsOfService() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="border-l-4 border-orange-600 pl-8"
+              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-200/60 dark:border-slate-700/60 shadow-lg"
             >
               <div className="flex items-center gap-4 mb-8">
-                <Shield className="h-8 w-8 text-orange-600 dark:text-orange-400" />
+                <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
+                  <Shield className="h-6 w-6 text-white" />
+                </div>
                 <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
                   Responsabilidades del Usuario
                 </h2>
@@ -169,11 +181,11 @@ export default function TermsOfService() {
                     </div>
                   </div>
                   
-                  <div className="bg-orange-50 dark:bg-orange-900/20 p-8 rounded-xl border border-orange-200 dark:border-orange-800">
-                    <h3 className="text-xl font-semibold text-orange-800 dark:text-orange-200 mb-4">
+                  <div className="bg-cyan-50 dark:bg-cyan-900/20 p-8 rounded-xl border border-cyan-200 dark:border-cyan-800">
+                    <h3 className="text-xl font-semibold text-cyan-800 dark:text-cyan-200 mb-4">
                       Calidad de las Contribuciones
                     </h3>
-                    <p className="text-orange-700 dark:text-orange-300 leading-relaxed">
+                    <p className="text-cyan-700 dark:text-cyan-300 leading-relaxed">
                       Las contribuciones al diccionario deben ser precisas, culturalmente apropiadas y basadas en fuentes confiables. 
                       Nos reservamos el derecho de revisar, editar o rechazar contribuciones que no cumplan con nuestros estándares de calidad.
                     </p>
@@ -187,26 +199,28 @@ export default function TermsOfService() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="border-l-4 border-purple-600 pl-8"
+              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-200/60 dark:border-slate-700/60 shadow-lg"
             >
               <div className="flex items-center gap-4 mb-8">
-                <FileText className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                  <FileText className="h-6 w-6 text-white" />
+                </div>
                 <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
                   Propiedad Intelectual y Licencias
                 </h2>
               </div>
               
               <div className="prose prose-lg dark:prose-invert max-w-none">
-                <div className="bg-purple-50 dark:bg-purple-900/20 p-8 rounded-xl border border-purple-200 dark:border-purple-800 mb-8">
-                  <h3 className="text-xl font-semibold text-purple-800 dark:text-purple-200 mb-4">
+                <div className="bg-cyan-50 dark:bg-cyan-900/20 p-8 rounded-xl border border-cyan-200 dark:border-cyan-800 mb-8">
+                  <h3 className="text-xl font-semibold text-cyan-800 dark:text-cyan-200 mb-4">
                     Licencia de Contribuciones
                   </h3>
-                  <p className="text-purple-700 dark:text-purple-300 leading-relaxed mb-4">
-                    Al contribuir con traducciones, definiciones o cualquier contenido a nuestra plataforma, otorgas a Nahuatlajtol 
+                  <p className="text-cyan-700 dark:text-cyan-300 leading-relaxed mb-4">
+                    Al contribuir con traducciones, definiciones o cualquier contenido a nuestra plataforma, otorgas a <strong className="text-cyan-800 dark:text-cyan-200">Nawatlahtol</strong> 
                     una licencia perpetua, mundial, no exclusiva, libre de regalías para usar, modificar, distribuir y mostrar 
                     dicho contenido con fines educativos y de preservación cultural.
                   </p>
-                  <p className="text-purple-700 dark:text-purple-300 leading-relaxed text-sm">
+                  <p className="text-cyan-700 dark:text-cyan-300 leading-relaxed text-sm">
                     Esta licencia permite que tu contribución beneficie a la comunidad global de aprendizaje del náhuatl, 
                     manteniendo siempre la atribución apropiada cuando sea posible.
                   </p>
@@ -245,10 +259,12 @@ export default function TermsOfService() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              className="border-l-4 border-red-600 pl-8"
+              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-200/60 dark:border-slate-700/60 shadow-lg"
             >
               <div className="flex items-center gap-4 mb-8">
-                <AlertTriangle className="h-8 w-8 text-red-600 dark:text-red-400" />
+                <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center">
+                  <AlertTriangle className="h-6 w-6 text-white" />
+                </div>
                 <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
                   Limitaciones de Responsabilidad
                 </h2>
@@ -294,41 +310,43 @@ export default function TermsOfService() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6 }}
-              className="border-l-4 border-indigo-600 pl-8"
+              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-200/60 dark:border-slate-700/60 shadow-lg"
             >
               <div className="flex items-center gap-4 mb-8">
-                <Clock className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
+                <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl flex items-center justify-center">
+                  <Clock className="h-6 w-6 text-white" />
+                </div>
                 <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
                   Modificaciones a los Términos
                 </h2>
               </div>
               
-              <div className="bg-indigo-50 dark:bg-indigo-900/20 p-8 rounded-xl border border-indigo-200 dark:border-indigo-800">
-                <p className="text-indigo-800 dark:text-indigo-200 text-lg mb-6 leading-relaxed">
+              <div className="bg-cyan-50 dark:bg-cyan-900/20 p-8 rounded-xl border border-cyan-200 dark:border-cyan-800">
+                <p className="text-cyan-800 dark:text-cyan-200 text-lg mb-6 leading-relaxed">
                   Nos reservamos el derecho de modificar estos términos de servicio en cualquier momento para reflejar 
                   cambios en nuestros servicios, requisitos legales o mejores prácticas.
                 </p>
                 
                 <div className="space-y-4">
                   <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-indigo-600 rounded-full mt-3 flex-shrink-0"></div>
-                    <p className="text-indigo-700 dark:text-indigo-300">
+                    <div className="w-2 h-2 bg-cyan-600 rounded-full mt-3 flex-shrink-0"></div>
+                    <p className="text-cyan-700 dark:text-cyan-300">
                       <strong>Notificación:</strong> Los cambios significativos serán comunicados con al menos 30 días de anticipación 
                       a través de nuestra plataforma o por correo electrónico.
                     </p>
                   </div>
                   
                   <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-indigo-600 rounded-full mt-3 flex-shrink-0"></div>
-                    <p className="text-indigo-700 dark:text-indigo-300">
+                    <div className="w-2 h-2 bg-cyan-600 rounded-full mt-3 flex-shrink-0"></div>
+                    <p className="text-cyan-700 dark:text-cyan-300">
                       <strong>Vigencia:</strong> Tu uso continuado después de la fecha de vigencia constituye 
                       aceptación de los términos modificados.
                     </p>
                   </div>
                   
                   <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-indigo-600 rounded-full mt-3 flex-shrink-0"></div>
-                    <p className="text-indigo-700 dark:text-indigo-300">
+                    <div className="w-2 h-2 bg-cyan-600 rounded-full mt-3 flex-shrink-0"></div>
+                    <p className="text-cyan-700 dark:text-cyan-300">
                       <strong>Derecho de cancelación:</strong> Si no estás de acuerdo con las modificaciones, 
                       puedes cancelar tu cuenta antes de que entren en vigor.
                     </p>
@@ -342,10 +360,12 @@ export default function TermsOfService() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.7 }}
-              className="bg-slate-900 dark:bg-slate-800 rounded-2xl p-12 text-white text-center"
+              className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 rounded-2xl p-12 text-white text-center shadow-2xl"
             >
               <div className="flex items-center justify-center gap-4 mb-8">
-                <Mail className="h-10 w-10 text-blue-400" />
+                <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center">
+                  <Mail className="h-6 w-6 text-white" />
+                </div>
                 <h2 className="text-3xl font-bold">Contacto Legal</h2>
               </div>
               
@@ -356,7 +376,7 @@ export default function TermsOfService() {
               <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
                 <a 
                   href="mailto:joseortegahac@gmail.com"
-                  className="inline-flex items-center gap-3 bg-blue-600 hover:bg-blue-700 px-8 py-4 rounded-lg font-semibold transition-colors duration-200"
+                  className="inline-flex items-center gap-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 px-8 py-4 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
                   <Mail className="h-5 w-5" />
                   joseortegahac@gmail.com
@@ -370,7 +390,7 @@ export default function TermsOfService() {
               
               <div className="mt-8 pt-8 border-t border-slate-700">
                 <p className="text-sm text-slate-400 mb-4">
-                  Estos términos se rigen por las leyes aplicables en la jurisdicción donde opera Nahuatlajtol.
+                  Estos términos se rigen por las leyes aplicables en la jurisdicción donde opera <strong className="text-slate-300">Nawatlahtol</strong>.
                 </p>
                 <p className="text-xs text-slate-500">
                   Tiempo de respuesta estimado para consultas legales: 5-10 días hábiles

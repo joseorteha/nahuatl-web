@@ -1,14 +1,21 @@
 'use client';
 import { motion } from 'framer-motion';
-import Header from '@/components/Header';
-import { Shield, Mail, Eye, Lock, Users, FileText, Database, Settings, AlertTriangle } from 'lucide-react';
+import ConditionalHeader from '@/components/ConditionalHeader';
+import { Shield, Mail, Eye, Lock, Users, FileText, Database, Settings, AlertTriangle, CheckCircle, Globe, Heart } from 'lucide-react';
 
 export default function PrivacyPolicy() {
   return (
     <>
-      <Header />
-      <main className="min-h-screen bg-white dark:bg-slate-900">
-        <div className="container mx-auto px-4 py-16 max-w-4xl">
+      <ConditionalHeader />
+      <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
+        {/* Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-tr from-blue-500/10 to-cyan-500/10 rounded-full blur-3xl"></div>
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(6,182,212,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(6,182,212,0.02)_1px,transparent_1px)] bg-[size:64px_64px]"></div>
+        </div>
+
+        <div className="relative z-10 container mx-auto px-4 py-16 max-w-4xl">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -16,16 +23,17 @@ export default function PrivacyPolicy() {
             transition={{ duration: 0.6 }}
             className="text-center mb-16"
           >
-            <div className="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-lg">
+            <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-xl">
               <Shield className="h-10 w-10 text-white" />
             </div>
             <h1 className="text-4xl lg:text-5xl font-bold text-slate-900 dark:text-slate-100 mb-6">
-              Política de Privacidad
+              Política de <span className="bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">Privacidad</span>
             </h1>
             <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed">
-              En Nahuatlajtol nos comprometemos a proteger tu privacidad y manejar tu información personal de manera transparente y segura.
+              En <strong className="text-slate-900 dark:text-slate-100">Nawatlahtol</strong> nos comprometemos a proteger tu privacidad y manejar tu información personal de manera transparente y segura.
             </p>
-            <div className="mt-6 text-sm text-slate-500 dark:text-slate-400">
+            <div className="mt-6 inline-flex items-center gap-2 bg-cyan-50 dark:bg-cyan-900/20 px-4 py-2 rounded-full text-sm text-cyan-700 dark:text-cyan-300 border border-cyan-200/50 dark:border-cyan-700/30">
+              <CheckCircle className="h-4 w-4" />
               Última actualización: 16 de septiembre de 2025
             </div>
           </motion.div>
@@ -37,10 +45,12 @@ export default function PrivacyPolicy() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="border-l-4 border-blue-600 pl-8"
+              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-200/60 dark:border-slate-700/60 shadow-lg"
             >
               <div className="flex items-center gap-4 mb-8">
-                <Eye className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+                <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-xl flex items-center justify-center">
+                  <Eye className="h-6 w-6 text-white" />
+                </div>
                 <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
                   Información que Recopilamos
                 </h2>
@@ -92,10 +102,12 @@ export default function PrivacyPolicy() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="border-l-4 border-green-600 pl-8"
+              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-200/60 dark:border-slate-700/60 shadow-lg"
             >
               <div className="flex items-center gap-4 mb-8">
-                <Settings className="h-8 w-8 text-green-600 dark:text-green-400" />
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                  <Settings className="h-6 w-6 text-white" />
+                </div>
                 <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
                   Cómo Utilizamos tu Información
                 </h2>
@@ -111,19 +123,19 @@ export default function PrivacyPolicy() {
                     <h4 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4">Funcionalidad de la Plataforma</h4>
                     <ul className="space-y-3 text-slate-700 dark:text-slate-300">
                       <li className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-green-500 rounded-full mt-3 flex-shrink-0"></div>
+                        <div className="w-2 h-2 bg-cyan-500 rounded-full mt-3 flex-shrink-0"></div>
                         Proporcionar acceso a tu cuenta personal
                       </li>
                       <li className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-green-500 rounded-full mt-3 flex-shrink-0"></div>
+                        <div className="w-2 h-2 bg-cyan-500 rounded-full mt-3 flex-shrink-0"></div>
                         Guardar y sincronizar tu progreso de aprendizaje
                       </li>
                       <li className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-green-500 rounded-full mt-3 flex-shrink-0"></div>
+                        <div className="w-2 h-2 bg-cyan-500 rounded-full mt-3 flex-shrink-0"></div>
                         Permitir contribuciones al diccionario comunitario
                       </li>
                       <li className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-green-500 rounded-full mt-3 flex-shrink-0"></div>
+                        <div className="w-2 h-2 bg-cyan-500 rounded-full mt-3 flex-shrink-0"></div>
                         Personalizar tu experiencia educativa
                       </li>
                     </ul>
@@ -159,25 +171,27 @@ export default function PrivacyPolicy() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="border-l-4 border-purple-600 pl-8"
+              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-200/60 dark:border-slate-700/60 shadow-lg"
             >
               <div className="flex items-center gap-4 mb-8">
-                <Lock className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
+                  <Lock className="h-6 w-6 text-white" />
+                </div>
                 <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
                   Protección y Seguridad de Datos
                 </h2>
               </div>
               
-              <div className="bg-purple-50 dark:bg-purple-900/20 p-8 rounded-xl border border-purple-200 dark:border-purple-800">
-                <h3 className="text-xl font-semibold text-purple-800 dark:text-purple-200 mb-6">
+              <div className="bg-cyan-50 dark:bg-cyan-900/20 p-8 rounded-xl border border-cyan-200 dark:border-cyan-800">
+                <h3 className="text-xl font-semibold text-cyan-800 dark:text-cyan-200 mb-6">
                   Compromiso de Confidencialidad
                 </h3>
-                <p className="text-purple-700 dark:text-purple-300 text-lg leading-relaxed mb-6">
+                <p className="text-cyan-700 dark:text-cyan-300 text-lg leading-relaxed mb-6">
                   No vendemos, alquilamos, intercambiamos ni transferimos tu información personal a terceros sin tu consentimiento explícito, excepto en las circunstancias limitadas descritas a continuación.
                 </p>
                 
-                <h4 className="font-semibold text-purple-800 dark:text-purple-200 mb-4">Compartimos información únicamente cuando:</h4>
-                <ul className="space-y-3 text-purple-700 dark:text-purple-300">
+                <h4 className="font-semibold text-cyan-800 dark:text-cyan-200 mb-4">Compartimos información únicamente cuando:</h4>
+                <ul className="space-y-3 text-cyan-700 dark:text-cyan-300">
                   <li>• Has dado tu consentimiento expreso y específico</li>
                   <li>• Es requerido por ley o autoridades competentes</li>
                   <li>• Es necesario para proteger la seguridad y integridad de la plataforma</li>
@@ -191,10 +205,12 @@ export default function PrivacyPolicy() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="border-l-4 border-orange-600 pl-8"
+              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-200/60 dark:border-slate-700/60 shadow-lg"
             >
               <div className="flex items-center gap-4 mb-8">
-                <FileText className="h-8 w-8 text-orange-600 dark:text-orange-400" />
+                <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
+                  <FileText className="h-6 w-6 text-white" />
+                </div>
                 <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
                   Tus Derechos como Usuario
                 </h2>
@@ -206,32 +222,32 @@ export default function PrivacyPolicy() {
                 </p>
                 
                 <div className="grid md:grid-cols-3 gap-6">
-                  <div className="bg-slate-50 dark:bg-slate-800 p-6 rounded-lg text-center">
-                    <div className="w-12 h-12 bg-orange-600 text-white rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <div className="bg-cyan-50 dark:bg-cyan-900/20 p-6 rounded-xl text-center border border-cyan-200/50 dark:border-cyan-700/30 hover:border-cyan-300/60 dark:hover:border-cyan-600/60 transition-all duration-300">
+                    <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-cyan-600 text-white rounded-lg flex items-center justify-center mx-auto mb-4">
                       <Eye className="h-6 w-6" />
                     </div>
-                    <h4 className="font-semibold text-slate-800 dark:text-slate-200 mb-3">Derecho de Acceso</h4>
-                    <p className="text-sm text-slate-700 dark:text-slate-300">
+                    <h4 className="font-semibold text-cyan-800 dark:text-cyan-200 mb-3">Derecho de Acceso</h4>
+                    <p className="text-sm text-cyan-700 dark:text-cyan-300">
                       Solicitar una copia completa de toda la información personal que tenemos sobre ti
                     </p>
                   </div>
                   
-                  <div className="bg-slate-50 dark:bg-slate-800 p-6 rounded-lg text-center">
-                    <div className="w-12 h-12 bg-orange-600 text-white rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-xl text-center border border-blue-200/50 dark:border-blue-700/30 hover:border-blue-300/60 dark:hover:border-blue-600/60 transition-all duration-300">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg flex items-center justify-center mx-auto mb-4">
                       <Settings className="h-6 w-6" />
                     </div>
-                    <h4 className="font-semibold text-slate-800 dark:text-slate-200 mb-3">Derecho de Rectificación</h4>
-                    <p className="text-sm text-slate-700 dark:text-slate-300">
+                    <h4 className="font-semibold text-blue-800 dark:text-blue-200 mb-3">Derecho de Rectificación</h4>
+                    <p className="text-sm text-blue-700 dark:text-blue-300">
                       Actualizar, corregir o modificar información incorrecta o desactualizada
                     </p>
                   </div>
                   
-                  <div className="bg-slate-50 dark:bg-slate-800 p-6 rounded-lg text-center">
-                    <div className="w-12 h-12 bg-orange-600 text-white rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <div className="bg-orange-50 dark:bg-orange-900/20 p-6 rounded-xl text-center border border-orange-200/50 dark:border-orange-700/30 hover:border-orange-300/60 dark:hover:border-orange-600/60 transition-all duration-300">
+                    <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-lg flex items-center justify-center mx-auto mb-4">
                       <AlertTriangle className="h-6 w-6" />
                     </div>
-                    <h4 className="font-semibold text-slate-800 dark:text-slate-200 mb-3">Derecho de Supresión</h4>
-                    <p className="text-sm text-slate-700 dark:text-slate-300">
+                    <h4 className="font-semibold text-orange-800 dark:text-orange-200 mb-3">Derecho de Supresión</h4>
+                    <p className="text-sm text-orange-700 dark:text-orange-300">
                       Solicitar la eliminación completa de tu cuenta y todos los datos asociados
                     </p>
                   </div>
@@ -244,10 +260,12 @@ export default function PrivacyPolicy() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              className="bg-slate-900 dark:bg-slate-800 rounded-2xl p-12 text-white text-center"
+              className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 rounded-2xl p-12 text-white text-center shadow-2xl"
             >
               <div className="flex items-center justify-center gap-4 mb-8">
-                <Mail className="h-10 w-10 text-blue-400" />
+                <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center">
+                  <Mail className="h-6 w-6 text-white" />
+                </div>
                 <h2 className="text-3xl font-bold">Contacto para Asuntos de Privacidad</h2>
               </div>
               
@@ -259,7 +277,7 @@ export default function PrivacyPolicy() {
               <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
                 <a 
                   href="mailto:joseortegahac@gmail.com"
-                  className="inline-flex items-center gap-3 bg-blue-600 hover:bg-blue-700 px-8 py-4 rounded-lg font-semibold transition-colors duration-200"
+                  className="inline-flex items-center gap-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 px-8 py-4 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
                   <Mail className="h-5 w-5" />
                   joseortegahac@gmail.com

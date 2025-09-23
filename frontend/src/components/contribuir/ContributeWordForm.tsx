@@ -169,18 +169,18 @@ export default function ContributeWordForm({ userId, userEmail, onSuccess }: Con
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg p-8 border border-white/20 dark:border-gray-700/50"
+      className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 border border-slate-200/60 dark:border-slate-700/60"
     >
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg">
+          <div className="p-2 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-lg">
             <FileText className="h-6 w-6 text-white" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+          <h2 className="text-2xl font-bold text-slate-800 dark:text-white">
             Contribuir Nueva Palabra
           </h2>
         </div>
-        <p className="text-gray-600 dark:text-gray-300">
+        <p className="text-slate-600 dark:text-slate-300">
           Ayuda a expandir nuestro diccionario de náhuatl. Tu contribución será revisada por moderadores antes de ser publicada.
         </p>
       </div>
@@ -191,7 +191,7 @@ export default function ContributeWordForm({ userId, userEmail, onSuccess }: Con
           animate={{ opacity: 1, y: 0 }}
           className={`mb-6 p-4 rounded-xl border flex items-start gap-3 ${
             message.type === 'success' 
-              ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-800 dark:text-green-300' 
+              ? 'bg-cyan-50 dark:bg-cyan-900/20 border-cyan-200 dark:border-cyan-800 text-cyan-800 dark:text-cyan-300' 
               : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-800 dark:text-red-300'
           }`}
         >
@@ -210,16 +210,16 @@ export default function ContributeWordForm({ userId, userEmail, onSuccess }: Con
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-6 border border-blue-100 dark:border-blue-800"
+          className="bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-xl p-6 border border-cyan-100 dark:border-cyan-800"
         >
           <div className="flex items-center gap-2 mb-4">
-            <Hash className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Información Básica</h3>
+            <Hash className="h-5 w-5 text-cyan-600 dark:text-cyan-400" />
+            <h3 className="text-lg font-semibold text-slate-800 dark:text-white">Información Básica</h3>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Palabra en Náhuatl <span className="text-red-500">*</span>
               </label>
               <input
@@ -228,20 +228,20 @@ export default function ContributeWordForm({ userId, userEmail, onSuccess }: Con
                 value={formData.word}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors"
                 placeholder="Ej: Atl"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Información Gramatical
               </label>
               <select
                 name="info_gramatical"
                 value={formData.info_gramatical}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors appearance-none cursor-pointer"
+                className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors appearance-none cursor-pointer"
               >
                 <option value="">Selecciona tipo...</option>
                 <optgroup label="Sustantivos">
@@ -285,7 +285,7 @@ export default function ContributeWordForm({ userId, userEmail, onSuccess }: Con
               onChange={handleChange}
               required
               rows={3}
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"
+              className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors resize-none"
               placeholder="Definición de la palabra en español..."
             />
           </div>
@@ -305,7 +305,7 @@ export default function ContributeWordForm({ userId, userEmail, onSuccess }: Con
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Variantes
               </label>
               <input
@@ -313,13 +313,13 @@ export default function ContributeWordForm({ userId, userEmail, onSuccess }: Con
                 name="variants"
                 value={formData.variants}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+                className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                 placeholder="Separadas por comas"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Nombre Científico
               </label>
               <input
@@ -327,7 +327,7 @@ export default function ContributeWordForm({ userId, userEmail, onSuccess }: Con
                 name="nombre_cientifico"
                 value={formData.nombre_cientifico}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+                className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                 placeholder="Para plantas, animales, etc."
               />
             </div>
@@ -342,12 +342,12 @@ export default function ContributeWordForm({ userId, userEmail, onSuccess }: Con
               value={formData.examples}
               onChange={handleChange}
               rows={3}
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors resize-none"
+              className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"
               placeholder="Un ejemplo por línea. Formato: frase_nahuatl = traducción_español"
             />
             <div className="flex items-center gap-2 mt-2">
-              <Info className="h-4 w-4 text-gray-500" />
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <Info className="h-4 w-4 text-slate-500" />
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Ejemplo: Nikatl = Soy agua
               </p>
             </div>
@@ -355,7 +355,7 @@ export default function ContributeWordForm({ userId, userEmail, onSuccess }: Con
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Sinónimos
               </label>
               <input
@@ -363,13 +363,13 @@ export default function ContributeWordForm({ userId, userEmail, onSuccess }: Con
                 name="synonyms"
                 value={formData.synonyms}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+                className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                 placeholder="Separados por comas"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Raíces
               </label>
               <input
@@ -377,7 +377,7 @@ export default function ContributeWordForm({ userId, userEmail, onSuccess }: Con
                 name="roots"
                 value={formData.roots}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+                className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                 placeholder="Separadas por comas"
               />
             </div>
@@ -400,14 +400,14 @@ export default function ContributeWordForm({ userId, userEmail, onSuccess }: Con
           
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 ¿Por qué quieres agregar esta palabra?
               </label>
               <select
                 name="razon_contribucion"
                 value={formData.razon_contribucion}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors appearance-none cursor-pointer"
+                className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-colors appearance-none cursor-pointer"
               >
                 <option value="">Selecciona motivo...</option>
                 <optgroup label="Preservación Cultural">
@@ -439,14 +439,14 @@ export default function ContributeWordForm({ userId, userEmail, onSuccess }: Con
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                   Fuente de Información
                 </label>
                 <select
                   name="fuente"
                   value={formData.fuente}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors appearance-none cursor-pointer"
+                  className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-colors appearance-none cursor-pointer"
                 >
                   <option value="">Selecciona fuente...</option>
                   <optgroup label="Fuentes Primarias">
@@ -476,7 +476,7 @@ export default function ContributeWordForm({ userId, userEmail, onSuccess }: Con
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                   Nivel de Confianza
                 </label>
                 <div className="relative">
@@ -484,7 +484,7 @@ export default function ContributeWordForm({ userId, userEmail, onSuccess }: Con
                     name="nivel_confianza"
                     value={formData.nivel_confianza}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors appearance-none"
+                    className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-colors appearance-none"
                   >
                     <option value="bajo">Bajo - No estoy completamente seguro</option>
                     <option value="medio">Medio - Tengo confianza moderada</option>
@@ -512,7 +512,7 @@ export default function ContributeWordForm({ userId, userEmail, onSuccess }: Con
               ver_tambien: '', ortografias_alternativas: '', notes: '',
               razon_contribucion: '', fuente: '', nivel_confianza: 'medio'
             })}
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors font-medium"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors font-medium"
           >
             <RotateCcw className="h-5 w-5" />
             Limpiar
@@ -521,7 +521,7 @@ export default function ContributeWordForm({ userId, userEmail, onSuccess }: Con
           <button
             type="submit"
             disabled={isSubmitting}
-            className="inline-flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl font-medium"
+            className="inline-flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-xl hover:from-cyan-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl font-medium"
           >
             {isSubmitting ? (
               <>
