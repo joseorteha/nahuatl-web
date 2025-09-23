@@ -2,10 +2,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { User, Mail, AtSign, Settings, Save, X, Edit3, RefreshCw, ExternalLink, Users, Heart, MessageCircle, Share2, Bookmark, CheckCircle, MapPin, Globe, Shield, Bell, Eye, Calendar } from 'lucide-react';
+import { User, Mail, AtSign, Settings, Save, X, Edit3, RefreshCw, ExternalLink, Users, Heart, MessageCircle, Share2, Bookmark, CheckCircle, MapPin, Globe, Shield, Bell, Eye, Calendar, Trophy, Star, Target, Award, TrendingUp, Zap, Crown, Sparkles, ArrowUp, Flame, BarChart3, History, Gift, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Avatar from 'boring-avatars';
-import Header from '@/components/Header';
+import ConditionalHeader from '@/components/ConditionalHeader';
 import Recompensas from '@/components/Recompensas';
 import Image from 'next/image';
 import { useAuthBackend } from '@/hooks/useAuthBackend';
@@ -28,14 +28,14 @@ interface AvatarData {
 }
 
 export default function ProfilePage() {
+  // Hooks de autenticación y social
   const { user, loading, isAuthenticated } = useAuthBackend();
-  const { 
-    obtenerSeguidores, 
-    obtenerSiguiendo, 
-    obtenerFeedbackGuardado
-  } = useSocial();
-  const [isEditing, setIsEditing] = useState(false);
+  const { obtenerSeguidores, obtenerSiguiendo, obtenerFeedbackGuardado } = useSocial();
+  const router = useRouter();
+
+  // Estados del componente
   const [showAvatarSelector, setShowAvatarSelector] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [generatedAvatars, setGeneratedAvatars] = useState<AvatarData[]>([]);
   const [formData, setFormData] = useState({
     nombre_completo: '',
@@ -66,8 +66,19 @@ export default function ProfilePage() {
   const [siguiendo, setSiguiendo] = useState<Seguimiento[]>([]);
   const [feedbackGuardado, setFeedbackGuardado] = useState<FeedbackGuardado[]>([]);
   const [isLoadingSocial, setIsLoadingSocial] = useState(true);
-  const [activeTab, setActiveTab] = useState<'stats' | 'social' | 'saved'>('stats');
-  const router = useRouter();
+  const [activeTab, setActiveTab] = useState<'contributions' | 'social' | 'saved'>('contributions');
+  
+  // Nuevos estados para el sistema de contribuciones
+  const [contributionsStats, setContributionsStats] = useState({
+    totalContributions: 0,
+    approvedContributions: 0,
+    pendingContributions: 0,
+    rejectedContributions: 0,
+    totalPoints: 0,
+    level: 'principiante',
+    experience: 0
+  });
+  const [isLoadingContributions, setIsLoadingContributions] = useState(true);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -84,8 +95,8 @@ export default function ProfilePage() {
   const renderAvatar = (avatarString: string | null | undefined, size: number = 128) => {
     if (!avatarString) {
       return (
-        <div className="w-full h-full rounded-full bg-emerald-100 flex items-center justify-center">
-          <User className={`w-${size/8} h-${size/8} text-emerald-600`} />
+        <div className="w-full h-full rounded-full bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center">
+          <User className={`w-${size/8} h-${size/8} text-cyan-600 dark:text-cyan-400`} />
         </div>
       );
     }
@@ -98,7 +109,7 @@ export default function ProfilePage() {
       
       return (
         <div 
-          className="rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold"
+          className="rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-semibold shadow-lg"
           style={{ width: size, height: size }}
         >
           {initials}
@@ -113,7 +124,7 @@ export default function ProfilePage() {
         alt="Avatar" 
         width={size}
         height={size}
-        className="w-full h-full rounded-full object-cover"
+        className="w-full h-full rounded-full object-cover shadow-lg"
       />
     );
   };
@@ -142,6 +153,50 @@ export default function ProfilePage() {
       setStats({ contributions: 0, feedback: 0, savedWords: 0 });
     } finally {
       setIsLoadingStats(false);
+    }
+  }, [API_URL]);
+
+  // Nueva función para cargar estadísticas de contribuciones
+  const loadContributionsStats = useCallback(async (userId: string) => {
+    try {
+      setIsLoadingContributions(true);
+      const token = localStorage.getItem('auth_tokens');
+      const parsedTokens = token ? JSON.parse(token) : null;
+      
+      // Cargar estadísticas de contribuciones
+      const contributionsResponse = await fetch(`${API_URL}/api/contribuciones/stats/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${parsedTokens?.accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (contributionsResponse.ok) {
+        const contributionsData = await contributionsResponse.json();
+        setContributionsStats(contributionsData);
+      }
+
+      // Cargar datos de recompensas para puntos y nivel
+      const rewardsResponse = await fetch(`${API_URL}/api/recompensas/usuario/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${parsedTokens?.accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (rewardsResponse.ok) {
+        const rewardsData = await rewardsResponse.json();
+        setContributionsStats(prev => ({
+          ...prev,
+          totalPoints: rewardsData.recompensas?.puntos_totales || 0,
+          level: rewardsData.recompensas?.nivel || 'principiante',
+          experience: rewardsData.recompensas?.experiencia || 0
+        }));
+      }
+    } catch (error) {
+      console.error('Error loading contributions stats:', error);
+    } finally {
+      setIsLoadingContributions(false);
     }
   }, [API_URL]);
 
@@ -226,10 +281,11 @@ export default function ProfilePage() {
       });
       generateAvatars(user.email || 'default');
       loadUserStats(user.id);
+      loadContributionsStats(user.id);
       loadSavedWords(user.id);
       loadSocialData(user.id);
     }
-  }, [loading, isAuthenticated, user, router, loadUserStats, loadSavedWords, loadSocialData]);
+  }, [loading, isAuthenticated, user, router, loadUserStats, loadContributionsStats, loadSavedWords, loadSocialData]);
 
   const generateAvatars = (seed: string) => {
     const variants = ['marble', 'beam', 'pixel', 'sunset', 'ring', 'bauhaus'];
@@ -346,10 +402,10 @@ export default function ProfilePage() {
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100">
-        <Header />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
+        <ConditionalHeader />
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600"></div>
         </div>
       </div>
     );
@@ -360,89 +416,88 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 dark:from-gray-900 dark:via-gray-800 dark:to-emerald-900">
-      <Header />
-      
-      <div className="container mx-auto px-4 py-8 max-w-4xl space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
+      <ConditionalHeader />
+      <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8 max-w-6xl space-y-6 sm:space-y-8">
         {/* Header con avatar */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden border border-white/30 dark:border-gray-700/60"
+          className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-white/40 dark:border-slate-700/60"
         >
-          <div className="bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 dark:from-emerald-600 dark:via-teal-600 dark:to-cyan-600 px-6 sm:px-8 py-8 sm:py-12 relative overflow-hidden">
+          <div className="bg-gradient-to-br from-cyan-500 via-blue-600 to-slate-600 dark:from-cyan-600 dark:via-blue-700 dark:to-slate-700 px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12 relative overflow-hidden">
             {/* Decorative elements mejorados */}
             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent dark:from-black/20 dark:to-transparent"></div>
-            <div className="absolute top-0 right-0 w-72 h-72 bg-white/10 dark:bg-white/5 rounded-full -translate-y-36 translate-x-36 animate-pulse"></div>
-            <div className="absolute bottom-0 left-0 w-56 h-56 bg-white/10 dark:bg-white/5 rounded-full translate-y-28 -translate-x-28 animate-pulse" style={{ animationDelay: '1s' }}></div>
-            <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-white/5 dark:bg-white/3 rounded-full -translate-x-1/2 -translate-y-1/2 animate-pulse" style={{ animationDelay: '2s' }}></div>
+            <div className="absolute top-0 right-0 w-48 h-48 sm:w-72 sm:h-72 bg-white/10 dark:bg-white/5 rounded-full -translate-y-24 sm:-translate-y-36 translate-x-24 sm:translate-x-36 animate-pulse"></div>
+            <div className="absolute bottom-0 left-0 w-40 h-40 sm:w-56 sm:h-56 bg-white/10 dark:bg-white/5 rounded-full translate-y-20 sm:translate-y-28 -translate-x-20 sm:-translate-x-28 animate-pulse" style={{ animationDelay: '1s' }}></div>
+            <div className="absolute top-1/2 left-1/2 w-24 h-24 sm:w-32 sm:h-32 bg-white/5 dark:bg-white/3 rounded-full -translate-x-1/2 -translate-y-1/2 animate-pulse" style={{ animationDelay: '2s' }}></div>
             
-            <div className="relative flex flex-col lg:flex-row items-center gap-6 lg:gap-8">
+            <div className="relative flex flex-col lg:flex-row items-center gap-4 sm:gap-6 lg:gap-8">
               {/* Avatar section */}
               <div className="relative flex-shrink-0">
-                <div className="w-28 h-28 sm:w-32 sm:h-32 lg:w-36 lg:h-36 rounded-full bg-white/20 dark:bg-white/10 backdrop-blur-sm p-1 shadow-2xl flex items-center justify-center border-2 border-white/40 dark:border-white/20 ring-4 ring-white/20 dark:ring-white/10">
+                <div className="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-full bg-white/20 dark:bg-white/10 backdrop-blur-sm p-1 shadow-2xl flex items-center justify-center border-2 border-white/40 dark:border-white/20 ring-4 ring-white/20 dark:ring-white/10">
                   {renderAvatar(userData.url_avatar, 120)}
                 </div>
                 <button
                   onClick={() => setShowAvatarSelector(true)}
-                  className="absolute -bottom-1 -right-1 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-full p-2.5 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 border-2 border-white/30 dark:border-gray-600/50 hover:border-emerald-400 dark:hover:border-emerald-500"
+                  className="absolute -bottom-1 -right-1 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm rounded-full p-2 sm:p-2.5 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 border-2 border-white/30 dark:border-slate-600/50 hover:border-cyan-400 dark:hover:border-cyan-500"
                 >
-                  <Edit3 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <Edit3 className="w-3 h-3 sm:w-4 sm:h-4 text-cyan-600 dark:text-cyan-400" />
                 </button>
               </div>
               
               {/* User info section */}
               <div className="text-center lg:text-left flex-1 min-w-0">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-3">
-                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white drop-shadow-lg break-words">
+                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white drop-shadow-lg break-words">
                     {userData.nombre_completo || 'Usuario'}
                   </h1>
-                  <div className="flex items-center justify-center lg:justify-start gap-2 flex-wrap">
+                  <div className="flex items-center justify-center lg:justify-start gap-1.5 sm:gap-2 flex-wrap">
                     {user?.verificado && (
-                      <div className="w-6 h-6 sm:w-7 sm:h-7 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
-                        <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                      <div className="w-5 h-5 sm:w-6 sm:h-6 bg-cyan-500 rounded-full flex items-center justify-center shadow-lg">
+                        <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                       </div>
                     )}
                     {user?.es_beta_tester && (
-                      <div className="px-2 py-1 bg-purple-500/90 text-white text-xs font-bold rounded-full shadow-lg">
+                      <div className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-blue-500/90 text-white text-xs font-bold rounded-full shadow-lg">
                         BETA
                       </div>
                     )}
                     {user?.rol === 'admin' && (
-                      <div className="px-2 py-1 bg-red-500/90 text-white text-xs font-bold rounded-full shadow-lg">
+                      <div className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-red-500/90 text-white text-xs font-bold rounded-full shadow-lg">
                         ADMIN
                       </div>
                     )}
                     {user?.rol === 'moderador' && (
-                      <div className="px-2 py-1 bg-orange-500/90 text-white text-xs font-bold rounded-full shadow-lg">
+                      <div className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-orange-500/90 text-white text-xs font-bold rounded-full shadow-lg">
                         MOD
                       </div>
                     )}
                   </div>
                 </div>
                 
-                <p className="text-emerald-100 dark:text-emerald-200 text-lg sm:text-xl font-semibold mb-1">
+                <p className="text-cyan-100 dark:text-cyan-200 text-base sm:text-lg font-semibold mb-1">
                   @{userData.username || 'usuario'}
                 </p>
-                <p className="text-emerald-200 dark:text-emerald-300 text-sm sm:text-base opacity-90 mb-3">
+                <p className="text-cyan-200 dark:text-cyan-300 text-sm sm:text-base opacity-90 mb-3">
                   {userData.email}
                 </p>
                 
                 {user?.biografia && (
-                  <p className="text-emerald-100 dark:text-emerald-200 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto lg:mx-0 mb-4">
+                  <p className="text-cyan-100 dark:text-cyan-200 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto lg:mx-0 mb-4">
                     {user.biografia}
                   </p>
                 )}
                 
-                <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 text-xs sm:text-sm text-emerald-200 dark:text-emerald-300">
+                <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 lg:gap-6 text-xs sm:text-sm text-cyan-200 dark:text-cyan-300">
                   <div className="flex items-center gap-1">
-                    <Calendar className="w-4 h-4" />
+                    <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
                     <span>Se unió {new Date(user?.fecha_creacion || Date.now()).toLocaleDateString()}</span>
                   </div>
                   {user?.ubicacion && (
                     <div className="flex items-center gap-1">
-                      <MapPin className="w-4 h-4" />
-                      <span className="truncate max-w-[200px]">{user.ubicacion}</span>
+                      <MapPin className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span className="truncate max-w-[150px] sm:max-w-[200px]">{user.ubicacion}</span>
                     </div>
                   )}
                   {user?.sitio_web && (
@@ -450,9 +505,9 @@ export default function ProfilePage() {
                       href={user.sitio_web}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1 hover:text-white transition-colors truncate max-w-[200px]"
+                      className="flex items-center gap-1 hover:text-white transition-colors truncate max-w-[150px] sm:max-w-[200px]"
                     >
-                      <Globe className="w-4 h-4 flex-shrink-0" />
+                      <Globe className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                       <span className="truncate">Website</span>
                     </a>
                   )}
@@ -460,89 +515,96 @@ export default function ProfilePage() {
               </div>
 
               {/* Action buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
                 <button
                   onClick={() => setIsEditing(!isEditing)}
-                  className="bg-white/25 dark:bg-white/15 backdrop-blur-sm text-white px-6 py-3 rounded-xl hover:bg-white/35 dark:hover:bg-white/25 transition-all duration-300 flex items-center justify-center gap-2 border border-white/30 hover:border-white/50 shadow-lg hover:shadow-xl font-semibold"
+                  className="bg-white/25 dark:bg-white/15 backdrop-blur-sm text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl hover:bg-white/35 dark:hover:bg-white/25 transition-all duration-300 flex items-center justify-center gap-1.5 sm:gap-2 border border-white/30 hover:border-white/50 shadow-lg hover:shadow-xl font-semibold text-sm sm:text-base"
                 >
-                  <Settings className="w-5 h-5" />
-                  {isEditing ? 'Cancelar' : 'Editar'}
+                  <Settings className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="hidden sm:inline">{isEditing ? 'Cancelar' : 'Editar'}</span>
+                  <span className="sm:hidden">{isEditing ? 'Cancel' : 'Edit'}</span>
                 </button>
                 <button
                   onClick={handleLogout}
-                  className="bg-red-500/30 dark:bg-red-500/40 backdrop-blur-sm text-white px-6 py-3 rounded-xl hover:bg-red-500/40 dark:hover:bg-red-500/50 transition-all duration-300 border border-red-400/30 hover:border-red-400/50 shadow-lg hover:shadow-xl font-semibold"
+                  className="bg-red-500/30 dark:bg-red-500/40 backdrop-blur-sm text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl hover:bg-red-500/40 dark:hover:bg-red-500/50 transition-all duration-300 border border-red-400/30 hover:border-red-400/50 shadow-lg hover:shadow-xl font-semibold text-sm sm:text-base"
                 >
-                  Cerrar Sesión
+                  <span className="hidden sm:inline">Cerrar Sesión</span>
+                  <span className="sm:hidden">Salir</span>
                 </button>
               </div>
             </div>
           </div>
         </motion.div>
 
-        {/* Pestañas de navegación social */}
+        {/* Pestañas de navegación mejoradas */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-3xl shadow-2xl border border-white/30 dark:border-gray-700/60 overflow-hidden"
+          className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/40 dark:border-slate-700/60 overflow-hidden"
         >
-          <div className="flex border-b border-gray-200/50 dark:border-gray-700/50">
+          <div className="flex border-b border-slate-200/50 dark:border-slate-700/50">
             <button
-              onClick={() => setActiveTab('stats')}
-              className={`flex-1 px-4 sm:px-6 py-4 sm:py-5 text-center font-semibold transition-all duration-300 relative group ${
-                activeTab === 'stats'
-                  ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50/80 dark:bg-emerald-900/30'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20'
+              onClick={() => setActiveTab('contributions')}
+              className={`flex-1 px-3 sm:px-4 lg:px-6 py-3 sm:py-4 lg:py-5 text-center font-semibold transition-all duration-300 relative group ${
+                activeTab === 'contributions'
+                  ? 'text-cyan-600 dark:text-cyan-400 bg-cyan-50/80 dark:bg-cyan-900/30'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-cyan-50/50 dark:hover:bg-cyan-900/20'
               }`}
             >
-              <div className="flex items-center justify-center gap-2 sm:gap-3">
-                <RefreshCw className={`w-5 h-5 transition-transform duration-300 ${activeTab === 'stats' ? 'scale-110' : 'group-hover:scale-105'}`} />
-                <span className="text-sm sm:text-base">Estadísticas</span>
+              <div className="flex items-center justify-center gap-1.5 sm:gap-2 lg:gap-3">
+                <Target className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 ${activeTab === 'contributions' ? 'scale-110' : 'group-hover:scale-105'}`} />
+                <span className="text-xs sm:text-sm lg:text-base">Contribuciones</span>
+                {contributionsStats.totalContributions > 0 && (
+                  <span className="bg-cyan-500 text-white text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full font-bold shadow-lg">
+                    {contributionsStats.totalContributions}
+                  </span>
+                )}
               </div>
-              {activeTab === 'stats' && (
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-t-full"></div>
+              {activeTab === 'contributions' && (
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-t-full"></div>
               )}
             </button>
             <button
               onClick={() => setActiveTab('social')}
-              className={`flex-1 px-4 sm:px-6 py-4 sm:py-5 text-center font-semibold transition-all duration-300 relative group ${
+              className={`flex-1 px-3 sm:px-4 lg:px-6 py-3 sm:py-4 lg:py-5 text-center font-semibold transition-all duration-300 relative group ${
                 activeTab === 'social'
-                  ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50/80 dark:bg-emerald-900/30'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20'
+                  ? 'text-blue-600 dark:text-blue-400 bg-blue-50/80 dark:bg-blue-900/30'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-900/20'
               }`}
             >
-              <div className="flex items-center justify-center gap-2 sm:gap-3">
-                <Users className={`w-5 h-5 transition-transform duration-300 ${activeTab === 'social' ? 'scale-110' : 'group-hover:scale-105'}`} />
-                <span className="text-sm sm:text-base">Social</span>
+              <div className="flex items-center justify-center gap-1.5 sm:gap-2 lg:gap-3">
+                <Users className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 ${activeTab === 'social' ? 'scale-110' : 'group-hover:scale-105'}`} />
+                <span className="text-xs sm:text-sm lg:text-base">Social</span>
                 {seguidores.length > 0 && (
-                  <span className="bg-emerald-500 text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg">
+                  <span className="bg-blue-500 text-white text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full font-bold shadow-lg">
                     {seguidores.length}
                   </span>
                 )}
               </div>
               {activeTab === 'social' && (
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-t-full"></div>
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-blue-600 rounded-t-full"></div>
               )}
             </button>
             <button
               onClick={() => setActiveTab('saved')}
-              className={`flex-1 px-4 sm:px-6 py-4 sm:py-5 text-center font-semibold transition-all duration-300 relative group ${
+              className={`flex-1 px-3 sm:px-4 lg:px-6 py-3 sm:py-4 lg:py-5 text-center font-semibold transition-all duration-300 relative group ${
                 activeTab === 'saved'
-                  ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50/80 dark:bg-emerald-900/30'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20'
+                  ? 'text-slate-600 dark:text-slate-400 bg-slate-50/80 dark:bg-slate-900/30'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-400 hover:bg-slate-50/50 dark:hover:bg-slate-900/20'
               }`}
             >
-              <div className="flex items-center justify-center gap-2 sm:gap-3">
-                <Bookmark className={`w-5 h-5 transition-transform duration-300 ${activeTab === 'saved' ? 'scale-110' : 'group-hover:scale-105'}`} />
-                <span className="text-sm sm:text-base">Guardados</span>
+              <div className="flex items-center justify-center gap-1.5 sm:gap-2 lg:gap-3">
+                <Bookmark className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 ${activeTab === 'saved' ? 'scale-110' : 'group-hover:scale-105'}`} />
+                <span className="text-xs sm:text-sm lg:text-base">Guardados</span>
                 {feedbackGuardado.length > 0 && (
-                  <span className="bg-emerald-500 text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg">
+                  <span className="bg-slate-500 text-white text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full font-bold shadow-lg">
                     {feedbackGuardado.length}
                   </span>
                 )}
               </div>
               {activeTab === 'saved' && (
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-t-full"></div>
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-slate-500 to-slate-600 rounded-t-full"></div>
               )}
             </button>
           </div>
@@ -881,250 +943,220 @@ export default function ProfilePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-3xl shadow-2xl p-6 sm:p-8 border border-white/30 dark:border-gray-700/60"
+          className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl rounded-3xl shadow-2xl p-4 sm:p-6 lg:p-8 border border-white/40 dark:border-slate-700/60"
         >
-          {/* Pestaña de Estadísticas */}
-          {activeTab === 'stats' && (
+          {/* Pestaña de Contribuciones */}
+          {activeTab === 'contributions' && (
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Mi Actividad</h2>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Sistema de Contribuciones</h2>
+                <Link href="/contribuir" className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 flex items-center gap-2 text-sm sm:text-base">
+                  <Target className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="hidden sm:inline">Nueva Contribución</span>
+                  <span className="sm:hidden">Nueva</span>
+                </Link>
+              </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {/* Contribuciones con link */}
-            <Link href="/contribuir" className="block transform transition-all duration-300 hover:scale-105 hover:-translate-y-1">
-              <div className="text-center p-6 bg-gradient-to-br from-emerald-50 to-emerald-100/80 dark:from-emerald-900/40 dark:to-emerald-800/30 backdrop-blur-sm rounded-2xl border border-emerald-200/60 dark:border-emerald-700/60 hover:border-emerald-300 dark:hover:border-emerald-600 cursor-pointer transition-all duration-300 group shadow-lg hover:shadow-2xl">
-                <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-emerald-600 dark:from-emerald-400 dark:to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl group-hover:shadow-2xl transition-all duration-300 group-hover:scale-110">
-                  <User className="w-7 h-7 text-white" />
-                </div>
-                <h3 className="font-bold text-gray-900 dark:text-white flex items-center justify-center gap-2 mb-3 text-lg">
-                  Contribuciones
-                  <ExternalLink className="w-4 h-4 opacity-70 group-hover:opacity-100 transition-opacity" />
-                </h3>
-                {isLoadingStats ? (
-                  <div className="animate-pulse">
-                    <div className="h-8 bg-gray-200 dark:bg-gray-600 rounded-lg mt-1 mb-2"></div>
-                    <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded"></div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+                {/* Estadísticas de contribuciones */}
+                <motion.div 
+                  whileHover={{ scale: 1.02 }}
+                  className="text-center p-4 sm:p-6 bg-gradient-to-br from-cyan-50 to-cyan-100/80 dark:from-cyan-900/30 dark:to-cyan-800/30 backdrop-blur-sm rounded-2xl border border-cyan-200/60 dark:border-cyan-700/60 hover:shadow-lg transition-all duration-300"
+                >
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-xl">
+                    <Target className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                   </div>
-                ) : (
-                  <>
-                    <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mt-1 mb-1">{stats.contributions}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">palabras enviadas</p>
-                  </>
-                )}
-              </div>
-            </Link>
-
-            {/* Feedback con link */}
-            <Link href="/feedback" className="block transform transition-all duration-300 hover:scale-105 hover:-translate-y-1">
-              <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-blue-100/80 dark:from-blue-900/40 dark:to-blue-800/30 backdrop-blur-sm rounded-2xl border border-blue-200/60 dark:border-blue-700/60 hover:border-blue-300 dark:hover:border-blue-600 cursor-pointer transition-all duration-300 group shadow-lg hover:shadow-2xl">
-                <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl group-hover:shadow-2xl transition-all duration-300 group-hover:scale-110">
-                  <Mail className="w-7 h-7 text-white" />
-                </div>
-                <h3 className="font-bold text-gray-900 dark:text-white flex items-center justify-center gap-2 mb-3 text-lg">
-                  Feedback
-                  <ExternalLink className="w-4 h-4 opacity-70 group-hover:opacity-100 transition-opacity" />
-                </h3>
-                {isLoadingStats ? (
-                  <div className="animate-pulse">
-                    <div className="h-8 bg-gray-200 dark:bg-gray-600 rounded-lg mt-1 mb-2"></div>
-                    <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded"></div>
-                  </div>
-                ) : (
-                  <>
-                    <p className="text-3xl font-bold text-blue-600 dark:text-blue-400 mt-1 mb-1">{stats.feedback}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">mensajes enviados</p>
-                  </>
-                )}
-              </div>
-            </Link>
-
-            {/* Palabras guardadas sin link - expansible */}
-            <div className="text-center p-6 bg-gradient-to-br from-purple-50 to-purple-100/80 dark:from-purple-900/40 dark:to-purple-800/30 backdrop-blur-sm rounded-2xl border border-purple-200/60 dark:border-purple-700/60 transition-all duration-300 shadow-lg hover:shadow-xl">
-              <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 dark:from-purple-400 dark:to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl">
-                <AtSign className="w-7 h-7 text-white" />
-              </div>
-              <h3 className="font-bold text-gray-900 dark:text-white mb-3 text-lg">Palabras Guardadas</h3>
-              {isLoadingStats ? (
-                <div className="animate-pulse">
-                  <div className="h-8 bg-gray-200 dark:bg-gray-600 rounded-lg mt-1 mb-2"></div>
-                  <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded"></div>
-                </div>
-              ) : (
-                <>
-                  <p className="text-3xl font-bold text-purple-600 dark:text-purple-400 mt-1 mb-1">{stats.savedWords}</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">palabras guardadas</p>
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* Lista de palabras guardadas */}
-          {savedWords.length > 0 && (
-            <div className="mt-8">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-                <AtSign className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-                Mis Palabras Guardadas
-              </h3>
-              {isLoadingSavedWords ? (
-                <div className="space-y-4">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="animate-pulse">
-                      <div className="h-20 bg-gray-200 dark:bg-gray-700 rounded-2xl"></div>
+                  <h3 className="font-bold text-slate-900 dark:text-white mb-2 text-base sm:text-lg">Total</h3>
+                  {isLoadingContributions ? (
+                    <div className="animate-pulse">
+                      <div className="h-6 sm:h-8 bg-slate-200 dark:bg-slate-600 rounded-lg mb-2"></div>
+                      <div className="h-3 sm:h-4 bg-slate-200 dark:bg-slate-600 rounded"></div>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="grid gap-4 max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
-                  {savedWords.slice(0, 10).map((saved: SavedWord, index) => (
-                    <motion.div
-                      key={saved.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="bg-gradient-to-r from-purple-50 to-purple-100/80 dark:from-purple-900/30 dark:to-purple-800/20 rounded-2xl p-5 border border-purple-200/60 dark:border-purple-700/60 hover:shadow-lg transition-all duration-300 hover:scale-[1.02]"
-                    >
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <h4 className="font-bold text-gray-900 dark:text-white text-lg mb-2">{saved.diccionario?.word}</h4>
-                          <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-3">{saved.diccionario?.definition}</p>
-                          {saved.diccionario?.info_gramatical && (
-                            <span className="inline-block px-3 py-1 bg-purple-200 dark:bg-purple-800 text-purple-800 dark:text-purple-200 text-xs font-semibold rounded-full">
-                              {saved.diccionario.info_gramatical}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                  {savedWords.length > 10 && (
-                    <div className="text-center py-4">
-                      <p className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded-full px-4 py-2 inline-block">
-                        Y {savedWords.length - 10} palabras más...
-                      </p>
-                    </div>
+                  ) : (
+                    <>
+                      <p className="text-2xl sm:text-3xl font-bold text-cyan-600 dark:text-cyan-400 mb-1">{contributionsStats.totalContributions}</p>
+                      <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">contribuciones</p>
+                    </>
                   )}
-                </div>
-              )}
-            </div>
-          )}
+                </motion.div>
+                
+
+                <motion.div 
+                  whileHover={{ scale: 1.02 }}
+                  className="text-center p-4 sm:p-6 bg-gradient-to-br from-green-50 to-green-100/80 dark:from-green-900/30 dark:to-green-800/30 backdrop-blur-sm rounded-2xl border border-green-200/60 dark:border-green-700/60 hover:shadow-lg transition-all duration-300"
+                >
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-xl">
+                    <CheckCircle className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                  </div>
+                  <h3 className="font-bold text-slate-900 dark:text-white mb-2 text-base sm:text-lg">Aprobadas</h3>
+                  {isLoadingContributions ? (
+                    <div className="animate-pulse">
+                      <div className="h-6 sm:h-8 bg-slate-200 dark:bg-slate-600 rounded-lg mb-2"></div>
+                      <div className="h-3 sm:h-4 bg-slate-200 dark:bg-slate-600 rounded"></div>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-2xl sm:text-3xl font-bold text-green-600 dark:text-green-400 mb-1">{contributionsStats.approvedContributions}</p>
+                      <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">aprobadas</p>
+                    </>
+                  )}
+                </motion.div>
+
+                <motion.div 
+                  whileHover={{ scale: 1.02 }}
+                  className="text-center p-4 sm:p-6 bg-gradient-to-br from-yellow-50 to-yellow-100/80 dark:from-yellow-900/30 dark:to-yellow-800/30 backdrop-blur-sm rounded-2xl border border-yellow-200/60 dark:border-yellow-700/60 hover:shadow-lg transition-all duration-300"
+                >
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-xl">
+                    <Clock className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                  </div>
+                  <h3 className="font-bold text-slate-900 dark:text-white mb-2 text-base sm:text-lg">Pendientes</h3>
+                  {isLoadingContributions ? (
+                    <div className="animate-pulse">
+                      <div className="h-6 sm:h-8 bg-slate-200 dark:bg-slate-600 rounded-lg mb-2"></div>
+                      <div className="h-3 sm:h-4 bg-slate-200 dark:bg-slate-600 rounded"></div>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-2xl sm:text-3xl font-bold text-yellow-600 dark:text-yellow-400 mb-1">{contributionsStats.pendingContributions}</p>
+                      <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">pendientes</p>
+                    </>
+                  )}
+                </motion.div>
+
+                <motion.div 
+                  whileHover={{ scale: 1.02 }}
+                  className="text-center p-4 sm:p-6 bg-gradient-to-br from-blue-50 to-blue-100/80 dark:from-blue-900/30 dark:to-blue-800/30 backdrop-blur-sm rounded-2xl border border-blue-200/60 dark:border-blue-700/60 hover:shadow-lg transition-all duration-300"
+                >
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-xl">
+                    <Trophy className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                  </div>
+                  <h3 className="font-bold text-slate-900 dark:text-white mb-2 text-base sm:text-lg">Puntos</h3>
+                  {isLoadingContributions ? (
+                    <div className="animate-pulse">
+                      <div className="h-6 sm:h-8 bg-slate-200 dark:bg-slate-600 rounded-lg mb-2"></div>
+                      <div className="h-3 sm:h-4 bg-slate-200 dark:bg-slate-600 rounded"></div>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400 mb-1">{contributionsStats.totalPoints}</p>
+                      <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">puntos ganados</p>
+                    </>
+                  )}
+                </motion.div>
+              </div>
+
+              {/* Sección de navegación rápida */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <Link href="/feedback" className="block transform transition-all duration-300 hover:scale-105 hover:-translate-y-1">
+                  <div className="text-center p-4 sm:p-6 bg-gradient-to-br from-blue-50 to-blue-100/80 dark:from-blue-900/30 dark:to-blue-800/30 backdrop-blur-sm rounded-2xl border border-blue-200/60 dark:border-blue-700/60 hover:border-blue-300 dark:hover:border-blue-600 cursor-pointer transition-all duration-300 group shadow-lg hover:shadow-2xl">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-xl group-hover:shadow-2xl transition-all duration-300 group-hover:scale-110">
+                      <MessageCircle className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                    </div>
+                    <h3 className="font-bold text-slate-900 dark:text-white flex items-center justify-center gap-2 mb-2 text-base sm:text-lg">
+                      Comunidad
+                      <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 opacity-70 group-hover:opacity-100 transition-opacity" />
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">Participa en la comunidad</p>
+                  </div>
+                </Link>
+
+                <Link href="/experiencia-social" className="block transform transition-all duration-300 hover:scale-105 hover:-translate-y-1">
+                  <div className="text-center p-4 sm:p-6 bg-gradient-to-br from-purple-50 to-purple-100/80 dark:from-purple-900/30 dark:to-purple-800/30 backdrop-blur-sm rounded-2xl border border-purple-200/60 dark:border-purple-700/60 hover:border-purple-300 dark:hover:border-purple-600 cursor-pointer transition-all duration-300 group shadow-lg hover:shadow-2xl">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-xl group-hover:shadow-2xl transition-all duration-300 group-hover:scale-110">
+                      <Users className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                    </div>
+                    <h3 className="font-bold text-slate-900 dark:text-white flex items-center justify-center gap-2 mb-2 text-base sm:text-lg">
+                      Experiencia Social
+                      <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 opacity-70 group-hover:opacity-100 transition-opacity" />
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">Ve tu progreso social</p>
+                  </div>
+                </Link>
+              </div>
             </div>
           )}
 
           {/* Pestaña Social */}
           {activeTab === 'social' && (
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8 flex items-center gap-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center">
-                  <Users className="w-5 h-5 text-white" />
-                </div>
-                Red Social
-              </h2>
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-6">Actividad Social</h2>
               
               {isLoadingSocial ? (
-                <div className="space-y-6">
-                  <div className="animate-pulse">
-                    <div className="h-40 bg-gray-200 dark:bg-gray-700 rounded-2xl"></div>
-                  </div>
-                  <div className="animate-pulse">
-                    <div className="h-40 bg-gray-200 dark:bg-gray-700 rounded-2xl"></div>
-                  </div>
+                <div className="flex justify-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
                 </div>
               ) : (
-                <div className="space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {/* Seguidores */}
-                  <div className="bg-gradient-to-br from-blue-50 to-blue-100/80 dark:from-blue-900/30 dark:to-blue-800/20 rounded-2xl p-6 border border-blue-200/60 dark:border-blue-700/60">
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
-                      <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-                        <Users className="w-5 h-5 text-white" />
-                      </div>
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100/80 dark:from-blue-900/30 dark:to-blue-800/30 rounded-2xl p-6 border border-blue-200/60 dark:border-blue-700/60">
+                    <h3 className="font-bold text-blue-900 dark:text-blue-100 mb-4 flex items-center gap-2">
+                      <Users className="w-5 h-5" />
                       Seguidores ({seguidores.length})
                     </h3>
-                    {seguidores.length === 0 ? (
-                      <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-                        <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                          <Users className="w-8 h-8 text-gray-400" />
-                        </div>
-                        <p className="text-lg font-medium">No tienes seguidores aún</p>
-                        <p className="text-sm mt-2">¡Comparte contenido para atraer seguidores!</p>
-                      </div>
-                    ) : (
-                      <div className="grid gap-4">
+                    {seguidores.length > 0 ? (
+                      <div className="space-y-3 max-h-64 overflow-y-auto">
                         {seguidores.slice(0, 5).map((seguidor, index) => (
-                          <motion.div
-                            key={seguidor.id}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.1 }}
-                          >
-                            <UserCard
-                              user={seguidor.seguidor}
-                              variant="compact"
-                              onUserClick={(userId) => {
-                                // TODO: Navegar al perfil del usuario
-                                console.log('Navigate to user profile:', userId);
-                              }}
-                            />
-                          </motion.div>
+                          <UserCard key={`seguidor-${seguidor.id}-${index}`} user={seguidor.seguidor} />
                         ))}
                         {seguidores.length > 5 && (
-                          <div className="text-center py-4">
-                            <p className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded-full px-4 py-2 inline-block">
-                              Y {seguidores.length - 5} seguidores más...
-                            </p>
-                          </div>
+                          <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">
+                            +{seguidores.length - 5} más
+                          </p>
                         )}
                       </div>
+                    ) : (
+                      <p className="text-blue-600 dark:text-blue-400 text-sm">No tienes seguidores aún</p>
                     )}
                   </div>
 
                   {/* Siguiendo */}
-                  <div className="bg-gradient-to-br from-pink-50 to-pink-100/80 dark:from-pink-900/30 dark:to-pink-800/20 rounded-2xl p-6 border border-pink-200/60 dark:border-pink-700/60">
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
-                      <div className="w-8 h-8 bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl flex items-center justify-center">
-                        <Heart className="w-5 h-5 text-white" />
-                      </div>
+                  <div className="bg-gradient-to-br from-green-50 to-green-100/80 dark:from-green-900/30 dark:to-green-800/30 rounded-2xl p-6 border border-green-200/60 dark:border-green-700/60">
+                    <h3 className="font-bold text-green-900 dark:text-green-100 mb-4 flex items-center gap-2">
+                      <Heart className="w-5 h-5" />
                       Siguiendo ({siguiendo.length})
                     </h3>
-                    {siguiendo.length === 0 ? (
-                      <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-                        <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                          <Heart className="w-8 h-8 text-gray-400" />
-                        </div>
-                        <p className="text-lg font-medium">No sigues a nadie aún</p>
-                        <p className="text-sm mt-2">¡Descubre usuarios interesantes para seguir!</p>
-                      </div>
-                    ) : (
-                      <div className="grid gap-4">
-                        {siguiendo.slice(0, 5).map((seguimiento, index) => (
-                          <motion.div
-                            key={seguimiento.id}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.1 }}
-                          >
-                            <UserCard
-                              user={seguimiento.seguido}
-                              variant="compact"
-                              showFollowButton={true}
-                              isFollowing={true}
-                              onUnfollow={(userId) => {
-                                // TODO: Implementar dejar de seguir
-                                console.log('Unfollow user:', userId);
-                              }}
-                              onUserClick={(userId) => {
-                                // TODO: Navegar al perfil del usuario
-                                console.log('Navigate to user profile:', userId);
-                              }}
-                            />
-                          </motion.div>
+                    {siguiendo.length > 0 ? (
+                      <div className="space-y-3 max-h-64 overflow-y-auto">
+                        {siguiendo.slice(0, 5).map((seguido, index) => (
+                          <UserCard key={`siguiendo-${seguido.id}-${index}`} user={seguido.seguido} />
                         ))}
                         {siguiendo.length > 5 && (
-                          <div className="text-center py-4">
-                            <p className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded-full px-4 py-2 inline-block">
-                              Y {siguiendo.length - 5} usuarios más...
-                            </p>
-                          </div>
+                          <p className="text-sm text-green-600 dark:text-green-400 font-medium">
+                            +{siguiendo.length - 5} más
+                          </p>
                         )}
                       </div>
+                    ) : (
+                      <p className="text-green-600 dark:text-green-400 text-sm">No sigues a nadie aún</p>
+                    )}
+                  </div>
+
+                  {/* Feedback Guardado */}
+                  <div className="bg-gradient-to-br from-purple-50 to-purple-100/80 dark:from-purple-900/30 dark:to-purple-800/30 rounded-2xl p-6 border border-purple-200/60 dark:border-purple-700/60">
+                    <h3 className="font-bold text-purple-900 dark:text-purple-100 mb-4 flex items-center gap-2">
+                      <Bookmark className="w-5 h-5" />
+                      Feedback Guardado ({feedbackGuardado.length})
+                    </h3>
+                    {feedbackGuardado.length > 0 ? (
+                      <div className="space-y-3 max-h-64 overflow-y-auto">
+                        {feedbackGuardado.slice(0, 3).map((feedback, index) => (
+                          <div key={`feedback-${feedback.id}-${index}`} className="bg-white/70 dark:bg-purple-800/30 rounded-lg p-3">
+                            <p className="text-sm text-purple-800 dark:text-purple-200 line-clamp-2">
+                              {feedback.retroalimentacion?.contenido || 'Sin contenido'}
+                            </p>
+                            <p className="text-xs text-purple-600 dark:text-purple-400 mt-1">
+                              Por {feedback.retroalimentacion?.usuario?.nombre_completo || 'Usuario'}
+                            </p>
+                          </div>
+                        ))}
+                        {feedbackGuardado.length > 3 && (
+                          <p className="text-sm text-purple-600 dark:text-purple-400 font-medium">
+                            +{feedbackGuardado.length - 3} más
+                          </p>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-purple-600 dark:text-purple-400 text-sm">No has guardado feedback aún</p>
                     )}
                   </div>
                 </div>
@@ -1135,98 +1167,39 @@ export default function ProfilePage() {
           {/* Pestaña Guardados */}
           {activeTab === 'saved' && (
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8 flex items-center gap-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
-                  <Bookmark className="w-5 h-5 text-white" />
-                </div>
-                Feedback Guardado
-              </h2>
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-6">Contenido Guardado</h2>
               
-              {isLoadingSocial ? (
-                <div className="space-y-6">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="animate-pulse">
-                      <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded-2xl"></div>
+              {isLoadingSavedWords ? (
+                <div className="flex justify-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-600"></div>
+                </div>
+              ) : savedWords.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {savedWords.map((word) => (
+                    <div key={word.id} className="bg-gradient-to-br from-slate-50 to-slate-100/80 dark:from-slate-800/50 dark:to-slate-700/50 rounded-2xl p-6 border border-slate-200/60 dark:border-slate-600/60 hover:shadow-lg transition-all duration-300">
+                      <h3 className="font-bold text-slate-900 dark:text-white text-lg mb-2">
+                        {word.diccionario?.word || 'Palabra'}
+                      </h3>
+                      <p className="text-slate-600 dark:text-slate-400 text-sm mb-2">
+                        {word.diccionario?.definition || 'Sin definición'}
+                      </p>
+                      {word.diccionario?.info_gramatical && (
+                        <span className="inline-block px-2 py-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs rounded-full">
+                          {word.diccionario.info_gramatical}
+                        </span>
+                      )}
                     </div>
                   ))}
-                </div>
-              ) : feedbackGuardado.length === 0 ? (
-                <div className="text-center py-16 text-gray-500 dark:text-gray-400">
-                  <div className="w-20 h-20 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Bookmark className="w-10 h-10 text-gray-400" />
-                  </div>
-                  <p className="text-xl font-medium mb-2">No has guardado ningún feedback aún</p>
-                  <p className="text-sm">¡Explora el contenido y guarda lo que te interese!</p>
                 </div>
               ) : (
-                <div className="space-y-6">
-                  {feedbackGuardado.slice(0, 10).map((item, index) => (
-                    <motion.div
-                      key={item.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="bg-gradient-to-r from-purple-50 to-purple-100/80 dark:from-purple-900/30 dark:to-purple-800/20 rounded-2xl p-6 border border-purple-200/60 dark:border-purple-700/60 hover:shadow-lg transition-all duration-300 hover:scale-[1.02]"
-                    >
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                          {item.retroalimentacion.usuario.nombre_completo[0]}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-bold text-gray-900 dark:text-white text-lg mb-2">
-                            {item.retroalimentacion.titulo}
-                          </h4>
-                          <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
-                            {item.retroalimentacion.contenido.substring(0, 150)}...
-                          </p>
-                          <div className="flex items-center gap-6 mb-4 text-sm text-gray-500 dark:text-gray-400">
-                            <span className="flex items-center gap-2">
-                              <Heart className="w-4 h-4 text-red-500" />
-                              <span className="font-semibold">{item.retroalimentacion.contador_likes}</span>
-                            </span>
-                            <span className="flex items-center gap-2">
-                              <MessageCircle className="w-4 h-4 text-blue-500" />
-                              <span className="font-semibold">0</span>
-                            </span>
-                            <span className="flex items-center gap-2">
-                              <Share2 className="w-4 h-4 text-green-500" />
-                              <span className="font-semibold">{item.retroalimentacion.compartido_contador}</span>
-                            </span>
-                            <span className="text-xs bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
-                              Guardado {new Date(item.fecha_guardado).toLocaleDateString()}
-                            </span>
-                          </div>
-                          {item.notas_personales && (
-                            <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/30 rounded-xl border border-blue-200 dark:border-blue-700">
-                              <p className="text-sm text-blue-800 dark:text-blue-200">
-                                <strong>Nota personal:</strong> {item.notas_personales}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                  {feedbackGuardado.length > 10 && (
-                    <div className="text-center py-6">
-                      <p className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded-full px-6 py-3 inline-block">
-                        Y {feedbackGuardado.length - 10} feedbacks más...
-                      </p>
-                    </div>
-                  )}
+                <div className="text-center py-12">
+                  <Bookmark className="w-16 h-16 text-slate-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-slate-600 dark:text-slate-400 mb-2">No hay palabras guardadas</h3>
+                  <p className="text-slate-500 dark:text-slate-500">Guarda palabras del diccionario para verlas aquí</p>
                 </div>
               )}
             </div>
           )}
-        </motion.div>
-
-        {/* Sistema de Recompensas */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          {userData && <Recompensas userId={userData.id} />}
         </motion.div>
       </div>
     </div>

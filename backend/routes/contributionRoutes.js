@@ -2,6 +2,61 @@
 const express = require('express');
 const router = express.Router();
 const { supabase } = require('../config/database');
+const { authenticateToken } = require('../middleware/auth');
+
+// GET /api/contributions/stats/:userId - Obtener estadísticas de contribuciones
+router.get('/stats/:userId', authenticateToken, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    // Verificar que el usuario esté accediendo a sus propias estadísticas o sea admin
+    if (req.user.id !== userId && req.user.rol !== 'admin') {
+      return res.status(403).json({ error: 'No tienes permisos para acceder a estas estadísticas' });
+    }
+
+    // Obtener estadísticas de contribuciones
+    const { data: contribuciones, error: contribucionesError } = await supabase
+      .from('contribuciones_diccionario')
+      .select('estado')
+      .eq('usuario_id', userId);
+
+    if (contribucionesError) {
+      throw contribucionesError;
+    }
+
+    // Calcular estadísticas
+    const totalContributions = contribuciones.length;
+    const approvedContributions = contribuciones.filter(c => c.estado === 'aprobada').length;
+    const pendingContributions = contribuciones.filter(c => c.estado === 'pendiente').length;
+    const rejectedContributions = contribuciones.filter(c => c.estado === 'rechazada').length;
+
+    // Obtener puntos totales de recompensas
+    const { data: recompensas, error: recompensasError } = await supabase
+      .from('recompensas_usuario')
+      .select('puntos_totales, nivel, experiencia')
+      .eq('usuario_id', userId)
+      .single();
+
+    if (recompensasError && recompensasError.code !== 'PGRST116') {
+      throw recompensasError;
+    }
+
+    const stats = {
+      totalContributions,
+      approvedContributions,
+      pendingContributions,
+      rejectedContributions,
+      totalPoints: recompensas?.puntos_totales || 0,
+      level: recompensas?.nivel || 'principiante',
+      experience: recompensas?.experiencia || 0
+    };
+
+    res.json(stats);
+  } catch (error) {
+    console.error('Error getting contribution stats:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
 
 // GET /api/contributions/user/:userId - Obtener contribuciones del usuario
 router.get('/user/:userId', async (req, res) => {

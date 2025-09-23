@@ -138,6 +138,7 @@ app.use('/api/feedback', feedbackRoutes);
 app.use('/api/temas', temasRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/contributions', contributionRoutes);
+app.use('/api/contribuciones', contributionRoutes); // Alias en español
 app.use('/api/recompensas', recompensasRoutes);
 app.use('/api/social', socialRoutes);
 app.use('/api/temas-stats', temasStatsRoutes);
