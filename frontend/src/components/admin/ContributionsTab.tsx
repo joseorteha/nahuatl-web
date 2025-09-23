@@ -85,39 +85,43 @@ export default function ContributionsTab({ contributions, onSelectContribution }
     : contributions;
 
   return (
-    <div className="space-y-6">
-      {/* Filtros */}
+    <div className="space-y-4 sm:space-y-6">
+      {/* Filtros - Responsive */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-xl p-4 border border-slate-200/60 dark:border-slate-700/60 shadow-lg"
+        className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-slate-200/60 dark:border-slate-700/60 shadow-lg"
       >
-        <div className="flex items-center gap-2 mb-3">
-          <Filter className="h-5 w-5 text-slate-600 dark:text-slate-300" />
-          <span className="font-medium text-slate-700 dark:text-slate-200">Filtros</span>
+        <div className="flex items-center gap-2 mb-2 sm:mb-3">
+          <Filter className="h-4 w-4 sm:h-5 sm:w-5 text-slate-600 dark:text-slate-300" />
+          <span className="font-medium text-slate-700 dark:text-slate-200 text-sm sm:text-base">Filtros</span>
         </div>
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
           <button
             onClick={() => setFilter('pendiente')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+            className={`flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg font-medium transition-all duration-200 text-sm sm:text-base ${
               filter === 'pendiente'
                 ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg'
                 : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
             }`}
           >
-            <Clock className="h-4 w-4" />
-            Pendientes ({contributions.filter(c => c.estado === 'pendiente').length})
+            <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Pendientes</span>
+            <span className="sm:hidden">Pend.</span>
+            <span className="ml-1">({contributions.filter(c => c.estado === 'pendiente').length})</span>
           </button>
           <button
             onClick={() => setFilter('todas')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+            className={`flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg font-medium transition-all duration-200 text-sm sm:text-base ${
               filter === 'todas'
                 ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg'
                 : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
             }`}
           >
-            <Globe className="h-4 w-4" />
-            Todas ({contributions.length})
+            <Globe className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Todas</span>
+            <span className="sm:hidden">Todas</span>
+            <span className="ml-1">({contributions.length})</span>
           </button>
         </div>
       </motion.div>
@@ -133,93 +137,149 @@ export default function ContributionsTab({ contributions, onSelectContribution }
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="text-center py-16"
+            className="text-center py-8 sm:py-12 lg:py-16"
           >
-            <div className="mb-6">
-              <div className="mx-auto w-20 h-20 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full flex items-center justify-center">
-                <FileText className="h-10 w-10 text-white" />
+            <div className="mb-4 sm:mb-6">
+              <div className="mx-auto w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full flex items-center justify-center">
+                <FileText className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
               </div>
             </div>
-            <h3 className="text-xl font-semibold text-slate-800 dark:text-white mb-2">
+            <h3 className="text-lg sm:text-xl font-semibold text-slate-800 dark:text-white mb-2 px-4">
               {filter === 'pendiente' ? 'No hay contribuciones pendientes' : 'No hay contribuciones'}
             </h3>
-            <p className="text-slate-600 dark:text-slate-300">
+            <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base px-4">
               {filter === 'pendiente' 
                 ? 'Todas las contribuciones han sido revisadas.' 
                 : 'No se han recibido contribuciones aún.'}
             </p>
           </motion.div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full">
-              <thead className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-700 dark:to-slate-800">
-                <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
-                    Palabra
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
-                    Contribuidor
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
-                    Estado
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
-                    Fecha
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
-                    Acciones
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {filteredContributions.map((contribution, index) => (
-                  <motion.tr 
-                    key={contribution.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
-                  >
-                    <td className="px-6 py-4">
-                      <div>
-                        <div className="text-sm font-semibold text-slate-900 dark:text-white">
-                          {contribution.word}
+          <>
+            {/* Vista de escritorio - Tabla */}
+            <div className="hidden lg:block overflow-x-auto">
+              <table className="min-w-full">
+                <thead className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-700 dark:to-slate-800">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                      Palabra
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                      Contribuidor
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                      Estado
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                      Fecha
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                      Acciones
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                  {filteredContributions.map((contribution, index) => (
+                    <motion.tr 
+                      key={contribution.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+                    >
+                      <td className="px-6 py-4">
+                        <div>
+                          <div className="text-sm font-semibold text-slate-900 dark:text-white">
+                            {contribution.word}
+                          </div>
+                          <div className="text-sm text-slate-600 dark:text-slate-300 line-clamp-1">
+                            {contribution.definition}
+                          </div>
                         </div>
-                        <div className="text-sm text-slate-600 dark:text-slate-300 line-clamp-1">
-                          {contribution.definition}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div>
+                          <div className="text-sm font-medium text-slate-900 dark:text-white">
+                            {contribution.perfiles.nombre_completo}
+                          </div>
+                          <div className="text-sm text-slate-600 dark:text-slate-400">
+                            {contribution.perfiles.email}
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div>
-                        <div className="text-sm font-medium text-slate-900 dark:text-white">
-                          {contribution.perfiles.nombre_completo}
-                        </div>
-                        <div className="text-sm text-slate-600 dark:text-slate-400">
-                          {contribution.perfiles.email}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
+                      </td>
+                      <td className="px-6 py-4">
+                        {getStatusBadge(contribution.estado)}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                        {formatDate(contribution.fecha_creacion)}
+                      </td>
+                      <td className="px-6 py-4">
+                        <button
+                          onClick={() => onSelectContribution(contribution)}
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm font-medium rounded-lg hover:from-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                        >
+                          <Eye className="h-4 w-4" />
+                          Ver Detalles
+                        </button>
+                      </td>
+                    </motion.tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Vista móvil - Cards */}
+            <div className="lg:hidden space-y-3 p-3 sm:p-4">
+              {filteredContributions.map((contribution, index) => (
+                <motion.div
+                  key={contribution.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="bg-white dark:bg-slate-700 rounded-xl p-4 border border-slate-200 dark:border-slate-600 shadow-sm hover:shadow-md transition-all duration-200"
+                >
+                  {/* Header con palabra y estado */}
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-1">
+                        {contribution.word}
+                      </h3>
+                      <p className="text-sm text-slate-600 dark:text-slate-300 line-clamp-2">
+                        {contribution.definition}
+                      </p>
+                    </div>
+                    <div className="ml-3 flex-shrink-0">
                       {getStatusBadge(contribution.estado)}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                    </div>
+                  </div>
+
+                  {/* Información del contribuidor */}
+                  <div className="mb-3">
+                    <div className="text-sm font-medium text-slate-900 dark:text-white">
+                      {contribution.perfiles.nombre_completo}
+                    </div>
+                    <div className="text-xs text-slate-600 dark:text-slate-400">
+                      {contribution.perfiles.email}
+                    </div>
+                  </div>
+
+                  {/* Fecha y botón */}
+                  <div className="flex items-center justify-between">
+                    <div className="text-xs text-slate-500 dark:text-slate-400">
                       {formatDate(contribution.fecha_creacion)}
-                    </td>
-                    <td className="px-6 py-4">
-                      <button
-                        onClick={() => onSelectContribution(contribution)}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm font-medium rounded-lg hover:from-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl"
-                      >
-                        <Eye className="h-4 w-4" />
-                        Ver Detalles
-                      </button>
-                    </td>
-                  </motion.tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    </div>
+                    <button
+                      onClick={() => onSelectContribution(contribution)}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-xs font-medium rounded-lg hover:from-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-sm hover:shadow-md"
+                    >
+                      <Eye className="h-3.5 w-3.5" />
+                      <span className="hidden sm:inline">Ver Detalles</span>
+                      <span className="sm:hidden">Ver</span>
+                    </button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </>
         )}
       </motion.div>
     </div>
