@@ -144,39 +144,39 @@ export default function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-700/50 shadow-sm">
+    <header className="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-200/60 dark:border-slate-700/60 shadow-lg">
       <div className="container-wide">
-        <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
-          {/* Logo y brand - Rediseñado */}
-          <Link href={user ? "/dashboard" : "/"} className="group flex items-center gap-3">
+        <div className="flex items-center justify-between h-16 px-3 sm:px-4 lg:px-6">
+          {/* Logo y brand - Responsive */}
+          <Link href={user ? "/dashboard" : "/"} className="group flex items-center gap-2 sm:gap-3">
             <div className="relative">
               <Image 
                 src="/logo.png" 
                 alt="Nawatlahtol Logo" 
-                width={40} 
-                height={40} 
-                className="object-contain group-hover:scale-105 transition-transform duration-300"
+                width={32} 
+                height={32} 
+                className="sm:w-10 sm:h-10 object-contain group-hover:scale-105 transition-transform duration-300"
                 priority
               />
             </div>
             <div className="flex flex-col">
-              <span className="text-xl font-bold bg-gradient-to-r from-cyan-600 via-blue-600 to-slate-600 bg-clip-text text-transparent group-hover:from-cyan-500 group-hover:via-blue-500 group-hover:to-slate-500 transition-all duration-300">
+              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-cyan-600 via-blue-600 to-slate-600 bg-clip-text text-transparent group-hover:from-cyan-500 group-hover:via-blue-500 group-hover:to-slate-500 transition-all duration-300">
                 NAWATLAHTOL
               </span>
-              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium tracking-wide">
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium tracking-wide hidden sm:block">
                 Lengua Náhuatl Digital
               </span>
             </div>
           </Link>
 
-          {/* Desktop Navigation - Reorganizado */}
-          <nav className="hidden lg:flex items-center gap-1">
+          {/* Desktop Navigation - Responsive */}
+          <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
             {/* Navegación principal */}
             {mainNavLinks.map((link) => (
               <Link 
                 key={link.name}
                 href={link.href} 
-                className={`group flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${link.color} ${link.hoverColor} ${link.bgColor} border border-transparent hover:border-cyan-200/50 dark:hover:border-cyan-700/50`}
+                className={`group flex items-center gap-2 px-3 xl:px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${link.color} ${link.hoverColor} ${link.bgColor} border border-transparent hover:border-cyan-200/50 dark:hover:border-cyan-700/50`}
               >
                 <link.icon size={16} className="group-hover:scale-110 transition-transform duration-300" />
                 <span>{link.name}</span>
@@ -191,7 +191,7 @@ export default function Header() {
               <Link 
                 key={link.name}
                 href={link.href} 
-                className={`group flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${link.color} ${link.hoverColor} ${link.bgColor} border border-transparent hover:border-cyan-200/50 dark:hover:border-cyan-700/50`}
+                className={`group flex items-center gap-2 px-3 xl:px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${link.color} ${link.hoverColor} ${link.bgColor} border border-transparent hover:border-cyan-200/50 dark:hover:border-cyan-700/50`}
               >
                 <link.icon size={16} className="group-hover:scale-110 transition-transform duration-300" />
                 <span>{link.name}</span>
@@ -225,19 +225,19 @@ export default function Header() {
             ))}
           </nav>
 
-          {/* User menu / Auth - Rediseñado */}
-          <div className="flex items-center gap-3">
+          {/* User menu / Auth - Responsive */}
+          <div className="flex items-center gap-2 sm:gap-3">
             <ThemeToggle />
             {loading ? (
-              <div className="w-10 h-10 bg-slate-200 dark:bg-slate-700 rounded-xl animate-pulse"></div>
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-slate-200 dark:bg-slate-700 rounded-xl animate-pulse"></div>
             ) : user ? (
               <>
-                {/* Desktop user menu - Mejorado */}
+                {/* Desktop user menu - Responsive */}
                 <div className="hidden lg:block">
                   <Menu as="div" className="relative">
-                    <Menu.Button className="group flex items-center gap-3 p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-300 border border-transparent hover:border-cyan-200/50 dark:hover:border-cyan-700/50">
-                      {renderAvatar(user.url_avatar, 36)}
-                      <div className="text-left">
+                    <Menu.Button className="group flex items-center gap-2 xl:gap-3 p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-300 border border-transparent hover:border-cyan-200/50 dark:hover:border-cyan-700/50">
+                      {renderAvatar(user.url_avatar, 32)}
+                      <div className="text-left hidden xl:block">
                         <div className="text-sm font-semibold text-slate-900 dark:text-slate-100 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors duration-300">
                           {user.nombre_completo || 'Usuario'}
                         </div>
@@ -294,68 +294,69 @@ export default function Header() {
                   </Menu>
                 </div>
 
-                {/* Mobile menu button - Mejorado */}
+                {/* Mobile menu button - Responsive */}
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="lg:hidden p-3 text-slate-600 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all duration-300"
+                  className="lg:hidden p-2 sm:p-3 text-slate-600 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all duration-300"
                 >
-                  {mobileMenuOpen ? <X size={24} /> : <MenuIcon size={24} />}
+                  {mobileMenuOpen ? <X size={20} className="sm:w-6 sm:h-6" /> : <MenuIcon size={20} className="sm:w-6 sm:h-6" />}
                 </button>
               </>
             ) : (
               <Link 
                 href="/login" 
-                className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:from-cyan-700 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm"
+                className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white px-3 sm:px-4 py-2 rounded-lg font-semibold hover:from-cyan-700 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-xs sm:text-sm"
               >
-                Iniciar Sesión
+                <span className="hidden sm:inline">Iniciar Sesión</span>
+                <span className="sm:hidden">Login</span>
               </Link>
             )}
           </div>
         </div>
 
-        {/* Mobile Menu - Completamente rediseñado */}
+        {/* Mobile Menu - Responsive */}
         {mobileMenuOpen && user && (
           <div className="lg:hidden border-t border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm">
-            <div className="px-4 py-6">
-              {/* User info - Mejorado */}
-              <div className="flex items-center gap-4 px-4 py-4 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-2xl mb-6">
-                {renderAvatar(user.url_avatar, 48)}
+            <div className="px-3 sm:px-4 py-4 sm:py-6">
+              {/* User info - Responsive */}
+              <div className="flex items-center gap-3 sm:gap-4 px-3 sm:px-4 py-3 sm:py-4 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-2xl mb-4 sm:mb-6">
+                {renderAvatar(user.url_avatar, 40)}
                 <div className="flex flex-col">
-                  <span className="text-lg font-semibold text-slate-900 dark:text-slate-100">{user.nombre_completo || user.email || 'Usuario'}</span>
-                  <span className="text-sm text-slate-500 dark:text-slate-400">{user.email}</span>
+                  <span className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100">{user.nombre_completo || user.email || 'Usuario'}</span>
+                  <span className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">{user.email}</span>
                 </div>
               </div>
 
-              {/* Navigation links - Organizados por secciones */}
-              <div className="space-y-6">
+              {/* Navigation links - Responsive */}
+              <div className="space-y-4 sm:space-y-6">
                 {/* Sección Principal */}
                 <div>
-                  <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">PRINCIPAL</h3>
+                  <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 sm:mb-3">PRINCIPAL</h3>
                   <div className="space-y-1">
-                    <Link 
-                      href="/profile" 
-                      className="flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 transition-all duration-300 rounded-xl"
+                <Link 
+                  href="/profile" 
+                      className="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-slate-700 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 transition-all duration-300 rounded-xl"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      <UserIcon size={20} />
-                      <span className="font-medium">Mi Perfil</span>
+                      <UserIcon size={18} className="sm:w-5 sm:h-5" />
+                      <span className="font-medium text-sm sm:text-base">Mi Perfil</span>
                     </Link>
                   </div>
                 </div>
 
                 {/* Sección Navegación */}
                 <div>
-                  <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">NAVEGACIÓN</h3>
+                  <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 sm:mb-3">NAVEGACIÓN</h3>
                   <div className="space-y-1">
                     {mainNavLinks.map((link) => (
                       <Link 
                         key={link.name}
                         href={link.href} 
-                        className={`flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-300 rounded-xl`}
+                        className={`flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-300 rounded-xl`}
                         onClick={() => setMobileMenuOpen(false)}
                       >
-                        <link.icon size={20} />
-                        <span className="font-medium">{link.name}</span>
+                        <link.icon size={18} className="sm:w-5 sm:h-5" />
+                        <span className="font-medium text-sm sm:text-base">{link.name}</span>
                       </Link>
                     ))}
                   </div>
@@ -363,17 +364,17 @@ export default function Header() {
 
                 {/* Sección Usuario */}
                 <div>
-                  <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">USUARIO</h3>
+                  <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 sm:mb-3">USUARIO</h3>
                   <div className="space-y-1">
                     {userNavLinks.map((link) => (
                       <Link 
                         key={link.name}
                         href={link.href} 
-                        className={`flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-300 rounded-xl`}
+                        className={`flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-300 rounded-xl`}
                         onClick={() => setMobileMenuOpen(false)}
                       >
-                        <link.icon size={20} />
-                        <span className="font-medium">{link.name}</span>
+                        <link.icon size={18} className="sm:w-5 sm:h-5" />
+                        <span className="font-medium text-sm sm:text-base">{link.name}</span>
                       </Link>
                     ))}
                   </div>
@@ -382,17 +383,17 @@ export default function Header() {
                 {/* Sección Admin */}
                 {user?.rol === 'admin' && (
                   <div>
-                    <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">ADMINISTRACIÓN</h3>
+                    <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 sm:mb-3">ADMINISTRACIÓN</h3>
                     <div className="space-y-1">
                       {adminNavLinks.map((link) => (
                         <Link 
                           key={link.name}
                           href={link.href} 
-                          className={`flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-300 rounded-xl`}
+                          className={`flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-300 rounded-xl`}
                           onClick={() => setMobileMenuOpen(false)}
                         >
-                          <link.icon size={20} />
-                          <span className="font-medium">{link.name}</span>
+                          <link.icon size={18} className="sm:w-5 sm:h-5" />
+                          <span className="font-medium text-sm sm:text-base">{link.name}</span>
                         </Link>
                       ))}
                     </div>
@@ -401,16 +402,16 @@ export default function Header() {
 
                 {/* Lecciones (próximamente) */}
                 <div>
-                  <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">PRÓXIMAMENTE</h3>
+                  <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 sm:mb-3">PRÓXIMAMENTE</h3>
                   <div className="space-y-1">
                     {comingSoonLinks.map((link) => (
                       <div 
                         key={link.name}
-                        className={`flex items-center gap-3 px-4 py-3 text-slate-400 dark:text-slate-500 cursor-not-allowed rounded-xl`}
+                        className={`flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-slate-400 dark:text-slate-500 cursor-not-allowed rounded-xl`}
                       >
-                        <link.icon size={20} />
+                        <link.icon size={18} className="sm:w-5 sm:h-5" />
                         <div className="flex flex-col">
-                          <span className="font-medium">{link.name}</span>
+                          <span className="font-medium text-sm sm:text-base">{link.name}</span>
                           <span className="text-xs text-slate-400 dark:text-slate-500">(Próximamente)</span>
                         </div>
                       </div>
@@ -419,13 +420,13 @@ export default function Header() {
                 </div>
               </div>
 
-              {/* Logout button - Mejorado */}
+              {/* Logout button - Responsive */}
               <button 
                 onClick={handleLogout}
-                className="flex items-center gap-3 px-4 py-3 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300 border-t border-slate-200 dark:border-slate-700 pt-4 mt-6 rounded-xl w-full"
+                className="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300 border-t border-slate-200 dark:border-slate-700 pt-4 mt-4 sm:mt-6 rounded-xl w-full"
               >
-                <LogOut size={20} />
-                <span className="font-medium">Cerrar Sesión</span>
+                <LogOut size={18} className="sm:w-5 sm:h-5" />
+                <span className="font-medium text-sm sm:text-base">Cerrar Sesión</span>
               </button>
             </div>
           </div>

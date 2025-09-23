@@ -384,7 +384,7 @@ export default function Recompensas({ userId }: { userId: string }) {
                            }}
                          />
                        ))}
-                     </div>
+            </div>
                   </motion.div>
             </div>
                 
@@ -413,7 +413,7 @@ export default function Recompensas({ userId }: { userId: string }) {
                 >
                   {Math.round(progreso.porcentaje)}%
                 </motion.div>
-            </div>
+          </div>
               
               {/* Información adicional del progreso */}
               <motion.div 
@@ -526,7 +526,7 @@ export default function Recompensas({ userId }: { userId: string }) {
             </motion.div>
         )}
 
-           {activeTab === 'logros' && (
+        {activeTab === 'logros' && (
              <motion.div
                key="logros"
                initial={{ opacity: 0, x: -20 }}
@@ -544,7 +544,7 @@ export default function Recompensas({ userId }: { userId: string }) {
                  </div>
                </div>
                
-               {logros.length === 0 ? (
+            {logros.length === 0 ? (
                  <div className="text-center py-12">
                    <div className="relative">
                      <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 rounded-full flex items-center justify-center">
@@ -620,16 +620,16 @@ export default function Recompensas({ userId }: { userId: string }) {
                                  <Sparkles className="w-3 h-3" />
                                  <span>Logro desbloqueado</span>
                                </div>
-                             </div>
-                           </div>
-                         </div>
-                       </div>
+                  </div>
+                    </div>
+                  </div>
+                </div>
                      </motion.div>
                    ))}
-                 </div>
+          </div>
                )}
              </motion.div>
-           )}
+        )}
 
         {activeTab === 'historial' && (
             <motion.div
