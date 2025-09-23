@@ -17,13 +17,15 @@ interface RespuestaFormProps {
     username: string;
     url_avatar?: string;
   };
+  onRespuestaEnviada?: (respuesta: any) => void;
 }
 
 export default function RespuestaForm({ 
   onSubmit, 
   isSubmitting = false, 
   placeholder = "Escribe tu respuesta...",
-  usuario
+  usuario,
+  onRespuestaEnviada
 }: RespuestaFormProps) {
   const [contenido, setContenido] = useState('');
   const [error, setError] = useState('');
@@ -53,6 +55,10 @@ export default function RespuestaForm({
     
     if (validateForm()) {
       onSubmit(contenido);
+      // Llamar callback si existe
+      if (onRespuestaEnviada) {
+        onRespuestaEnviada({ contenido, fecha: new Date().toISOString() });
+      }
       setContenido('');
       setError('');
     }

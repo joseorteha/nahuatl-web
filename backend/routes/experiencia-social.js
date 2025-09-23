@@ -266,4 +266,191 @@ router.get('/ranking/:periodo', async (req, res) => {
   }
 });
 
+// GET /api/experiencia-social/notificaciones/:userId - Obtener notificaciones de experiencia social
+router.get('/notificaciones/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { limit = 20, offset = 0 } = req.query;
+
+    console.log('🔔 Obteniendo notificaciones de experiencia social para usuario:', userId);
+
+    // Obtener notificaciones de experiencia social usando la estructura real de la BD
+    const { data: notificaciones, error: notificacionesError } = await supabase
+      .from('notificaciones')
+      .select(`
+        id,
+        tipo_notificacion,
+        titulo,
+        mensaje,
+        leida,
+        fecha_creacion,
+        relacionado_id,
+        relacionado_tipo
+      `)
+      .eq('usuario_id', userId)
+      .in('tipo_notificacion', [
+        'like_recibido',
+        'respuesta_recibida', 
+        'mencion',
+        'nuevo_seguidor',
+        'logro_obtenido',
+        'puntos_ganados'
+      ])
+      .order('fecha_creacion', { ascending: false })
+      .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
+
+    if (notificacionesError) {
+      console.error('❌ Error en notificaciones:', notificacionesError);
+      throw notificacionesError;
+    }
+
+    console.log('✅ Notificaciones obtenidas:', notificaciones?.length || 0);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        notificaciones: notificaciones || [],
+        total: notificaciones?.length || 0,
+        noLeidas: notificaciones?.filter(n => !n.leida).length || 0
+      }
+    });
+
+  } catch (error) {
+    console.error('Error fetching notificaciones experiencia social:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error interno del servidor al obtener notificaciones'
+    });
+  }
+});
+
+// POST /api/experiencia-social/crear-notificacion - Crear notificación de experiencia social
+router.post('/crear-notificacion', authenticateToken, async (req, res) => {
+  try {
+    const { usuarioDestino, tipo, titulo, mensaje, datosAdicionales } = req.body;
+    const { userId: usuarioOrigen } = req.userId;
+
+    console.log('🔔 Creando notificación:', { usuarioDestino, tipo, titulo });
+
+    const { data: notificacion, error: notificacionError } = await supabase
+      .from('notificaciones')
+      .insert({
+        usuario_id: usuarioDestino,
+        tipo_notificacion: tipo,
+        titulo,
+        mensaje,
+        relacionado_id: datosAdicionales?.tema_id || datosAdicionales?.respuesta_id || null,
+        relacionado_tipo: datosAdicionales?.tema_id ? 'feedback' : datosAdicionales?.respuesta_id ? 'respuesta' : 'usuario',
+        leida: false,
+        fecha_creacion: new Date().toISOString()
+      })
+      .select()
+      .single();
+
+    if (notificacionError) {
+      console.error('❌ Error creando notificación:', notificacionError);
+      throw notificacionError;
+    }
+
+    console.log('✅ Notificación creada:', notificacion.id);
+
+    res.status(201).json({
+      success: true,
+      data: notificacion
+    });
+
+  } catch (error) {
+    console.error('Error creating notificacion:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error interno del servidor al crear notificación'
+    });
+  }
+});
+
+// GET /api/experiencia-social/temas-stats/:userId - Obtener estadísticas de temas del usuario
+router.get('/temas-stats/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    console.log('📊 Obteniendo estadísticas de temas para usuario:', userId);
+
+    // Obtener temas creados por el usuario
+    const { data: temasCreados, error: temasError } = await supabase
+      .from('temas_conversacion')
+      .select(`
+        id,
+        titulo,
+        categoria,
+        estado,
+        participantes_count,
+        respuestas_count,
+        contador_likes,
+        compartido_contador,
+        fecha_creacion
+      `)
+      .eq('creador_id', userId)
+      .eq('es_tema_principal', true)
+      .order('fecha_creacion', { ascending: false });
+
+    if (temasError) throw temasError;
+
+    // Obtener likes dados por el usuario
+    const { data: likesDados, error: likesError } = await supabase
+      .from('temas_likes')
+      .select('id, tema_id, fecha_creacion')
+      .eq('usuario_id', userId);
+
+    if (likesError) throw likesError;
+
+    // Obtener shares dados por el usuario
+    const { data: sharesDados, error: sharesError } = await supabase
+      .from('temas_shares')
+      .select('id, tema_id, fecha_creacion')
+      .eq('usuario_id', userId);
+
+    if (sharesError) throw sharesError;
+
+    // Calcular estadísticas totales
+    const totalTemas = temasCreados?.length || 0;
+    const totalLikesDados = likesDados?.length || 0;
+    const totalSharesDados = sharesDados?.length || 0;
+    const totalLikesRecibidos = temasCreados?.reduce((sum, tema) => sum + (tema.contador_likes || 0), 0) || 0;
+    const totalSharesRecibidos = temasCreados?.reduce((sum, tema) => sum + (tema.compartido_contador || 0), 0) || 0;
+    const totalRespuestas = temasCreados?.reduce((sum, tema) => sum + (tema.respuestas_count || 0), 0) || 0;
+
+    console.log('✅ Estadísticas de temas obtenidas:', {
+      totalTemas,
+      totalLikesDados,
+      totalSharesDados,
+      totalLikesRecibidos,
+      totalSharesRecibidos,
+      totalRespuestas
+    });
+
+    res.status(200).json({
+      success: true,
+      data: {
+        temas: temasCreados || [],
+        estadisticas: {
+          totalTemas,
+          totalLikesDados,
+          totalSharesDados,
+          totalLikesRecibidos,
+          totalSharesRecibidos,
+          totalRespuestas
+        },
+        likesDados: likesDados || [],
+        sharesDados: sharesDados || []
+      }
+    });
+
+  } catch (error) {
+    console.error('Error fetching temas stats:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error interno del servidor al obtener estadísticas de temas'
+    });
+  }
+});
+
 module.exports = router;

@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
-import { Plus, History, Users, BookOpen, Sparkles } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Plus, History, Users, BookOpen, Sparkles, X, CheckCircle, Star, Gift, Target, Award } from 'lucide-react';
 import ConditionalHeader from '@/components/ConditionalHeader';
 import Footer from '@/components/Footer';
 import ContributeWordForm from '@/components/contribuir/ContributeWordForm';
@@ -33,6 +33,9 @@ export default function ContributePage() {
     userContributions: 0
   });
   const [statsLoading, setStatsLoading] = useState(true);
+  const [showInfoModal, setShowInfoModal] = useState(false);
+  const [selectedContribution, setSelectedContribution] = useState<UserContribution | null>(null);
+  const [showDetails, setShowDetails] = useState(false);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web.onrender.com';
 
@@ -73,6 +76,28 @@ export default function ContributePage() {
       }
     }
   }, [user, authLoading, loadUserContributions, loadStats]);
+
+  // Mostrar modal informativo cada vez que se entra a la página (a menos que se haya cerrado permanentemente)
+  useEffect(() => {
+    const hasSeenInfo = localStorage.getItem('contribuir-info-seen');
+    if (!hasSeenInfo) {
+      setShowInfoModal(true);
+    }
+  }, []);
+
+  const handleCloseInfoModal = () => {
+    setShowInfoModal(false);
+  };
+
+  const handleClosePermanently = () => {
+    setShowInfoModal(false);
+    localStorage.setItem('contribuir-info-seen', 'true');
+  };
+
+  const handleViewDetails = (contribution: UserContribution) => {
+    setSelectedContribution(contribution);
+    setShowDetails(true);
+  };
 
   const getStatusBadge = (estado: string) => {
     const styles = {
@@ -130,6 +155,144 @@ export default function ContributePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
       <ConditionalHeader />
+      
+      {/* Modal Informativo */}
+      <AnimatePresence>
+        {showInfoModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={handleCloseInfoModal}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-white/40 dark:border-slate-700/60"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-8">
+                <div className="flex justify-between items-start mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-2xl">
+                      <Sparkles className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+                        ¡Contribuye al Náhuatl!
+                      </h2>
+                      <p className="text-slate-600 dark:text-slate-300">
+                        Tu conocimiento es invaluable para nuestra comunidad
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleCloseInfoModal}
+                    className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-all duration-200"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-8 mb-8">
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                      <BookOpen className="w-5 h-5 text-cyan-600" />
+                      ¿Qué es Contribuir?
+                    </h3>
+                    <div className="space-y-3 text-slate-600 dark:text-slate-300">
+                      <p>• Agregar nuevas palabras al diccionario</p>
+                      <p>• Mejorar definiciones existentes</p>
+                      <p>• Proporcionar ejemplos de uso</p>
+                      <p>• Compartir variantes regionales</p>
+                      <p>• Documentar información gramatical</p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                      <Gift className="w-5 h-5 text-blue-600" />
+                      Beneficios para Ti
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-xl">
+                        <Star className="w-5 h-5 text-yellow-500 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="font-medium text-slate-900 dark:text-white">Puntos y Niveles</p>
+                          <p className="text-sm text-slate-600 dark:text-slate-300">Gana puntos por cada contribución aprobada</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl">
+                        <Award className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="font-medium text-slate-900 dark:text-white">Reconocimiento</p>
+                          <p className="text-sm text-slate-600 dark:text-slate-300">Tu nombre aparecerá como contribuidor</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl">
+                        <Target className="w-5 h-5 text-purple-500 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="font-medium text-slate-900 dark:text-white">Impacto Cultural</p>
+                          <p className="text-sm text-slate-600 dark:text-slate-300">Ayuda a preservar el náhuatl</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-2xl p-6 border border-cyan-200/50 dark:border-cyan-700/50">
+                  <h4 className="font-semibold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+                    <CheckCircle className="w-5 h-5 text-green-500" />
+                    Proceso de Contribución
+                  </h4>
+                  <div className="grid md:grid-cols-3 gap-4 text-sm">
+                    <div className="text-center">
+                      <div className="w-8 h-8 bg-cyan-500 text-white rounded-full flex items-center justify-center mx-auto mb-2 text-sm font-bold">1</div>
+                      <p className="font-medium text-slate-900 dark:text-white">Envía tu contribución</p>
+                      <p className="text-slate-600 dark:text-slate-300">Completa el formulario con la información</p>
+                    </div>
+                    <div className="text-center">
+                      <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center mx-auto mb-2 text-sm font-bold">2</div>
+                      <p className="font-medium text-slate-900 dark:text-white">Revisión</p>
+                      <p className="text-slate-600 dark:text-slate-300">Nuestros expertos revisan tu contribución</p>
+                    </div>
+                    <div className="text-center">
+                      <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center mx-auto mb-2 text-sm font-bold">3</div>
+                      <p className="font-medium text-slate-900 dark:text-white">Publicación</p>
+                      <p className="text-slate-600 dark:text-slate-300">Si es aprobada, se publica en el diccionario</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center mt-8">
+                  <button
+                    onClick={handleClosePermanently}
+                    className="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
+                  >
+                    No volver a mostrar
+                  </button>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={handleCloseInfoModal}
+                      className="px-6 py-3 text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white transition-colors"
+                    >
+                      Cerrar
+                    </button>
+                    <button
+                      onClick={handleCloseInfoModal}
+                      className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-xl font-medium hover:from-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                    >
+                      ¡Empezar a Contribuir!
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       
       {/* Hero Section */}
       <div className="relative overflow-hidden">
@@ -347,8 +510,14 @@ export default function ContributePage() {
                               {contribution.definition}
                             </p>
                           </div>
-                          <div className="ml-4">
+                          <div className="ml-4 flex flex-col items-end gap-2">
                             {getStatusBadge(contribution.estado)}
+                            <button
+                              onClick={() => handleViewDetails(contribution)}
+                              className="text-xs px-3 py-1 bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 rounded-lg hover:bg-cyan-200 dark:hover:bg-cyan-800/50 transition-colors"
+                            >
+                              Ver detalles
+                            </button>
                           </div>
                         </div>
 
@@ -387,6 +556,153 @@ export default function ContributePage() {
           </motion.div>
         </div>
       </div>
+
+      {/* Modal de Detalles de Contribución */}
+      <AnimatePresence>
+        {showDetails && selectedContribution && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setShowDetails(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-white/40 dark:border-slate-700/60"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-8">
+                <div className="flex justify-between items-start mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-2xl">
+                      <BookOpen className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+                        Detalles de Contribución
+                      </h2>
+                      <p className="text-slate-600 dark:text-slate-300">
+                        Información completa de tu contribución
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowDetails(false)}
+                    className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-all duration-200"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="space-y-6">
+                  {/* Información Básica */}
+                  <div className="bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-2xl p-6 border border-cyan-200/50 dark:border-cyan-700/50">
+                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                      <BookOpen className="w-5 h-5 text-cyan-600" />
+                      Información Básica
+                    </h3>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-sm font-medium text-slate-600 dark:text-slate-300">Palabra</label>
+                        <p className="text-lg font-semibold text-slate-900 dark:text-white">{selectedContribution.word}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-slate-600 dark:text-slate-300">Estado</label>
+                        <div className="mt-1">
+                          {getStatusBadge(selectedContribution.estado)}
+                        </div>
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="text-sm font-medium text-slate-600 dark:text-slate-300">Definición</label>
+                        <p className="text-slate-900 dark:text-white mt-1">{selectedContribution.definition}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Fechas */}
+                  <div className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800/50 dark:to-slate-700/50 rounded-2xl p-6 border border-slate-200/50 dark:border-slate-600/50">
+                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                      <History className="w-5 h-5 text-slate-600" />
+                      Historial
+                    </h3>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-sm font-medium text-slate-600 dark:text-slate-300">Fecha de Envío</label>
+                        <p className="text-slate-900 dark:text-white">{formatDate(selectedContribution.fecha_creacion)}</p>
+                      </div>
+                      {selectedContribution.fecha_revision && (
+                        <div>
+                          <label className="text-sm font-medium text-slate-600 dark:text-slate-300">Fecha de Revisión</label>
+                          <p className="text-slate-900 dark:text-white">{formatDate(selectedContribution.fecha_revision)}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Comentarios del Admin */}
+                  {selectedContribution.comentarios_admin && (
+                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl p-6 border border-green-200/50 dark:border-green-700/50">
+                      <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                        <CheckCircle className="w-5 h-5 text-green-600" />
+                        Comentarios del Moderador
+                      </h3>
+                      <div className="bg-white/70 dark:bg-slate-800/50 rounded-xl p-4 border border-green-200/50 dark:border-green-700/50">
+                        <p className="text-slate-900 dark:text-white mb-3">{selectedContribution.comentarios_admin}</p>
+                        {selectedContribution.perfiles && (
+                          <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+                            <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                              <span className="text-xs text-white font-bold">
+                                {selectedContribution.perfiles.nombre_completo.charAt(0)}
+                              </span>
+                            </div>
+                            <span>— {selectedContribution.perfiles.nombre_completo}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Información Adicional */}
+                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl p-6 border border-purple-200/50 dark:border-purple-700/50">
+                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                      <Sparkles className="w-5 h-5 text-purple-600" />
+                      Información Adicional
+                    </h3>
+                    <div className="grid md:grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <label className="font-medium text-slate-600 dark:text-slate-300">ID de Contribución</label>
+                        <p className="text-slate-900 dark:text-white font-mono text-xs">{selectedContribution.id}</p>
+                      </div>
+                      <div>
+                        <label className="font-medium text-slate-600 dark:text-slate-300">Estado Actual</label>
+                        <p className="text-slate-900 dark:text-white capitalize">{selectedContribution.estado}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-3 mt-8">
+                  <button
+                    onClick={() => setShowDetails(false)}
+                    className="px-6 py-3 text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white transition-colors"
+                  >
+                    Cerrar
+                  </button>
+                  <button
+                    onClick={() => setShowDetails(false)}
+                    className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-xl font-medium hover:from-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                  >
+                    Entendido
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

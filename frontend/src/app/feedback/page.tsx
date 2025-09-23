@@ -166,6 +166,33 @@ export default function FeedbackPage() {
     setTimeout(() => setNotification(null), 4000);
   };
 
+  // Crear notificación de experiencia social
+  const crearNotificacionExperienciaSocial = async (tipo: string, titulo: string, mensaje: string, datosAdicionales?: any) => {
+    if (!user?.id) return;
+    
+    try {
+      const token = localStorage.getItem('auth_tokens');
+      const parsedTokens = token ? JSON.parse(token) : null;
+      
+      await fetch(`${API_URL}/api/experiencia-social/crear-notificacion`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${parsedTokens?.accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          usuarioDestino: user.id,
+          tipo,
+          titulo,
+          mensaje,
+          datosAdicionales
+        })
+      });
+    } catch (error) {
+      console.warn('Error creating notification:', error);
+    }
+  };
+
   // Otorgar puntos al usuario
   const awardPoints = async (action: string, points: number, description: string) => {
     if (!user?.id) return false;
@@ -179,6 +206,14 @@ export default function FeedbackPage() {
       });
       
       if (response.success) {
+        // Crear notificación de experiencia social
+        await crearNotificacionExperienciaSocial(
+          'experiencia_social_actualizada',
+          '¡Puntos ganados!',
+          `Has ganado ${points} puntos por ${description}`,
+          { puntos: points, accion: action }
+        );
+        
         // Actualizar stats del usuario
         fetchUserStats();
         return true;
@@ -208,6 +243,40 @@ export default function FeedbackPage() {
     }
   }, [user?.id]);
 
+  // Fetch experiencia social stats
+  const fetchExperienciaSocialStats = useCallback(async () => {
+    if (!user?.id) return;
+    
+    try {
+      // Obtener estadísticas de experiencia social
+      const response = await fetch(`${API_URL}/api/experiencia-social/${user.id}`);
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data) {
+          // Actualizar las estadísticas con datos de experiencia social
+          setUserStats(prev => prev ? {
+            ...prev,
+            puntos_totales: result.data.experienciaSocial || prev.puntos_totales,
+            nivel: result.data.nivel || prev.nivel,
+            likes_recibidos: result.data.estadisticas?.likesRecibidos || prev.likes_recibidos
+          } : null);
+        }
+      }
+
+      // Obtener estadísticas de temas
+      const temasResponse = await fetch(`${API_URL}/api/experiencia-social/temas-stats/${user.id}`);
+      if (temasResponse.ok) {
+        const temasResult = await temasResponse.json();
+        if (temasResult.success && temasResult.data) {
+          console.log('📊 Estadísticas de temas obtenidas:', temasResult.data.estadisticas);
+          // Aquí podrías actualizar más estadísticas si es necesario
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching experiencia social stats:', error);
+    }
+  }, [user?.id, API_URL]);
+
   // Función para mapear datos del backend a Tema
   const mapBackendToTema = (item: unknown): Tema => {
     const temaItem = item as Record<string, unknown>;
@@ -228,9 +297,9 @@ export default function FeedbackPage() {
       respuestas_count: (temaItem.respuestas_count as number) || 0,
       ultima_actividad: temaItem.ultima_actividad as string || temaItem.fecha_creacion as string,
       fecha_creacion: temaItem.fecha_creacion as string,
-      contador_likes: 0, // Por ahora usamos 0 ya que la columna no existe
-      compartido_contador: 0, // Por ahora usamos 0 ya que la columna no existe
-      trending_score: 0, // Por ahora usamos 0 ya que la columna no existe
+      contador_likes: (temaItem.contador_likes as number) || 0, // Usar datos reales de la BD
+      compartido_contador: (temaItem.compartido_contador as number) || 0, // Usar datos reales de la BD
+      trending_score: (temaItem.trending_score as number) || 0, // Usar datos reales de la BD
       hashtags: [] // Por ahora vacío
     };
   };
@@ -256,6 +325,7 @@ export default function FeedbackPage() {
       if (result.success) {
         const mappedTemas = result.data.map(mapBackendToTema);
         setTemas(mappedTemas);
+        console.log('📋 Temas cargados desde BD:', mappedTemas.length);
       } else {
         throw new Error(result.error || 'Error al cargar temas');
       }
@@ -270,14 +340,29 @@ export default function FeedbackPage() {
   // Fetch notifications
   const fetchNotifications = useCallback(async () => {
     try {
-      const response = await obtenerNotificaciones(1, 10, true);
-      if (response && Array.isArray(response)) {
-        setNotifications(response as Notificacion[]);
+      // Obtener notificaciones de experiencia social
+      const response = await fetch(`${API_URL}/api/experiencia-social/notificaciones/${user?.id}`);
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          setNotifications(result.data.notificaciones || []);
+          console.log('🔔 Notificaciones cargadas desde BD:', result.data.notificaciones?.length || 0);
+        }
+      } else {
+        console.warn('⚠️ Error al cargar notificaciones:', response.status);
+      }
+      
+      // También obtener notificaciones del sistema social general
+      const socialResponse = await obtenerNotificaciones(1, 10, true);
+      if (socialResponse && Array.isArray(socialResponse)) {
+        // Combinar notificaciones de experiencia social con las del sistema social
+        setNotifications(prev => [...(prev || []), ...(socialResponse as Notificacion[])]);
+        console.log('🔔 Notificaciones sociales combinadas:', socialResponse.length);
       }
     } catch (error) {
       console.error('Error fetching notifications:', error);
     }
-  }, [obtenerNotificaciones]);
+  }, [obtenerNotificaciones, user?.id, API_URL]);
 
   // Fetch hashtags
   const fetchHashtags = useCallback(async () => {
@@ -310,9 +395,10 @@ export default function FeedbackPage() {
     
     fetchTemas();
     fetchUserStats();
+    fetchExperienciaSocialStats();
     fetchNotifications();
     fetchHashtags();
-  }, [user, loading, router, fetchTemas, fetchUserStats, fetchNotifications, fetchHashtags]);
+  }, [user, loading, router, fetchTemas, fetchUserStats, fetchExperienciaSocialStats, fetchNotifications, fetchHashtags]);
 
   // Submit tema
   const handleTemaSubmit = async (tema: { titulo: string; descripcion: string; categoria: string }) => {
@@ -349,12 +435,22 @@ export default function FeedbackPage() {
         
         // Otorgar puntos por crear tema
         const pointsAwarded = await awardPoints('tema_creado', 15, `Tema creado: ${tema.titulo}`);
-      
-      if (pointsAwarded) {
+        
+        if (pointsAwarded) {
           showNotification('success', '¡Tema creado! Has ganado 15 puntos 🎉');
-      } else {
+          // Crear notificación de tema creado
+          await crearNotificacionExperienciaSocial(
+            'tema_creado',
+            'Tema creado',
+            `Has creado el tema: ${tema.titulo}`,
+            { tema_id: newTema.id, puntos: 15 }
+          );
+          // Actualizar estadísticas en tiempo real
+          fetchUserStats();
+          fetchExperienciaSocialStats();
+        } else {
           showNotification('success', '¡Tema creado exitosamente!');
-      }
+        }
       } else {
         throw new Error(result.error || 'Error al crear tema');
       }
@@ -389,14 +485,17 @@ export default function FeedbackPage() {
       
       const result = await response.json();
       if (result.success) {
-        // Actualizar el tema en la lista
+        // Actualizar el tema en la lista con contadores dinámicos
         setTemas(prev => prev.map(tema => 
           tema.id === temaId 
             ? { 
                 ...tema, 
                 contador_likes: result.data.action === 'liked' 
                   ? tema.contador_likes + 1 
-                  : tema.contador_likes - 1
+                  : tema.contador_likes - 1,
+                participantes_count: result.data.action === 'liked' 
+                  ? tema.participantes_count + 1 
+                  : Math.max(1, tema.participantes_count - 1) // Mínimo 1 (el creador)
               }
             : tema
         ));
@@ -404,10 +503,20 @@ export default function FeedbackPage() {
         // Otorgar puntos por dar like
         if (result.data.action === 'liked') {
           const pointsAwarded = await awardPoints('like_dado', 2, 'Like dado a tema');
-        if (pointsAwarded) {
-          showNotification('success', '+2 puntos por dar like! ❤️');
+          if (pointsAwarded) {
+            showNotification('success', '+2 puntos por dar like! ❤️');
+            // Crear notificación de like dado
+            await crearNotificacionExperienciaSocial(
+              'like_dado',
+              'Like dado',
+              'Has dado like a un tema',
+              { tema_id: temaId, puntos: 2 }
+            );
+            // Actualizar estadísticas en tiempo real
+            fetchUserStats();
+            fetchExperienciaSocialStats();
+          }
         }
-      }
       } else {
         throw new Error(result.error || 'Error al procesar like');
       }
@@ -439,12 +548,24 @@ export default function FeedbackPage() {
       
       const result = await response.json();
       if (result.success) {
-        // Actualizar el tema en la lista
+        // Actualizar el tema en la lista con contadores dinámicos
         setTemas(prev => prev.map(tema => 
           tema.id === temaId 
-            ? { ...tema, compartido_contador: tema.compartido_contador + 1 }
+            ? { 
+                ...tema, 
+                compartido_contador: tema.compartido_contador + 1,
+                participantes_count: tema.participantes_count + 1
+              }
             : tema
         ));
+
+        // Crear notificación de share
+        await crearNotificacionExperienciaSocial(
+          'share_dado',
+          'Tema compartido',
+          'Has compartido un tema',
+          { tema_id: temaId }
+        );
 
         showNotification('success', 'Tema compartido exitosamente');
       } else {
@@ -474,6 +595,15 @@ export default function FeedbackPage() {
       console.error('Error marking all notifications as read:', error);
       showNotification('error', 'Error al marcar notificaciones');
     }
+  };
+
+  // Función para actualizar un tema específico
+  const handleTemaUpdate = (temaId: string, updates: any) => {
+    setTemas(prev => prev.map(tema => 
+      tema.id === temaId 
+        ? { ...tema, ...updates }
+        : tema
+    ));
   };
 
 
@@ -808,6 +938,7 @@ export default function FeedbackPage() {
                         tema={tema}
                         onLike={handleLikeTema}
                         onShare={handleShareTema}
+                        onTemaUpdate={handleTemaUpdate}
                         />
                       </motion.div>
                   ))}

@@ -39,22 +39,41 @@ interface TemaCardProps {
   };
   onLike?: (temaId: string) => void;
   onShare?: (temaId: string) => void;
+  onTemaUpdate?: (temaId: string, updates: any) => void;
 }
 
-export default function TemaCard({ tema, onLike, onShare }: TemaCardProps) {
+export default function TemaCard({ tema, onLike, onShare, onTemaUpdate }: TemaCardProps) {
   const [isLiked, setIsLiked] = useState(false);
   const [isShared, setIsShared] = useState(false);
   const router = useRouter();
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsLiked(!isLiked);
+    const newLikedState = !isLiked;
+    setIsLiked(newLikedState);
+    
+    // Actualizar contador local
+    const likeChange = newLikedState ? 1 : -1;
+    onTemaUpdate?.(tema.id, {
+      contador_likes: tema.contador_likes + likeChange,
+      participantes_count: newLikedState ? tema.participantes_count + 1 : tema.participantes_count
+    });
+    
     onLike?.(tema.id);
   };
 
   const handleShare = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsShared(!isShared);
+    const newSharedState = !isShared;
+    setIsShared(newSharedState);
+    
+    // Actualizar contador local
+    const shareChange = newSharedState ? 1 : -1;
+    onTemaUpdate?.(tema.id, {
+      compartido_contador: tema.compartido_contador + shareChange,
+      participantes_count: newSharedState ? tema.participantes_count + 1 : tema.participantes_count
+    });
+    
     onShare?.(tema.id);
   };
 
@@ -168,11 +187,19 @@ export default function TemaCard({ tema, onLike, onShare }: TemaCardProps) {
             
             <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
               <User className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              <Link href={`/profile/${tema.creador.id}`} className="font-medium hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors truncate">
+              <Link 
+                href={`/profile/${tema.creador.id}`} 
+                className="font-medium hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors truncate"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <span className="hidden sm:inline">{tema.creador.nombre_completo}</span>
                 <span className="sm:hidden">{tema.creador.nombre_completo.split(' ')[0]}</span>
               </Link>
-              <Link href={`/profile/${tema.creador.id}`} className="text-xs hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors">
+              <Link 
+                href={`/profile/${tema.creador.id}`} 
+                className="text-xs hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
                 @{tema.creador.username}
               </Link>
             </div>

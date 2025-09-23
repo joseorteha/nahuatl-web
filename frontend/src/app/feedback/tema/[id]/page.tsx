@@ -131,6 +131,33 @@ export default function TemaPage() {
     }
   }, [temaId, API_URL]);
 
+  // Crear notificación de experiencia social
+  const crearNotificacionExperienciaSocial = async (tipo: string, titulo: string, mensaje: string, datosAdicionales?: any) => {
+    if (!user?.id) return;
+    
+    try {
+      const token = localStorage.getItem('auth_tokens');
+      const parsedTokens = token ? JSON.parse(token) : null;
+      
+      await fetch(`${API_URL}/api/experiencia-social/crear-notificacion`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${parsedTokens?.accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          usuarioDestino: user.id,
+          tipo,
+          titulo,
+          mensaje,
+          datosAdicionales
+        })
+      });
+    } catch (error) {
+      console.warn('Error creating notification:', error);
+    }
+  };
+
   // Submit respuesta
   const handleRespuestaSubmit = async (contenido: string) => {
     if (!user?.id || !tema) return;
@@ -167,6 +194,14 @@ export default function TemaPage() {
 
         setRespuestas(prev => [...prev, newRespuesta]);
         setTema(prev => prev ? { ...prev, respuestas_count: prev.respuestas_count + 1 } : null);
+        
+        // Crear notificación de respuesta enviada
+        await crearNotificacionExperienciaSocial(
+          'respuesta_tema',
+          'Respuesta enviada',
+          `Has respondido al tema: ${tema.titulo}`,
+          { tema_id: tema.id, respuesta_id: newRespuesta.id }
+        );
         
         showNotification('success', '¡Respuesta enviada exitosamente!');
       } else {
@@ -207,7 +242,10 @@ export default function TemaPage() {
           ...prev, 
           contador_likes: result.data.action === 'liked' 
             ? prev.contador_likes + 1 
-            : prev.contador_likes - 1
+            : prev.contador_likes - 1,
+          participantes_count: result.data.action === 'liked' 
+            ? prev.participantes_count + 1 
+            : Math.max(1, prev.participantes_count - 1) // Mínimo 1 (el creador)
         } : null);
         
         if (result.data.action === 'liked') {
@@ -247,7 +285,11 @@ export default function TemaPage() {
       
       const result = await response.json();
       if (result.success) {
-        setTema(prev => prev ? { ...prev, compartido_contador: prev.compartido_contador + 1 } : null);
+        setTema(prev => prev ? { 
+          ...prev, 
+          compartido_contador: prev.compartido_contador + 1,
+          participantes_count: prev.participantes_count + 1
+        } : null);
         showNotification('success', 'Tema compartido exitosamente');
       } else {
         throw new Error(result.error || 'Error al compartir tema');
@@ -447,10 +489,18 @@ export default function TemaPage() {
               <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
                 <div className="flex items-center gap-2">
                   <User className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <Link href={`/profile/${tema.creador?.id}`} className="font-medium hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                  <Link 
+                    href={`/profile/${tema.creador?.id}`} 
+                    className="font-medium hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     {tema.creador?.nombre_completo || 'Usuario'}
                   </Link>
-                  <Link href={`/profile/${tema.creador?.id}`} className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                  <Link 
+                    href={`/profile/${tema.creador?.id}`} 
+                    className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     @{tema.creador?.username || 'usuario'}
                   </Link>
                 </div>
@@ -565,6 +615,10 @@ export default function TemaPage() {
               username: user.username || 'usuario',
               url_avatar: user.url_avatar
             } : undefined}
+            onRespuestaEnviada={(respuesta) => {
+              // Crear notificación adicional si es necesario
+              console.log('Respuesta enviada:', respuesta);
+            }}
           />
         </motion.div>
       </div>
