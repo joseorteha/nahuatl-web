@@ -305,18 +305,18 @@ export default function TemaPage() {
 
   if (loading || isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
         <Header />
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
           <div className="text-center">
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
               className="inline-block"
             >
-              <div className="w-12 h-12 border-4 border-blue-600/20 border-t-blue-600 rounded-full"></div>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 border-4 border-cyan-600/20 border-t-cyan-600 rounded-full"></div>
             </motion.div>
-            <p className="mt-4 text-gray-600 dark:text-gray-300">Cargando tema...</p>
+            <p className="mt-3 sm:mt-4 text-slate-600 dark:text-slate-400 text-sm sm:text-base">Cargando tema...</p>
           </div>
         </div>
       </div>
@@ -325,24 +325,25 @@ export default function TemaPage() {
 
   if (!tema) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
         <Header />
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
           <div className="text-center">
-            <div className="w-24 h-24 bg-gradient-to-r from-gray-400 to-gray-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <MessageCircle className="w-12 h-12 text-white" />
+            <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-gradient-to-r from-slate-400 to-slate-500 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+              <MessageCircle className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-white" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+            <h3 className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white mb-2">
               Tema no encontrado
             </h3>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">
+            <p className="text-slate-600 dark:text-slate-300 mb-4 sm:mb-6 text-sm sm:text-base px-4">
               El tema que buscas no existe o ha sido eliminado.
             </p>
             <button
               onClick={() => router.push('/feedback')}
-              className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+              className="bg-gradient-to-r from-cyan-500 via-blue-500 to-slate-500 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 text-sm sm:text-base"
             >
-              Volver a Temas
+              <span className="hidden sm:inline">Volver a Temas</span>
+              <span className="sm:hidden">Volver</span>
             </button>
           </div>
         </div>
@@ -351,7 +352,7 @@ export default function TemaPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
       <Header />
       
       {/* Notification */}
@@ -485,56 +486,60 @@ export default function TemaPage() {
           transition={{ delay: 0.1 }}
           className="mb-8"
         >
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+          <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-900 dark:text-white mb-4 sm:mb-6">
             Respuestas ({respuestas.length})
           </h2>
 
           {respuestas.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                <MessageCircle className="w-8 h-8 text-gray-400" />
+            <div className="text-center py-8 sm:py-12">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-slate-200 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                <MessageCircle className="w-6 h-6 sm:w-8 sm:h-8 text-slate-400" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              <h3 className="text-base sm:text-lg font-medium text-slate-900 dark:text-white mb-2">
                 No hay respuestas aún
               </h3>
-              <p className="text-gray-600 dark:text-gray-300">
+              <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base px-4">
                 Sé el primero en responder a este tema.
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {respuestas.map((respuesta, index) => (
                 <motion.div
                   key={respuesta.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-2xl shadow-lg border border-white/30 dark:border-gray-700/60 p-6"
+                  className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md rounded-2xl shadow-lg border border-slate-200/60 dark:border-slate-700/60 p-4 sm:p-6"
                 >
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-lg shadow-lg">
+                  <div className="flex items-start gap-3 sm:gap-4">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm sm:text-lg shadow-lg">
                       {respuesta.creador?.nombre_completo?.[0] || 'U'}
                     </div>
                     
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-3 mb-2">
-                        <Link href={`/profile/${respuesta.creador?.id}`} className="font-semibold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                          {respuesta.creador?.nombre_completo || 'Usuario'}
-                        </Link>
-                        <Link href={`/profile/${respuesta.creador?.id}`} className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                          @{respuesta.creador?.username || 'usuario'}
-                        </Link>
-                        {respuesta.es_respuesta_admin && (
-                          <span className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 text-xs font-semibold rounded-full">
-                            Admin
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 mb-2">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <Link href={`/profile/${respuesta.creador?.id}`} className="font-semibold text-slate-900 dark:text-white hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors text-sm sm:text-base">
+                            {respuesta.creador?.nombre_completo || 'Usuario'}
+                          </Link>
+                          <Link href={`/profile/${respuesta.creador?.id}`} className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors">
+                            @{respuesta.creador?.username || 'usuario'}
+                          </Link>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {respuesta.es_respuesta_admin && (
+                            <span className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 text-xs font-semibold rounded-full">
+                              Admin
+                            </span>
+                          )}
+                          <span className="text-xs text-slate-500 dark:text-slate-400">
+                            {new Date(respuesta.fecha_creacion).toLocaleDateString()}
                           </span>
-                        )}
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
-                          {new Date(respuesta.fecha_creacion).toLocaleDateString()}
-                        </span>
+                        </div>
                       </div>
                       
-                      <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                      <p className="text-slate-700 dark:text-slate-300 leading-relaxed text-sm sm:text-base">
                         {respuesta.contenido}
                       </p>
                     </div>
