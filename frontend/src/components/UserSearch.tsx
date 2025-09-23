@@ -52,11 +52,12 @@ export default function UserSearch({ className = '' }: UserSearchProps) {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(true)}
-        className="group bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3"
+        className="group bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 sm:gap-3 text-sm sm:text-base"
       >
-        <Search className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
-        <span>Buscar Usuarios</span>
-        <Users className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
+        <Search className="w-4 h-4 sm:w-5 sm:h-5 group-hover:scale-110 transition-transform duration-300" />
+        <span className="hidden sm:inline">Buscar Usuarios</span>
+        <span className="sm:hidden">Buscar</span>
+        <Users className="w-4 h-4 sm:w-5 sm:h-5 group-hover:scale-110 transition-transform duration-300" />
       </motion.button>
 
       {/* Modal de búsqueda */}
@@ -73,30 +74,30 @@ export default function UserSearch({ className = '' }: UserSearchProps) {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-lg shadow-2xl border border-gray-200 dark:border-gray-700"
+              className="bg-white dark:bg-slate-800 rounded-2xl p-4 sm:p-6 w-full max-w-lg shadow-2xl border border-slate-200 dark:border-slate-700"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
-                    <Search className="w-5 h-5 text-white" />
+              <div className="flex items-center justify-between mb-4 sm:mb-6">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full flex items-center justify-center">
+                    <Search className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">
                     Buscar Usuarios
                   </h3>
                 </div>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+                  className="p-1.5 sm:p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-colors"
                 >
-                  <X className="w-5 h-5 text-gray-500" />
+                  <X className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500" />
                 </button>
               </div>
 
               {/* Barra de búsqueda */}
-              <div className="relative mb-6">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <div className="relative mb-4 sm:mb-6">
+                <Search className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-slate-400" />
                 <input
                   type="text"
                   placeholder="Buscar por nombre o username..."
@@ -105,72 +106,72 @@ export default function UserSearch({ className = '' }: UserSearchProps) {
                     setSearchTerm(e.target.value);
                     handleSearch(e.target.value);
                   }}
-                  className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-lg transition-all duration-300"
+                  className="w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-4 border-2 border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-white text-sm sm:text-base transition-all duration-300"
                   autoFocus
                 />
               </div>
 
               {/* Resultados */}
-              <div className="max-h-80 overflow-y-auto">
+              <div className="max-h-64 sm:max-h-80 overflow-y-auto">
                 {isSearching ? (
-                  <div className="flex items-center justify-center py-12">
-                    <div className="flex items-center gap-3">
-                      <div className="w-6 h-6 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
-                      <span className="text-gray-600 dark:text-gray-300 font-medium">Buscando usuarios...</span>
+                  <div className="flex items-center justify-center py-8 sm:py-12">
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-cyan-600 border-t-transparent rounded-full animate-spin"></div>
+                      <span className="text-slate-600 dark:text-slate-300 font-medium text-sm sm:text-base">Buscando usuarios...</span>
                     </div>
                   </div>
                 ) : searchResults.length > 0 ? (
-                  <div className="space-y-3">
+                  <div className="space-y-2 sm:space-y-3">
                     {searchResults.map((user) => (
                       <motion.div
                         key={user.id}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="flex items-center gap-4 p-4 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 dark:hover:from-purple-900/20 dark:hover:to-pink-900/20 rounded-xl cursor-pointer transition-all duration-300 group border border-gray-100 dark:border-gray-700 hover:border-purple-200 dark:hover:border-purple-700"
+                        className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50 dark:hover:from-cyan-900/20 dark:hover:to-blue-900/20 rounded-xl cursor-pointer transition-all duration-300 group border border-slate-100 dark:border-slate-700 hover:border-cyan-200 dark:hover:border-cyan-700"
                         onClick={() => handleUserClick(user.id)}
                       >
-                        <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg group-hover:scale-110 transition-transform duration-300">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm sm:text-lg group-hover:scale-110 transition-transform duration-300">
                           {user.nombre_completo?.charAt(0) || 'U'}
                         </div>
-                        <div className="flex-1">
-                          <div className="font-bold text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-300 text-lg">
+                        <div className="flex-1 min-w-0">
+                          <div className="font-bold text-slate-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors duration-300 text-sm sm:text-base truncate">
                             {user.nombre_completo || 'Usuario'}
                           </div>
-                          <div className="text-sm text-gray-500 dark:text-gray-400">
+                          <div className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 truncate">
                             @{user.username || 'usuario'}
                           </div>
                           {user.verificado && (
                             <div className="inline-flex items-center gap-1 mt-1">
-                              <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                              <div className="w-3 h-3 sm:w-4 sm:h-4 bg-blue-500 rounded-full flex items-center justify-center">
                                 <span className="text-white text-xs">✓</span>
                               </div>
                               <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">Verificado</span>
                             </div>
                           )}
                         </div>
-                        <div className="text-purple-500 group-hover:text-purple-600 transition-colors duration-300">
-                          <ExternalLink className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+                        <div className="text-cyan-500 group-hover:text-cyan-600 transition-colors duration-300 flex-shrink-0">
+                          <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform duration-300" />
                         </div>
                       </motion.div>
                     ))}
                   </div>
                 ) : searchTerm.length >= 2 ? (
-                  <div className="text-center py-12">
-                    <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  <div className="text-center py-8 sm:py-12">
+                    <Users className="w-12 h-12 sm:w-16 sm:h-16 text-slate-400 mx-auto mb-3 sm:mb-4" />
+                    <h4 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-white mb-2">
                       No se encontraron usuarios
                     </h4>
-                    <p className="text-gray-500 dark:text-gray-400">
+                    <p className="text-slate-500 dark:text-slate-400 text-sm sm:text-base">
                       Intenta con un término de búsqueda diferente
                     </p>
                   </div>
                 ) : (
-                  <div className="text-center py-12">
-                    <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  <div className="text-center py-8 sm:py-12">
+                    <Search className="w-12 h-12 sm:w-16 sm:h-16 text-slate-400 mx-auto mb-3 sm:mb-4" />
+                    <h4 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-white mb-2">
                       Busca usuarios
                     </h4>
-                    <p className="text-gray-500 dark:text-gray-400">
+                    <p className="text-slate-500 dark:text-slate-400 text-sm sm:text-base">
                       Escribe al menos 2 caracteres para comenzar la búsqueda
                     </p>
                   </div>
