@@ -237,13 +237,47 @@ export default function Dashboard() {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white py-2 px-4 text-center"
+        className="bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 text-white py-4 px-4 relative overflow-hidden"
       >
-        <div className="container mx-auto flex items-center justify-center gap-2 text-sm font-medium">
-          <span className="inline-flex items-center px-2 py-1 rounded-full bg-white/20 text-xs">
-            BETA
-          </span>
-          <span>Nawatlajtol está en versión beta - ¡Ayúdanos a mejorarla!</span>
+        {/* Efecto de fondo animado */}
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform -translate-x-full animate-pulse"></div>
+        
+        <div className="container mx-auto relative z-10">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 text-center sm:text-left">
+            {/* Icono y badge */}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                  <Sparkles className="h-4 w-4 text-white" />
+                </div>
+                <span className="inline-flex items-center px-3 py-1 rounded-full bg-white/20 text-sm font-bold tracking-wider">
+                  BETA
+                </span>
+              </div>
+            </div>
+            
+            {/* Contenido principal */}
+            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+              <div className="flex items-center gap-2">
+                <BookOpen className="h-5 w-5 text-yellow-300" />
+                <span className="text-lg font-bold">Nawatlajtol</span>
+              </div>
+              <span className="text-sm sm:text-base font-medium">
+                está en versión beta
+              </span>
+            </div>
+            
+            {/* Call to action */}
+            <div className="flex items-center gap-2 text-sm">
+              <Heart className="h-4 w-4 text-pink-300" />
+              <span className="font-medium">¡Ayúdanos a mejorarla!</span>
+            </div>
+          </div>
+          
+          {/* Barra de progreso decorativa */}
+          <div className="mt-3 w-full bg-white/20 rounded-full h-1">
+            <div className="bg-gradient-to-r from-yellow-300 to-pink-300 h-1 rounded-full w-3/4 animate-pulse"></div>
+          </div>
         </div>
       </motion.div>
       
@@ -269,6 +303,88 @@ export default function Dashboard() {
                 </p>
               </div>
             </div>
+          </motion.div>
+
+          {/* Diccionario - Diseño como landing page */}
+          <motion.div variants={itemVariants} whileHover={cardHover} className="group">
+            <Link 
+              href="/diccionario" 
+              className="block bg-white/90 dark:bg-slate-800/90 backdrop-blur-md rounded-2xl p-6 border border-slate-200/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden"
+            >
+              {/* Efecto de brillo */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+              
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <motion.div 
+                      className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-xl flex items-center justify-center"
+                      whileHover={{ rotate: 5 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                    >
+                      <BookText className="h-6 w-6 text-white" />
+                    </motion.div>
+                    <div className="flex items-center gap-1">
+                      <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                      <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                      <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                    </div>
+                  </div>
+                  <ChevronRight className="h-5 w-5 text-slate-400 group-hover:translate-x-1 transition-transform" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2">
+                  Diccionario Náhuatl
+                </h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+                  Explora y aprende palabras náhuatl con traducciones y ejemplos
+                </p>
+                <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                  <BookOpen className="h-3 w-3" />
+                  <span>+3,500 palabras disponibles</span>
+                </div>
+              </div>
+            </Link>
+          </motion.div>
+
+          {/* Lecciones Section - Diseño como landing page */}
+          <motion.div variants={itemVariants} whileHover={cardHover} className="group">
+            <Link 
+              href="/lecciones" 
+              className="block bg-white/90 dark:bg-slate-800/90 backdrop-blur-md rounded-2xl p-6 border border-slate-200/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden"
+            >
+              {/* Efecto de brillo */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+              
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <motion.div 
+                      className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center"
+                      whileHover={{ rotate: 5 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                    >
+                      <BookOpen className="h-6 w-6 text-white" />
+                    </motion.div>
+                    <div className="flex items-center gap-1">
+                      <Trophy className="h-4 w-4 text-yellow-400 fill-current" />
+                      <Trophy className="h-4 w-4 text-yellow-400 fill-current" />
+                      <Trophy className="h-4 w-4 text-yellow-400 fill-current" />
+                    </div>
+                  </div>
+                  <ChevronRight className="h-5 w-5 text-slate-400 group-hover:translate-x-1 transition-transform" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2">
+                  Lecciones Interactivas
+                </h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+                  Aprende náhuatl paso a paso con lecciones estructuradas y ejercicios
+                </p>
+                <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                  <Target className="h-3 w-3" />
+                  <span>+50 lecciones disponibles</span>
+                </div>
+              </div>
+            </Link>
           </motion.div>
 
           {/* Main Grid Layout - Notion Style */}
@@ -357,37 +473,59 @@ export default function Dashboard() {
               >
                 <motion.div variants={itemVariants} whileHover={cardHover} className="group">
                   <Link 
-                    href="/diccionario" 
-                    className="block bg-gradient-to-br from-blue-500/10 to-cyan-500/10 dark:from-blue-500/20 dark:to-cyan-500/20 backdrop-blur-xl rounded-2xl p-6 border border-blue-200/50 dark:border-blue-700/50 hover:shadow-lg transition-all duration-300"
+                    href="/feedback" 
+                    className="block bg-white/90 dark:bg-slate-800/90 backdrop-blur-md rounded-2xl p-6 border border-slate-200/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden"
                   >
-                    <div className="flex items-center justify-between mb-4">
-                      <BookText className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-                      <ChevronRight className="h-5 w-5 text-blue-600 dark:text-blue-400 group-hover:translate-x-1 transition-transform" />
+                    {/* Efecto de brillo */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                    
+                    <div className="relative z-10">
+                      <div className="flex items-center justify-between mb-4">
+                        <motion.div 
+                          className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center"
+                          whileHover={{ rotate: 5 }}
+                          transition={{ type: "spring", stiffness: 300 }}
+                        >
+                          <Users className="h-5 w-5 text-white" />
+                        </motion.div>
+                        <ChevronRight className="h-5 w-5 text-slate-400 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
+                        Comunidad
+                      </h3>
+                      <p className="text-sm text-slate-600 dark:text-slate-400">
+                        Únete a conversaciones
+                      </p>
                     </div>
-                    <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
-                      Diccionario
-                    </h3>
-                    <p className="text-sm text-slate-600 dark:text-slate-400">
-                      Explora palabras náhuatl
-                    </p>
                   </Link>
                 </motion.div>
 
                 <motion.div variants={itemVariants} whileHover={cardHover} className="group">
                   <Link 
-                    href="/feedback" 
-                    className="block bg-gradient-to-br from-purple-500/10 to-pink-500/10 dark:from-purple-500/20 dark:to-pink-500/20 backdrop-blur-xl rounded-2xl p-6 border border-purple-200/50 dark:border-purple-700/50 hover:shadow-lg transition-all duration-300"
+                    href="/contribuir" 
+                    className="block bg-white/90 dark:bg-slate-800/90 backdrop-blur-md rounded-2xl p-6 border border-slate-200/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden"
                   >
-                    <div className="flex items-center justify-between mb-4">
-                      <Users className="h-8 w-8 text-purple-600 dark:text-purple-400" />
-                      <ChevronRight className="h-5 w-5 text-purple-600 dark:text-purple-400 group-hover:translate-x-1 transition-transform" />
+                    {/* Efecto de brillo */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                    
+                    <div className="relative z-10">
+                      <div className="flex items-center justify-between mb-4">
+                        <motion.div 
+                          className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center"
+                          whileHover={{ rotate: 5 }}
+                          transition={{ type: "spring", stiffness: 300 }}
+                        >
+                          <Award className="h-5 w-5 text-white" />
+                        </motion.div>
+                        <ChevronRight className="h-5 w-5 text-slate-400 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
+                        Contribuir
+                      </h3>
+                      <p className="text-sm text-slate-600 dark:text-slate-400">
+                        Añade palabras
+                      </p>
                     </div>
-                    <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
-                      Comunidad
-                    </h3>
-                    <p className="text-sm text-slate-600 dark:text-slate-400">
-                      Únete a conversaciones
-                    </p>
                   </Link>
                 </motion.div>
               </motion.div>
@@ -400,42 +538,51 @@ export default function Dashboard() {
                 <motion.div 
                   variants={itemVariants}
                   whileHover={cardHover}
-                  className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20 dark:border-slate-700/50"
+                  className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md rounded-2xl p-6 border border-slate-200/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
                 >
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center">
-                      <Crown className="h-5 w-5 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-                        Palabra Destacada
-                      </h3>
-                      <p className="text-sm text-slate-600 dark:text-slate-400">
-                        Más buscada hoy
-                      </p>
-                    </div>
-                  </div>
+                  {/* Efecto de brillo */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                   
-                  <div className="space-y-3">
-                    <div className="text-center p-4 bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 rounded-xl">
-                      <div className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-1">
-                        {featuredContent.featuredWord.palabra}
-                      </div>
-                      <div className="text-sm text-slate-600 dark:text-slate-400">
-                        {featuredContent.featuredWord.traduccion}
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-3 mb-4">
+                      <motion.div 
+                        className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center"
+                        whileHover={{ rotate: 5 }}
+                        transition={{ type: "spring", stiffness: 300 }}
+                      >
+                        <Crown className="h-5 w-5 text-white" />
+                      </motion.div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                          Palabra Destacada
+                        </h3>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">
+                          Más buscada hoy
+                        </p>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-600 dark:text-slate-400">
-                        {featuredContent.featuredWord.busquedas} búsquedas
-                      </span>
-                      <Link 
-                        href="/diccionario"
-                        className="text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 font-medium flex items-center gap-1"
-                      >
-                        Explorar
-                        <ArrowRight className="h-4 w-4" />
-                      </Link>
+                    
+                    <div className="space-y-3">
+                      <div className="text-center p-4 bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-xl">
+                        <div className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-1">
+                          {featuredContent.featuredWord.palabra}
+                        </div>
+                        <div className="text-sm text-slate-600 dark:text-slate-400">
+                          {featuredContent.featuredWord.traduccion}
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-slate-600 dark:text-slate-400">
+                          {featuredContent.featuredWord.busquedas} búsquedas
+                        </span>
+                        <Link 
+                          href="/diccionario"
+                          className="text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 font-medium flex items-center gap-1"
+                        >
+                          Explorar
+                          <ArrowRight className="h-4 w-4" />
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </motion.div>
@@ -446,54 +593,63 @@ export default function Dashboard() {
                 <motion.div 
                   variants={itemVariants}
                   whileHover={cardHover}
-                  className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20 dark:border-slate-700/50"
+                  className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md rounded-2xl p-6 border border-slate-200/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
                 >
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
-                      <Trophy className="h-5 w-5 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-                        Usuario Destacado
-                      </h3>
-                      <p className="text-sm text-slate-600 dark:text-slate-400">
-                        Más activo hoy
-                      </p>
-                    </div>
-                  </div>
+                  {/* Efecto de brillo */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                   
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3 p-3 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl">
-                      <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
-                        <User className="h-5 w-5 text-white" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-slate-900 dark:text-slate-100 truncate">
-                          {featuredContent.featuredUser.nombre}
-                        </div>
-                        <div className="text-sm text-slate-600 dark:text-slate-400">
-                          @{featuredContent.featuredUser.username}
-                        </div>
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-3 mb-4">
+                      <motion.div 
+                        className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center"
+                        whileHover={{ rotate: 5 }}
+                        transition={{ type: "spring", stiffness: 300 }}
+                      >
+                        <Trophy className="h-5 w-5 text-white" />
+                      </motion.div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                          Usuario Destacado
+                        </h3>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">
+                          Más activo hoy
+                        </p>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-600 dark:text-slate-400">
-                        {featuredContent.featuredUser.actividad} interacciones
-                      </span>
-                      <Link 
-                        href={`/profile/${featuredContent.featuredUser.id}`}
-                        className="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 font-medium flex items-center gap-1"
-                        onClick={(e) => {
-                          // Verificar si el ID es válido antes de navegar
-                          if (featuredContent.featuredUser?.id === '1') {
-                            e.preventDefault();
-                            console.log('Usuario destacado con ID de fallback, no navegando');
-                          }
-                        }}
-                      >
-                        Ver perfil
-                        <ArrowRight className="h-4 w-4" />
-                      </Link>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3 p-3 bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-xl">
+                        <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-full flex items-center justify-center">
+                          <User className="h-5 w-5 text-white" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-slate-900 dark:text-slate-100 truncate">
+                            {featuredContent.featuredUser.nombre}
+                          </div>
+                          <div className="text-sm text-slate-600 dark:text-slate-400">
+                            @{featuredContent.featuredUser.username}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-slate-600 dark:text-slate-400">
+                          {featuredContent.featuredUser.actividad} interacciones
+                        </span>
+                        <Link 
+                          href={`/profile/${featuredContent.featuredUser.id}`}
+                          className="text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 font-medium flex items-center gap-1"
+                          onClick={(e) => {
+                            // Verificar si el ID es válido antes de navegar
+                            if (featuredContent.featuredUser?.id === '1') {
+                              e.preventDefault();
+                              console.log('Usuario destacado con ID de fallback, no navegando');
+                            }
+                          }}
+                        >
+                          Ver perfil
+                          <ArrowRight className="h-4 w-4" />
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </motion.div>
@@ -502,44 +658,67 @@ export default function Dashboard() {
               {/* Quick Stats */}
               <motion.div 
                 variants={itemVariants}
-                className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20 dark:border-slate-700/50"
+                className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md rounded-2xl p-6 border border-slate-200/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
               >
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">
-                  Accesos Rápidos
-                </h3>
-                <div className="space-y-3">
-                  <Link 
-                    href="/contribuir"
-                    className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors group"
-                  >
-                    <Award className="h-5 w-5 text-cyan-600 dark:text-cyan-400" />
-                    <span className="text-sm font-medium text-slate-900 dark:text-slate-100">
-                      Contribuir
-                    </span>
-                    <ChevronRight className="h-4 w-4 text-slate-400 group-hover:translate-x-1 transition-transform ml-auto" />
-                  </Link>
-                  
-                  <Link 
-                    href="/profile"
-                    className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors group"
-                  >
-                    <Target className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                    <span className="text-sm font-medium text-slate-900 dark:text-slate-100">
-                      Mi Perfil
-                    </span>
-                    <ChevronRight className="h-4 w-4 text-slate-400 group-hover:translate-x-1 transition-transform ml-auto" />
-                  </Link>
-                  
-                  <Link 
-                    href="/experiencia-social"
-                    className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors group"
-                  >
-                    <TrendingUp className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                    <span className="text-sm font-medium text-slate-900 dark:text-slate-100">
-                      Experiencia Social
-                    </span>
-                    <ChevronRight className="h-4 w-4 text-slate-400 group-hover:translate-x-1 transition-transform ml-auto" />
-                  </Link>
+                {/* Efecto de brillo */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                
+                <div className="relative z-10">
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">
+                    Accesos Rápidos
+                  </h3>
+                  <div className="space-y-3">
+                    <Link 
+                      href="/contribuir"
+                      className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors group"
+                    >
+                      <motion.div 
+                        className="w-8 h-8 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-lg flex items-center justify-center"
+                        whileHover={{ rotate: 5 }}
+                        transition={{ type: "spring", stiffness: 300 }}
+                      >
+                        <Award className="h-4 w-4 text-white" />
+                      </motion.div>
+                      <span className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                        Contribuir
+                      </span>
+                      <ChevronRight className="h-4 w-4 text-slate-400 group-hover:translate-x-1 transition-transform ml-auto" />
+                    </Link>
+                    
+                    <Link 
+                      href="/profile"
+                      className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors group"
+                    >
+                      <motion.div 
+                        className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center"
+                        whileHover={{ rotate: 5 }}
+                        transition={{ type: "spring", stiffness: 300 }}
+                      >
+                        <Target className="h-4 w-4 text-white" />
+                      </motion.div>
+                      <span className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                        Mi Perfil
+                      </span>
+                      <ChevronRight className="h-4 w-4 text-slate-400 group-hover:translate-x-1 transition-transform ml-auto" />
+                    </Link>
+                    
+                    <Link 
+                      href="/experiencia-social"
+                      className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors group"
+                    >
+                      <motion.div 
+                        className="w-8 h-8 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-lg flex items-center justify-center"
+                        whileHover={{ rotate: 5 }}
+                        transition={{ type: "spring", stiffness: 300 }}
+                      >
+                        <TrendingUp className="h-4 w-4 text-white" />
+                      </motion.div>
+                      <span className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                        Experiencia Social
+                      </span>
+                      <ChevronRight className="h-4 w-4 text-slate-400 group-hover:translate-x-1 transition-transform ml-auto" />
+                    </Link>
+                  </div>
                 </div>
               </motion.div>
             </div>
