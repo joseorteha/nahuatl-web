@@ -9,7 +9,7 @@
 
 
 
-[![Landing Page](./frontend/public/image.png)](https://nahuatl-web.vercel.app)
+[![Landing Page](https://i.ibb.co/35cRstjN/image.png)](https://nahuatl-web.vercel.app)
 
 
 ## 🔗 Enlaces Rápidos
