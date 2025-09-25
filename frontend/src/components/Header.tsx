@@ -160,9 +160,14 @@ export default function Header() {
               />
             </div>
             <div className="flex flex-col">
-              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-cyan-600 via-blue-600 to-slate-600 bg-clip-text text-transparent group-hover:from-cyan-500 group-hover:via-blue-500 group-hover:to-slate-500 transition-all duration-300">
-                NAWATLAHTOL
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-cyan-600 via-blue-600 to-slate-600 bg-clip-text text-transparent group-hover:from-cyan-500 group-hover:via-blue-500 group-hover:to-slate-500 transition-all duration-300">
+                  NAWATLAHTOL
+                </span>
+                <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-gradient-to-r from-cyan-500 to-blue-600 text-white">
+                  BETA
+                </span>
+              </div>
               <span className="text-xs text-slate-500 dark:text-slate-400 font-medium tracking-wide hidden sm:block">
                 Lengua Náhuatl Digital
               </span>

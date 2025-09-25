@@ -24,6 +24,7 @@ const socialRoutes = require('./routes/socialRoutes');
 const temasStatsRoutes = require('./routes/temas-stats');
 const experienciaSocialRoutes = require('./routes/experiencia-social');
 const usuariosRoutes = require('./routes/usuarios');
+const dashboardRoutes = require('./routes/dashboard');
 
 // Crear aplicación Express
 const app = express();
@@ -144,6 +145,7 @@ app.use('/api/social', socialRoutes);
 app.use('/api/temas-stats', temasStatsRoutes);
 app.use('/api/experiencia-social', experienciaSocialRoutes);
 app.use('/api/usuarios', usuariosRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // ===== MANEJO DE ERRORES =====
 
