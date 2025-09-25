@@ -9,7 +9,7 @@
 
 
 
-[![Landing Page](frontend/public/image.png)](https://nahuatl-web.vercel.app)
+[![Landing Page](./frontend/public/image.png)](https://nahuatl-web.vercel.app)
 
 
 ## 🔗 Enlaces Rápidos
@@ -66,7 +66,7 @@
 
 | Funcionalidad | Descripción | Estado |
 |---------------|-------------|---------|
-| **📖 Diccionario Interactivo** | 4,300+ palabras con definiciones, ejemplos y pronunciación | ✅ Estable |
+| **📖 Diccionario Interactivo** | 3,556+ palabras con definiciones, ejemplos y pronunciación | ✅ Estable |
 | **📚 Sistema de Lecciones** | Contenido educativo estructurado con quizzes interactivos | ✅ Estable |
 | **👤 Gestión de Usuarios** | Perfiles, autenticación OAuth y sistema de roles | ✅ Estable |
 | **⭐ Palabras Guardadas** | Sistema de favoritos personalizado con sincronización | ✅ Estable |
