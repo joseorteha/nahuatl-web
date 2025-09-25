@@ -58,6 +58,86 @@ router.get('/stats/:userId', authenticateToken, async (req, res) => {
   }
 });
 
+// GET /api/contributions/historial/:userId - Obtener historial de contribuciones
+router.get('/historial/:userId', authenticateToken, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    // Verificar que el usuario esté accediendo a su propio historial o sea admin
+    if (req.user.id !== userId && req.user.rol !== 'admin') {
+      return res.status(403).json({ error: 'No tienes permisos para acceder a este historial' });
+    }
+
+    // Obtener historial de contribuciones
+    const { data: contribuciones, error: contribucionesError } = await supabase
+      .from('contribuciones_diccionario')
+      .select('id, estado, fecha_creacion, comentarios_admin')
+      .eq('usuario_id', userId)
+      .order('fecha_creacion', { ascending: false });
+
+    if (contribucionesError) {
+      throw contribucionesError;
+    }
+
+    // Mapear a formato de historial
+    const historial = contribuciones.map(contribucion => ({
+      puntos_ganados: contribucion.estado === 'aprobada' ? 10 : 0,
+      motivo: `contribucion_${contribucion.estado}`,
+      descripcion: contribucion.estado === 'aprobada' 
+        ? 'Contribución aprobada' 
+        : contribucion.estado === 'rechazada' 
+        ? 'Contribución rechazada' 
+        : 'Contribución pendiente',
+      fecha_creacion: contribucion.fecha_creacion
+    }));
+
+    res.json({ historial });
+  } catch (error) {
+    console.error('Error getting contribution history:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// PUT /api/contributions/:id - Editar contribución (solo admin)
+router.put('/:id', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { word, definition, info_gramatical, razon_contribucion, fuente } = req.body;
+    
+    // Verificar que el usuario sea admin
+    if (req.user.rol !== 'admin') {
+      return res.status(403).json({ error: 'Solo los administradores pueden editar contribuciones' });
+    }
+
+    // Actualizar la contribución
+    const { data, error } = await supabase
+      .from('contribuciones_diccionario')
+      .update({
+        word: word,
+        definition: definition,
+        info_gramatical: info_gramatical,
+        razon_contribucion: razon_contribucion,
+        fuente: fuente,
+        fecha_actualizacion: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    res.json({
+      message: 'Contribución actualizada exitosamente',
+      contribution: data
+    });
+  } catch (error) {
+    console.error('Error updating contribution:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
 // GET /api/contributions/user/:userId - Obtener contribuciones del usuario
 router.get('/user/:userId', async (req, res) => {
   const { userId } = req.params;

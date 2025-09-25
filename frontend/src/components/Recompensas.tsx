@@ -31,6 +31,7 @@ interface RecompensasUsuario {
   contribuciones_aprobadas: number;
   likes_recibidos: number;
   racha_dias: number;
+  total_contribuciones: number;
 }
 
 interface Logro {
@@ -117,25 +118,35 @@ export default function Recompensas({ userId }: { userId: string }) {
     try {
       setLoading(true);
       
-      // Obtener datos de recompensas
       const token = localStorage.getItem('auth_tokens');
       const parsedTokens = token ? JSON.parse(token) : null;
       
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/recompensas/usuario/${userId}`, {
+      // Obtener datos de contribuciones (mismo endpoint que el perfil)
+      const contribucionesResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/contribuciones/stats/${userId}`, {
         headers: {
           'Authorization': `Bearer ${parsedTokens?.accessToken}`,
           'Content-Type': 'application/json'
         },
       });
       
-      if (response.ok) {
-        const data = await response.json();
-        setRecompensas(data.recompensas);
-        setLogros(data.logros || []);
+      if (contribucionesResponse.ok) {
+        const contribucionesData = await contribucionesResponse.json();
+        console.log('Datos de contribuciones (Recompensas):', contribucionesData);
+        
+        // Mapear datos del sistema de contribuciones al formato esperado
+        setRecompensas({
+          puntos_totales: contribucionesData.totalPoints || 0,
+          nivel: contribucionesData.level || 'principiante',
+          experiencia: contribucionesData.experience || 0,
+          contribuciones_aprobadas: contribucionesData.approvedContributions || 0,
+          likes_recibidos: 0, // Ya no usamos likes del sistema viejo
+          racha_dias: 0, // Por ahora no implementado
+          total_contribuciones: contribucionesData.totalContributions || 0 // Agregar total de contribuciones
+        });
       }
 
-      // Obtener historial
-      const historialResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/recompensas/historial/${userId}`, {
+      // Obtener historial de contribuciones (usar el mismo sistema)
+      const historialResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/contributions/historial/${userId}`, {
         headers: {
           'Authorization': `Bearer ${parsedTokens?.accessToken}`,
           'Content-Type': 'application/json'
@@ -144,8 +155,15 @@ export default function Recompensas({ userId }: { userId: string }) {
       
       if (historialResponse.ok) {
         const historialData = await historialResponse.json();
+        console.log('Historial de contribuciones obtenido:', historialData);
         setHistorial(historialData.historial || []);
+      } else {
+        console.log('No hay historial de contribuciones, usando array vacío');
+        setHistorial([]);
       }
+      
+      // Por ahora, logros vacíos hasta implementar el sistema de logros del nuevo sistema
+      setLogros([]);
       
     } catch (error) {
       console.error('Error al obtener recompensas:', error);
@@ -478,34 +496,19 @@ export default function Recompensas({ userId }: { userId: string }) {
               <h4 className="text-base sm:text-lg font-semibold text-slate-800 dark:text-white mb-3 sm:mb-4">
                 Tu Progreso
               </h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
                 <motion.div 
                   whileHover={{ scale: 1.02 }}
-                  className="text-center p-3 sm:p-4 lg:p-6 bg-gradient-to-br from-cyan-50 to-cyan-100 dark:from-cyan-900/30 dark:to-cyan-800/30 rounded-xl border border-cyan-200 dark:border-cyan-700/50 hover:shadow-lg transition-all duration-300"
+                  className="text-center p-3 sm:p-4 lg:p-6 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 rounded-xl border border-blue-200 dark:border-blue-700/50 hover:shadow-lg transition-all duration-300"
                 >
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-gradient-to-r from-cyan-500 to-cyan-600 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3 shadow-lg">
-                    <Target className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3 shadow-lg">
+                    <Award className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
                   </div>
-                  <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-cyan-600 dark:text-cyan-400 mb-1">
-                    {recompensas?.contribuciones_aprobadas || 0}
+                  <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-600 dark:text-blue-400 mb-1">
+                    {recompensas?.puntos_totales || 0}
                   </div>
                   <div className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
-                    Contribuciones
-                  </div>
-                </motion.div>
-                
-                <motion.div 
-                  whileHover={{ scale: 1.02 }}
-                  className="text-center p-3 sm:p-4 lg:p-6 bg-gradient-to-br from-pink-50 to-pink-100 dark:from-pink-900/30 dark:to-pink-800/30 rounded-xl border border-pink-200 dark:border-pink-700/50 hover:shadow-lg transition-all duration-300"
-                >
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-gradient-to-r from-pink-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3 shadow-lg">
-                    <Heart className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
-                  </div>
-                  <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-pink-600 dark:text-pink-400 mb-1">
-                    {recompensas?.likes_recibidos || 0}
-                  </div>
-                  <div className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
-                    Likes Recibidos
+                    Puntos Totales
                   </div>
                 </motion.div>
                 
@@ -514,16 +517,16 @@ export default function Recompensas({ userId }: { userId: string }) {
                   className="text-center p-3 sm:p-4 lg:p-6 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30 rounded-xl border border-green-200 dark:border-green-700/50 hover:shadow-lg transition-all duration-300"
                 >
                   <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3 shadow-lg">
-                    <Award className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
-            </div>
+                    <Trophy className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
+                  </div>
                   <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-green-600 dark:text-green-400 mb-1">
                     {logros.length}
-            </div>
+                  </div>
                   <div className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
                     Logros Obtenidos
-            </div>
+                  </div>
                 </motion.div>
-          </div>
+              </div>
             </motion.div>
         )}
 
@@ -559,12 +562,12 @@ export default function Recompensas({ userId }: { userId: string }) {
                      ¡Aún no tienes logros!
                    </h3>
                    <p className="text-slate-500 dark:text-slate-400 mb-4 max-w-md mx-auto text-sm sm:text-base">
-                     Comienza a contribuir, dar likes y participar en la comunidad para desbloquear logros increíbles
+                     Comienza a contribuir al diccionario para desbloquear logros increíbles
                    </p>
                    <div className="flex flex-wrap justify-center gap-2">
-                     <span className="px-2 sm:px-3 py-1 bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 text-xs rounded-full">Crear feedback</span>
-                     <span className="px-2 sm:px-3 py-1 bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 text-xs rounded-full">Dar likes</span>
-                     <span className="px-2 sm:px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 text-xs rounded-full">Compartir</span>
+                     <span className="px-2 sm:px-3 py-1 bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 text-xs rounded-full">Crear contribuciones</span>
+                     <span className="px-2 sm:px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 text-xs rounded-full">Ganar puntos</span>
+                     <span className="px-2 sm:px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs rounded-full">Subir de nivel</span>
                    </div>
                  </div>
                ) : (
@@ -641,21 +644,30 @@ export default function Recompensas({ userId }: { userId: string }) {
               className="space-y-3 sm:space-y-4"
             >
               <h4 className="text-base sm:text-lg font-semibold text-slate-800 dark:text-white mb-3 sm:mb-4">
-                Historial de Puntos
+                Historial de Contribuciones
               </h4>
             {historial.length === 0 ? (
                 <div className="text-center py-6 sm:py-8 lg:py-12">
                   <History className="w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16 mx-auto mb-3 sm:mb-4 text-slate-300 dark:text-slate-600" />
                   <p className="text-slate-500 dark:text-slate-400 text-sm sm:text-base lg:text-lg mb-2">
-                    No hay historial de puntos
+                    No hay historial de contribuciones
                   </p>
                   <p className="text-slate-400 dark:text-slate-500 text-xs sm:text-sm">
-                    ¡Comienza a ganar puntos para ver tu historial aquí!
+                    ¡Comienza a contribuir al diccionario para ver tu historial aquí!
                   </p>
                 </div>
               ) : (
                 <div className="space-y-2 sm:space-y-3 max-h-80 sm:max-h-96 overflow-y-auto pr-1 sm:pr-2">
-                  {historial.map((entrada, index) => (
+                  {historial
+                    .filter(entrada => 
+                      entrada.motivo === 'contribucion_aprobada' || 
+                      entrada.motivo === 'contribucion_rechazada' ||
+                      entrada.motivo === 'contribucion_pendiente' ||
+                      entrada.motivo === 'Contribución aprobada' ||
+                      entrada.motivo === 'Contribución rechazada' ||
+                      entrada.motivo === 'Contribución pendiente'
+                    )
+                    .map((entrada, index) => (
                     <motion.div 
                       key={`${entrada.fecha_creacion}-${entrada.puntos_ganados}-${index}`}
                       initial={{ opacity: 0, y: 20 }}

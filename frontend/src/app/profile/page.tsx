@@ -1045,6 +1045,15 @@ export default function ProfilePage() {
                 </motion.div>
               </div>
 
+              {/* Sistema de Recompensas/Educación */}
+              <div className="mb-8">
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                  <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500" />
+                  Sistema de Recompensas Educativas
+                </h3>
+                <Recompensas userId={userData.id} />
+              </div>
+
               {/* Sección de navegación rápida */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <Link href="/feedback" className="block transform transition-all duration-300 hover:scale-105 hover:-translate-y-1">

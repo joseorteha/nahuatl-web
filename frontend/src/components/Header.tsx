@@ -132,16 +132,15 @@ export default function Header() {
     }
   ];
 
-  // Lecciones (próximamente)
-  const comingSoonLinks = [
-    {
-      name: 'Lecciones',
-      icon: HelpCircle,
-      comingSoon: true,
-      color: 'text-slate-400 dark:text-slate-500',
-      bgColor: 'cursor-not-allowed'
-    }
-  ];
+  // Lecciones (ahora disponible)
+  const leccionesLink = {
+    name: 'Lecciones',
+    href: '/lecciones',
+    icon: HelpCircle,
+    color: 'text-green-600 dark:text-green-400',
+    hoverColor: 'hover:text-green-600 dark:hover:text-green-400',
+    bgColor: 'hover:bg-green-50 dark:hover:bg-green-900/20'
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-200/60 dark:border-slate-700/60 shadow-lg">
@@ -215,19 +214,14 @@ export default function Header() {
               </Link>
             ))}
 
-            {/* Lecciones (próximamente) */}
-            {comingSoonLinks.map((link) => (
-              <div 
-                key={link.name}
-                className={`group flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium ${link.color} ${link.bgColor}`}
-              >
-                <link.icon size={16} />
-                <div className="flex flex-col">
-                  <span>{link.name}</span>
-                  <span className="text-xs text-slate-400 dark:text-slate-500">(Próximamente)</span>
-                </div>
-              </div>
-            ))}
+            {/* Lecciones */}
+            <Link 
+              href={leccionesLink.href} 
+              className={`group flex items-center gap-2 px-3 xl:px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${leccionesLink.color} ${leccionesLink.hoverColor} ${leccionesLink.bgColor} border border-transparent hover:border-green-200/50 dark:hover:border-green-700/50`}
+            >
+              <leccionesLink.icon size={16} className="group-hover:scale-110 transition-transform duration-300" />
+              <span>{leccionesLink.name}</span>
+            </Link>
           </nav>
 
           {/* User menu / Auth - Responsive */}
@@ -405,22 +399,18 @@ export default function Header() {
                   </div>
                 )}
 
-                {/* Lecciones (próximamente) */}
+                {/* Lecciones */}
                 <div>
-                  <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 sm:mb-3">PRÓXIMAMENTE</h3>
+                  <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 sm:mb-3">APRENDER</h3>
                   <div className="space-y-1">
-                    {comingSoonLinks.map((link) => (
-                      <div 
-                        key={link.name}
-                        className={`flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-slate-400 dark:text-slate-500 cursor-not-allowed rounded-xl`}
-                      >
-                        <link.icon size={18} className="sm:w-5 sm:h-5" />
-                        <div className="flex flex-col">
-                          <span className="font-medium text-sm sm:text-base">{link.name}</span>
-                          <span className="text-xs text-slate-400 dark:text-slate-500">(Próximamente)</span>
-                        </div>
-                      </div>
-                    ))}
+                    <Link 
+                      href={leccionesLink.href} 
+                      className={`flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-slate-700 dark:text-slate-300 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400 transition-all duration-300 rounded-xl`}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <leccionesLink.icon size={18} className="sm:w-5 sm:h-5" />
+                      <span className="font-medium text-sm sm:text-base">{leccionesLink.name}</span>
+                    </Link>
                   </div>
                 </div>
               </div>
