@@ -6,7 +6,7 @@
 [![Status](https://img.shields.io/badge/status-beta-yellow.svg)](https://nahuatl-web.vercel.app)
 [![Privacy](https://img.shields.io/badge/privacy-Protected-orange.svg)](SECURITY.md)
 
-> **🔒 PROYECTO PRIVADO - Una plataforma educativa moderna para preservar, aprender y contribuir al náhuatl a través de tecnología colaborativa.**
+>  Una plataforma educativa moderna para preservar, aprender y contribuir al náhuatl a través de tecnología colaborativa.**
 
 
 
@@ -15,17 +15,11 @@
 
 ## ⚠️ **ADVERTENCIA IMPORTANTE**
 
-### 🔒 **PROYECTO PRIVADO Y PROPIETARIO**
 
 Este repositorio contiene código **PRIVADO** y **PROPIETARIO** de José Ortega. 
 
-**🚫 PROHIBIDO:**
-- ❌ Usar, copiar o distribuir el código sin autorización
-- ❌ Hacer fork público del repositorio  
-- ❌ Usar el código para proyectos comerciales
-- ❌ Realizar ingeniería inversa
 
-**📄 Ver:** [LICENSE](LICENSE) | [SECURITY.md](SECURITY.md) | [CONTRIBUTING.md](CONTRIBUTING.md)
+**📄 Ver:** [LICENSE](LICENSE) | [SECURITY.md](SECURITY.md) 
 
 ---
 
