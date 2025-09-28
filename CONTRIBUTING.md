@@ -1,68 +1,68 @@
-# Guía de Contribución - Nawatlahtol
+# Contributing Guidelines - Nawatlahtol
 
-## 🚫 **IMPORTANTE: Este es un proyecto privado**
+## 🚫 **IMPORTANT: This is a private project**
 
-Este repositorio es **privado y personal**. No se aceptan contribuciones externas.
+This repository is **private and personal**. External contributions are not accepted.
 
-## 📋 **Para Desarrolladores Autorizados**
+## 📋 **For Authorized Developers**
 
-Si eres parte del equipo de desarrollo autorizado, sigue estas pautas:
+If you are part of the authorized development team, follow these guidelines:
 
-### 🔧 **Configuración del Entorno**
+### 🔧 **Environment Setup**
 
 ```bash
-# Clonar el repositorio
+# Clone the repository
 git clone https://github.com/joseorteha/nahuatl-web.git
 cd nahuatl-web
 
-# Instalar dependencias
+# Install dependencies
 npm run setup
 
-# Ejecutar en modo desarrollo
+# Run in development mode
 npm run dev
 ```
 
-### 📁 **Estructura del Proyecto**
+### 📁 **Project Structure**
 
 ```
 nahuatl-web/
-├── frontend/          # Aplicación Next.js
-├── backend/           # API Express.js
-├── docs/             # Documentación
-├── scripts/           # Scripts de utilidad
-├── data/             # Datos compartidos
-└── config/           # Configuraciones
+├── frontend/          # Next.js Application
+├── backend/           # Express.js API
+├── docs/             # Documentation
+├── scripts/           # Utility scripts
+├── data/             # Shared data
+└── config/           # Configurations
 ```
 
-### 🎯 **Estándares de Código**
+### 🎯 **Code Standards**
 
 - **Frontend**: TypeScript, React, Next.js, Tailwind CSS
 - **Backend**: Node.js, Express.js, PostgreSQL
-- **Base de datos**: Supabase
-- **Autenticación**: Google OAuth
+- **Database**: Supabase
+- **Authentication**: Google OAuth
 
-### 📝 **Proceso de Desarrollo**
+### 📝 **Development Process**
 
-1. **Crear rama**: `git checkout -b feature/nombre-feature`
-2. **Desarrollar**: Implementar cambios
-3. **Probar**: `npm run test`
-4. **Commit**: Mensajes descriptivos en español
-5. **Push**: `git push origin feature/nombre-feature`
-6. **Merge**: Solo el propietario puede hacer merge
+1. **Create branch**: `git checkout -b feature/feature-name`
+2. **Develop**: Implement changes
+3. **Test**: `npm run test`
+4. **Commit**: Descriptive messages in Spanish
+5. **Push**: `git push origin feature/feature-name`
+6. **Merge**: Only the owner can merge
 
-### 🚨 **Reglas Importantes**
+### 🚨 **Important Rules**
 
-- ❌ **NO** hacer push directo a `main`
-- ❌ **NO** compartir credenciales
-- ❌ **NO** modificar configuraciones de producción
-- ✅ **SÍ** seguir la estructura de carpetas
-- ✅ **SÍ** documentar cambios importantes
-- ✅ **SÍ** probar antes de commit
+- ❌ **DO NOT** push directly to `main`
+- ❌ **DO NOT** share credentials
+- ❌ **DO NOT** modify production configurations
+- ✅ **YES** follow the folder structure
+- ✅ **YES** document important changes
+- ✅ **YES** test before commit
 
-### 📞 **Contacto**
+### 📞 **Contact**
 
-Para dudas o problemas, contactar directamente al propietario del repositorio.
+For questions or issues, contact the repository owner directly.
 
 ---
 
-**© 2025 José Ortega - Todos los derechos reservados**
+**© 2025 José Ortega - All rights reserved**

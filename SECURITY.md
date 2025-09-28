@@ -1,74 +1,74 @@
-# Política de Seguridad - Nawatlahtol
+# Security Policy - Nawatlahtol
 
-## 🔒 **REPOSITORIO PRIVADO**
+## 🔒 **PRIVATE REPOSITORY**
 
-Este es un repositorio **PRIVADO** y **PROPIETARIO**. 
+This is a **PRIVATE** and **PROPRIETARY** repository. 
 
-## ⚠️ **ADVERTENCIAS IMPORTANTES**
+## ⚠️ **IMPORTANT WARNINGS**
 
-### 🚫 **PROHIBIDO ABSOLUTAMENTE**
+### 🚫 **ABSOLUTELY PROHIBITED**
 
-- ❌ **NO** compartir este código con terceros
-- ❌ **NO** hacer fork público del repositorio
-- ❌ **NO** distribuir o publicar el código
-- ❌ **NO** usar el código para proyectos comerciales sin autorización
-- ❌ **NO** realizar ingeniería inversa
-- ❌ **NO** extraer o copiar funcionalidades
+- ❌ **DO NOT** share this code with third parties
+- ❌ **DO NOT** make public forks of the repository
+- ❌ **DO NOT** distribute or publish the code
+- ❌ **DO NOT** use the code for commercial projects without authorization
+- ❌ **DO NOT** perform reverse engineering
+- ❌ **DO NOT** extract or copy functionalities
 
-### 🔐 **PROTECCIÓN DE DATOS**
+### 🔐 **DATA PROTECTION**
 
-- **Base de datos**: Información de usuarios protegida
-- **Autenticación**: Sistema OAuth seguro
-- **API**: Endpoints protegidos con JWT
-- **Configuración**: Variables de entorno seguras
+- **Database**: User information protected
+- **Authentication**: Secure OAuth system
+- **API**: JWT-protected endpoints
+- **Configuration**: Secure environment variables
 
-## 📞 **Reportar Problemas de Seguridad**
+## 📞 **Reporting Security Issues**
 
-Si encuentras vulnerabilidades de seguridad, contactar **INMEDIATAMENTE** a:
+If you find security vulnerabilities, contact **IMMEDIATELY**:
 
 **José Ortega**
-- Email: [tu-email@ejemplo.com]
-- **NO** crear issues públicos
-- **NO** compartir información sensible
+- Email: joseortegahac@gmail.com
+- **DO NOT** create public issues
+- **DO NOT** share sensitive information
 
-## 🛡️ **Medidas de Protección**
+## 🛡️ **Protection Measures**
 
-### **Nivel 1: Repositorio**
-- Repositorio privado en GitHub
-- Acceso restringido al propietario
-- Historial de commits protegido
+### **Level 1: Repository**
+- Private repository on GitHub
+- Access restricted to owner
+- Protected commit history
 
-### **Nivel 2: Código**
-- Licencia de propiedad privada
-- Copyright reservado
-- Prohibición de uso no autorizado
+### **Level 2: Code**
+- Private property license
+- Reserved copyright
+- Prohibition of unauthorized use
 
-### **Nivel 3: Datos**
-- Encriptación de datos sensibles
-- Autenticación obligatoria
-- Logs de seguridad
+### **Level 3: Data**
+- Encryption of sensitive data
+- Mandatory authentication
+- Security logs
 
-## ⚖️ **Consecuencias Legales**
+## ⚖️ **Legal Consequences**
 
-El uso no autorizado de este código puede resultar en:
+Unauthorized use of this code may result in:
 
-- 🚨 **Demandas civiles** por violación de derechos de autor
-- 🚨 **Acciones penales** por robo de propiedad intelectual
-- 🚨 **Daños y perjuicios** económicos
-- 🚨 **Prohibición legal** de uso del software
+- 🚨 **Civil lawsuits** for copyright infringement
+- 🚨 **Criminal actions** for intellectual property theft
+- 🚨 **Economic damages** and penalties
+- 🚨 **Legal prohibition** of software use
 
-## 📋 **Términos de Uso**
+## 📋 **Terms of Use**
 
-Al acceder a este repositorio, aceptas:
+By accessing this repository, you agree to:
 
-1. **Respetar la propiedad intelectual**
-2. **No distribuir el código**
-3. **No usar para fines comerciales**
-4. **Reportar vulnerabilidades de forma privada**
-5. **Cumplir con todas las restricciones legales**
+1. **Respect intellectual property**
+2. **Not distribute the code**
+3. **Not use for commercial purposes**
+4. **Report vulnerabilities privately**
+5. **Comply with all legal restrictions**
 
 ---
 
-**© 2025 José Ortega - Todos los derechos reservados**
+**© 2025 José Ortega - All rights reserved**
 
-*Este documento es legalmente vinculante y debe ser respetado por todos los usuarios.*
+*This document is legally binding and must be respected by all users.*
