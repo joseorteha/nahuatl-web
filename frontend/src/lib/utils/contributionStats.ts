@@ -1,4 +1,4 @@
-import { supabase } from './supabaseClient';
+import { supabase } from '../config/supabaseClient';
 
 export interface ContributionStats {
   totalWords: number;

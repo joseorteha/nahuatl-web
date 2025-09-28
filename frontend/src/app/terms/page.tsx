@@ -1,6 +1,6 @@
 'use client';
 import { motion } from 'framer-motion';
-import ConditionalHeader from '@/components/ConditionalHeader';
+import ConditionalHeader from '@/components/navigation/ConditionalHeader';
 import { Scale, CheckCircle, Users, Book, AlertTriangle, Mail, Shield, FileText, Globe, Clock, Heart, Zap } from 'lucide-react';
 
 export default function TermsOfService() {

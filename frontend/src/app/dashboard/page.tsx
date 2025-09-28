@@ -29,7 +29,7 @@ import {
   User,
   Bookmark
 } from 'lucide-react';
-import ConditionalHeader from '@/components/ConditionalHeader';
+import ConditionalHeader from '@/components/navigation/ConditionalHeader';
 import { useAuthBackend } from '@/hooks/useAuthBackend';
 
 interface RecentActivity {

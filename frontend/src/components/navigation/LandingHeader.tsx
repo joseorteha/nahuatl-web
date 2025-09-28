@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Info, HelpCircle, Menu, X, LogIn } from 'lucide-react';
 import { useState } from 'react';
-import { ThemeToggle, ThemeToggleMobile } from './ThemeToggle';
+import { ThemeToggle, ThemeToggleMobile } from '../shared/ThemeToggle';
 
 export default function LandingHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

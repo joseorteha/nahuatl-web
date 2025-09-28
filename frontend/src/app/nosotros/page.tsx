@@ -4,8 +4,8 @@ import { motion } from 'framer-motion';
 import { Heart, Globe, Users, BookOpen, Target, Lightbulb, Feather, Star, ArrowRight, Mail, Shield, Zap, Languages, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import Image from 'next/image';
-import ConditionalHeader from '@/components/ConditionalHeader';
-import JoinModal from '@/components/JoinModal';
+import ConditionalHeader from '@/components/navigation/ConditionalHeader';
+import JoinModal from '@/components/shared/JoinModal';
 
 export default function NosotrosPage() {
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);

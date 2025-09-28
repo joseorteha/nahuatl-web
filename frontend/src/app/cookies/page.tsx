@@ -1,7 +1,7 @@
 'use client';
 import { motion } from 'framer-motion';
-import ConditionalHeader from '@/components/ConditionalHeader';
-import Footer from '@/components/Footer';
+import ConditionalHeader from '@/components/navigation/ConditionalHeader';
+import Footer from '@/components/navigation/Footer';
 import { Cookie, Settings, Eye, Shield, AlertTriangle, Mail, Monitor, Globe, Clock } from 'lucide-react';
 
 export default function CookiesPolicy() {

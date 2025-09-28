@@ -5,12 +5,12 @@ import Link from 'next/link';
 import { User, Mail, AtSign, Settings, Save, X, Edit3, RefreshCw, ExternalLink, Users, Heart, MessageCircle, Share2, Bookmark, CheckCircle, MapPin, Globe, Shield, Bell, Eye, Calendar, Trophy, Star, Target, Award, TrendingUp, Zap, Crown, Sparkles, ArrowUp, Flame, BarChart3, History, Gift, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Avatar from 'boring-avatars';
-import ConditionalHeader from '@/components/ConditionalHeader';
-import Recompensas from '@/components/Recompensas';
+import ConditionalHeader from '@/components/navigation/ConditionalHeader';
+import Recompensas from '@/components/features/rewards/Recompensas';
 import Image from 'next/image';
 import { useAuthBackend } from '@/hooks/useAuthBackend';
 import { useSocial, Seguimiento, FeedbackGuardado } from '@/hooks/useSocial';
-import { UserCard } from '@/components/social/UserCard';
+import { UserCard } from '@/components/features/social/UserCard';
 
 interface SavedWord {
   id: string;

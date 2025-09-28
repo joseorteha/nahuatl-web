@@ -4,8 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, MessageCircle, Book, Users, Feather, Globe, HelpCircle, Lightbulb, ArrowRight, Star, CheckCircle, Zap, Heart } from 'lucide-react';
 import { useState } from 'react';
 import Image from 'next/image';
-import ConditionalHeader from '@/components/ConditionalHeader';
-import Footer from '@/components/Footer';
+import ConditionalHeader from '@/components/navigation/ConditionalHeader';
+import Footer from '@/components/navigation/Footer';
 
 const faqs = [
   {

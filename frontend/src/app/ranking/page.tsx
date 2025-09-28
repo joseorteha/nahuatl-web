@@ -1,5 +1,5 @@
-import Header from '@/components/Header';
-import RankingRecompensas from '@/components/RankingRecompensas';
+import Header from '@/components/navigation/Header';
+import RankingRecompensas from '@/components/features/social/RankingRecompensas';
 
 export default function RankingPage() {
   return (

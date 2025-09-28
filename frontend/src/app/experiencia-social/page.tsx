@@ -16,8 +16,8 @@ import {
   User
 } from 'lucide-react';
 import { useAuthBackend } from '@/hooks/useAuthBackend';
-import ConditionalHeader from '@/components/ConditionalHeader';
-import UserSearch from '@/components/UserSearch';
+import ConditionalHeader from '@/components/navigation/ConditionalHeader';
+import UserSearch from '@/components/features/social/UserSearch';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 

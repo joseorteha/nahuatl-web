@@ -3,14 +3,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Settings, Users, MessageCircle, FileText, Shield } from 'lucide-react';
-import ConditionalHeader from '@/components/ConditionalHeader';
-import ContributionsTab from '@/components/admin/ContributionsTab';
-import MessagesTab from '@/components/admin/MessagesTab';
-import RequestsTab from '@/components/admin/RequestsTab';
-import ContributionModal from '@/components/admin/ContributionModal';
-import MessageModal from '@/components/admin/MessageModal';
-import RequestModal from '@/components/admin/RequestModal';
-import { obtenerMensajesNoLeidos, obtenerSolicitudesPendientes, marcarContactoComoLeido } from '@/lib/contactService';
+import ConditionalHeader from '@/components/navigation/ConditionalHeader';
+import ContributionsTab from '@/components/features/admin/ContributionsTab';
+import MessagesTab from '@/components/features/admin/MessagesTab';
+import RequestsTab from '@/components/features/admin/RequestsTab';
+import ContributionModal from '@/components/features/admin/ContributionModal';
+import MessageModal from '@/components/features/admin/MessageModal';
+import RequestModal from '@/components/features/admin/RequestModal';
+import { obtenerMensajesNoLeidos, obtenerSolicitudesPendientes, marcarContactoComoLeido } from '@/services/api/contactService';
 import { useAuthBackend } from '@/hooks/useAuthBackend';
 
 interface AdminContribution {

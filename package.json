@@ -1,13 +1,22 @@
 {
-  "name": "nahuatl-app",
-  "version": "1.0.0",
-  "description": "Aplicación para aprender Náhuatl",
+  "name": "nahuatl-web",
+  "version": "2.2.0",
+  "description": "Plataforma colaborativa de aprendizaje Náhuatl",
   "scripts": {
-    "dev": "cd frontend && npm run dev",
+    "setup": "./scripts/setup.sh",
+    "dev": "concurrently \"cd frontend && npm run dev\" \"cd backend && npm run dev\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
     "build": "cd frontend && npm run build",
     "start": "cd frontend && npm start",
-    "lint": "cd frontend && npm run lint"
+    "deploy": "./scripts/deploy.sh",
+    "lint": "cd frontend && npm run lint",
+    "test": "cd frontend && npm test && cd ../backend && npm test"
   },
-  "author": "",
-  "license": "ISC"
+  "keywords": ["nahuatl", "language", "education", "collaborative"],
+  "author": "José Ortega",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
 }

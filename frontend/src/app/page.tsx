@@ -3,9 +3,9 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Head from 'next/head';
 import { BookOpen, Code, Users, Feather, Languages, Star, ArrowRight, Play, CheckCircle, Zap, Sparkles } from 'lucide-react';
-import LandingHeader from '../components/LandingHeader';
-import { AdvancedBackground } from '@/components/AdvancedBackground';
-import { FloatingElements } from '@/components/PremiumEffects';
+import LandingHeader from '../components/navigation/LandingHeader';
+import { AdvancedBackground } from '@/components/effects/AdvancedBackground';
+import { FloatingElements } from '@/components/effects/PremiumEffects';
 
 export default function LandingPage() {
   

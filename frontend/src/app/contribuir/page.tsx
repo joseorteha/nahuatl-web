@@ -3,10 +3,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, History, Users, BookOpen, Sparkles, X, CheckCircle, Star, Gift, Target, Award } from 'lucide-react';
-import ConditionalHeader from '@/components/ConditionalHeader';
-import Footer from '@/components/Footer';
-import ContributeWordForm from '@/components/contribuir/ContributeWordForm';
-import { getContributionStats, type ContributionStats } from '@/lib/contributionStats';
+import ConditionalHeader from '@/components/navigation/ConditionalHeader';
+import Footer from '@/components/navigation/Footer';
+import ContributeWordForm from '@/components/features/contributions/ContributeWordForm';
+import { getContributionStats, type ContributionStats } from '@/lib/utils/contributionStats';
 import { useAuthBackend } from '@/hooks/useAuthBackend';
 
 interface UserContribution {

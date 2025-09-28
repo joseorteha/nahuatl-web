@@ -21,7 +21,7 @@ import {
   Home,
   Shield
 } from 'lucide-react';
-import { ThemeToggle } from './ThemeToggle';
+import { ThemeToggle } from '../shared/ThemeToggle';
 import { useAuthBackend } from '@/hooks/useAuthBackend';
 
 export default function Header() {

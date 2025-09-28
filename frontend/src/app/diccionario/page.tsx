@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import debounce from 'lodash.debounce';
 import { Search, BookOpen, AlertCircle, Bot, Bookmark, BookmarkCheck, Volume2, Share2 } from 'lucide-react';
-import ConditionalHeader from '@/components/ConditionalHeader';
+import ConditionalHeader from '@/components/navigation/ConditionalHeader';
 
 interface DictionaryEntry {
   word: string;

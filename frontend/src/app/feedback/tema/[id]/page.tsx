@@ -17,8 +17,8 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { useAuthBackend } from '@/hooks/useAuthBackend';
-import Header from '@/components/Header';
-import RespuestaForm from '../../components/RespuestaForm';
+import Header from '@/components/navigation/Header';
+import RespuestaForm from '@/app/feedback/components/RespuestaForm';
 
 interface Tema {
   id: string;

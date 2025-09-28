@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { X, Users, Send, CheckCircle, AlertCircle, User, Mail, Phone, Heart } from 'lucide-react';
-import { submitJoinRequest, isValidEmail, isValidPhone, type JoinRequest } from '@/lib/contactService';
+import { submitJoinRequest, isValidEmail, isValidPhone, type JoinRequest } from '@/services/api/contactService';
 
 interface JoinModalProps {
   isOpen: boolean;

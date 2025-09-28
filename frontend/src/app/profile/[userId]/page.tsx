@@ -25,10 +25,10 @@ import {
 } from 'lucide-react';
 import { useAuthBackend } from '@/hooks/useAuthBackend';
 import { useSocial } from '@/hooks/useSocial';
-import Header from '@/components/Header';
-import ApiService from '@/services/apiService';
+import Header from '@/components/navigation/Header';
+import ApiService from '@/services/api/apiService';
 import { UserProfile, UserStats, TabType, Seguidor, Siguiendo } from '@/types';
-import ExperienciaSocialBadge from '@/components/ExperienciaSocialBadge';
+import ExperienciaSocialBadge from '@/components/features/social/ExperienciaSocialBadge';
 
 export default function UserProfilePage() {
   const params = useParams();

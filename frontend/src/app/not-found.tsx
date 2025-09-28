@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Home, ArrowLeft } from 'lucide-react';
-import ConditionalHeader from '@/components/ConditionalHeader';
+import ConditionalHeader from '@/components/navigation/ConditionalHeader';
 
 export default function NotFound() {
   return (

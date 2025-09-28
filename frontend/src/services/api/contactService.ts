@@ -1,5 +1,5 @@
 // lib/contactService.ts
-import { supabase } from './supabaseClient';
+import { supabase } from '../../lib/config/supabaseClient';
 
 export interface ContactMessage {
   nombre: string;

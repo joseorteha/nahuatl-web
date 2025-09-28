@@ -15,7 +15,7 @@ import {
   XCircle,
   Sparkles
 } from 'lucide-react';
-import ConditionalHeader from '@/components/ConditionalHeader';
+import ConditionalHeader from '@/components/navigation/ConditionalHeader';
 
 interface Palabra {
   nahuatl: string;

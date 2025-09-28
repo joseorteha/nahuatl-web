@@ -1,6 +1,6 @@
 'use client';
 import { motion } from 'framer-motion';
-import ConditionalHeader from '@/components/ConditionalHeader';
+import ConditionalHeader from '@/components/navigation/ConditionalHeader';
 import { Shield, Mail, Eye, Lock, Users, FileText, Database, Settings, AlertTriangle, CheckCircle, Globe, Heart } from 'lucide-react';
 
 export default function PrivacyPolicy() {

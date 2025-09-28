@@ -1,4 +1,3 @@
-// components/admin/ContributionModal.tsx
 'use client';
 
 import { useState } from 'react';

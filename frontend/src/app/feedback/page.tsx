@@ -27,11 +27,11 @@ import {
 } from 'lucide-react';
 import { useAuthBackend } from '@/hooks/useAuthBackend';
 import { useSocial, Notificacion, Hashtag } from '@/hooks/useSocial';
-import ConditionalHeader from '@/components/ConditionalHeader';
-import ApiService from '@/services/apiService';
+import ConditionalHeader from '@/components/navigation/ConditionalHeader';
+import ApiService from '@/services/api/apiService';
 import { UserStats } from '@/types';
-import { HashtagList } from '@/components/social/HashtagChip';
-import { NotificationList } from '@/components/social/NotificationItem';
+import { HashtagList } from '@/components/features/social/HashtagChip';
+import { NotificationList } from '@/components/features/social/NotificationItem';
 import TemaCard from './components/TemaCard';
 import TemaForm from './components/TemaForm';
 
