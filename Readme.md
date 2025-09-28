@@ -2,21 +2,38 @@
 
 [![Version](https://img.shields.io/badge/version-2.2.0-blue.svg)](https://github.com/joseorteha/nahuatl-web)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://nahuatl-web.vercel.app)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![License](https://img.shields.io/badge/license-Private-red.svg)](LICENSE)
 [![Status](https://img.shields.io/badge/status-beta-yellow.svg)](https://nahuatl-web.vercel.app)
+[![Privacy](https://img.shields.io/badge/privacy-Protected-orange.svg)](SECURITY.md)
 
-> **Una plataforma educativa moderna para preservar, aprender y contribuir al náhuatl a través de tecnología colaborativa.**
+> **🔒 PROYECTO PRIVADO - Una plataforma educativa moderna para preservar, aprender y contribuir al náhuatl a través de tecnología colaborativa.**
 
 
 
 [![Landing Page](https://i.ibb.co/35cRstjN/image.png)](https://nahuatl-web.vercel.app)
 
 
+## ⚠️ **ADVERTENCIA IMPORTANTE**
+
+### 🔒 **PROYECTO PRIVADO Y PROPIETARIO**
+
+Este repositorio contiene código **PRIVADO** y **PROPIETARIO** de José Ortega. 
+
+**🚫 PROHIBIDO:**
+- ❌ Usar, copiar o distribuir el código sin autorización
+- ❌ Hacer fork público del repositorio  
+- ❌ Usar el código para proyectos comerciales
+- ❌ Realizar ingeniería inversa
+
+**📄 Ver:** [LICENSE](LICENSE) | [SECURITY.md](SECURITY.md) | [CONTRIBUTING.md](CONTRIBUTING.md)
+
+---
+
 ## 🔗 Enlaces Rápidos
 
 - [🌐 **Demo en Vivo**](https://nahuatl-web.vercel.app) 
 - [📖 **Documentación Completa**](./docs/)
-- [🐛 **Reportar Problemas**](https://github.com/joseorteha/nahuatl-web/issues)
+- [🔒 **Política de Seguridad**](SECURITY.md)
 
 ---
 
