@@ -241,7 +241,7 @@ export default function ExperienciaSocialPage() {
 
                 {/* Estadísticas principales - Responsive */}
                 {data && (
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+                  <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
                     {[
                       { 
                         label: 'Likes Dados', 
@@ -277,7 +277,7 @@ export default function ExperienciaSocialPage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className={`${stat.bgColor} rounded-xl p-3 sm:p-4 lg:p-6 border border-slate-200/60 dark:border-slate-700/60`}
+                        className={`${stat.bgColor} rounded-xl p-3 sm:p-4 lg:p-6 border border-slate-200/60 dark:border-slate-700/60 hover:shadow-lg transition-all duration-300`}
                       >
                         <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
                           <div className={`w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r ${stat.color} rounded-lg flex items-center justify-center`}>
@@ -295,7 +295,7 @@ export default function ExperienciaSocialPage() {
 
                 {/* Rankings del usuario - Responsive */}
                 {data && (
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+                  <div className="grid grid-cols-1 xs:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
                     {[
                       { periodo: 'Semanal', valor: data.rankings.semanal, color: 'from-yellow-500 to-orange-500' },
                       { periodo: 'Mensual', valor: data.rankings.mensual, color: 'from-blue-500 to-purple-500' },
@@ -306,7 +306,7 @@ export default function ExperienciaSocialPage() {
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.4 + index * 0.1 }}
-                        className={`bg-gradient-to-r ${color} rounded-xl p-4 sm:p-6 text-white text-center`}
+                        className={`bg-gradient-to-r ${color} rounded-xl p-4 sm:p-6 text-white text-center hover:shadow-lg transition-all duration-300`}
                       >
                         <div className="text-xs sm:text-sm opacity-90 mb-1 sm:mb-2">{periodo}</div>
                         <div className="text-2xl sm:text-3xl font-bold">
@@ -318,24 +318,14 @@ export default function ExperienciaSocialPage() {
                   </div>
                 )}
 
-                {/* Botones de navegación - Responsive */}
+                {/* Solo UserSearch - Responsive */}
                 {user && (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.6 }}
-                    className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mt-6 sm:mt-8"
+                    className="flex justify-center mt-6 sm:mt-8"
                   >
-                    <button
-                      onClick={() => router.push(`/profile/${user.id}`)}
-                      className="group bg-gradient-to-r from-cyan-600 via-blue-600 to-slate-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-2xl font-bold text-sm sm:text-lg shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 hover:scale-105 flex items-center gap-2 sm:gap-3"
-                    >
-                      <User className="w-4 h-4 sm:w-6 sm:h-6 group-hover:scale-110 transition-transform duration-300" />
-                      <span className="hidden sm:inline">Ver Mi Perfil Completo</span>
-                      <span className="sm:hidden">Mi Perfil</span>
-                      <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform duration-300" />
-                    </button>
-                    
                     <UserSearch />
                   </motion.div>
                 )}
@@ -411,24 +401,14 @@ export default function ExperienciaSocialPage() {
                   </div>
                 )}
 
-                {/* Botones de navegación en sección personal - Responsive */}
+                {/* Solo UserSearch en sección personal - Responsive */}
                 {user && (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.8 }}
-                    className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mt-6 sm:mt-8"
+                    className="flex justify-center mt-6 sm:mt-8"
                   >
-                    <button
-                      onClick={() => router.push(`/profile/${user.id}`)}
-                      className="group bg-gradient-to-r from-cyan-600 via-blue-600 to-slate-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-2xl font-bold text-sm sm:text-lg shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 hover:scale-105 flex items-center gap-2 sm:gap-3"
-                    >
-                      <Target className="w-4 h-4 sm:w-6 sm:h-6 group-hover:scale-110 transition-transform duration-300" />
-                      <span className="hidden sm:inline">Ver Mi Progreso Completo</span>
-                      <span className="sm:hidden">Mi Progreso</span>
-                      <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform duration-300" />
-                    </button>
-                    
                     <UserSearch />
                   </motion.div>
                 )}

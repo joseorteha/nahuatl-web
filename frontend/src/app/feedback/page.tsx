@@ -131,9 +131,7 @@ export default function FeedbackPage() {
     obtenerNotificaciones, 
     marcarNotificacionLeida, 
     marcarTodasLeidas,
-    obtenerHashtagsPopulares,
-    compartirFeedback,
-    guardarFeedback
+    obtenerHashtagsPopulares
   } = useSocial();
   const router = useRouter();
   
@@ -640,7 +638,7 @@ export default function FeedbackPage() {
             >
               <div className="w-12 h-12 border-4 border-cyan-600/20 border-t-cyan-600 rounded-full"></div>
             </motion.div>
-            <p className="mt-4 text-slate-600 dark:text-slate-300">Cargando feedback...</p>
+            <p className="mt-4 text-slate-600 dark:text-slate-300">Cargando temas...</p>
           </div>
         </div>
       </div>

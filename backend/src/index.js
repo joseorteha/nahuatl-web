@@ -26,6 +26,8 @@ const experienciaSocialRoutes = require('./routes/experiencia-social');
 const usuariosRoutes = require('./routes/usuarios');
 const dashboardRoutes = require('./routes/dashboard');
 const leccionesRoutes = require('./routes/lecciones');
+const profileRoutes = require('./routes/profileRoutes');
+const logrosRoutes = require('./routes/logrosRoutes');
 
 // Crear aplicación Express
 const app = express();
@@ -122,12 +124,14 @@ app.get('/', (req, res) => {
       health: '/health',
       auth: '/api/auth/*',
       dictionary: '/api/dictionary/*',
-      feedback: '/api/feedback/*',
+      // feedback: '/api/feedback/*', // Deshabilitado - usando sistema de temas
       temas: '/api/temas/*',
       admin: '/api/admin/*',
       contributions: '/api/contributions/*',
       recompensas: '/api/recompensas/*',
-      social: '/api/social/*'
+      social: '/api/social/*',
+      profile: '/api/profile/*',
+      logros: '/api/logros/*'
     },
     docs: 'https://github.com/joseorteha/nahuatl-web/blob/main/backend/README.md'
   });
@@ -136,7 +140,7 @@ app.get('/', (req, res) => {
 // Registrar rutas de la API
 app.use('/api/auth', authRoutes);
 app.use('/api/dictionary', dictionaryRoutes);
-app.use('/api/feedback', feedbackRoutes);
+// app.use('/api/feedback', feedbackRoutes); // Deshabilitado - usando sistema de temas
 app.use('/api/temas', temasRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/contributions', contributionRoutes);
@@ -148,6 +152,8 @@ app.use('/api/experiencia-social', experienciaSocialRoutes);
 app.use('/api/usuarios', usuariosRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/lecciones', leccionesRoutes);
+app.use('/api/profile', profileRoutes);
+app.use('/api/logros', logrosRoutes);
 
 // ===== MANEJO DE ERRORES =====
 

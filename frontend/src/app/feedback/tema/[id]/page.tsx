@@ -114,8 +114,8 @@ export default function TemaPage() {
           respuestas_count: temaData.respuestas_count || 0,
           ultima_actividad: temaData.ultima_actividad || temaData.fecha_creacion,
           fecha_creacion: temaData.fecha_creacion,
-          contador_likes: 0,
-          compartido_contador: 0,
+          contador_likes: temaData.contador_likes || 0,
+          compartido_contador: temaData.compartido_contador || 0,
           trending_score: 0
         });
         

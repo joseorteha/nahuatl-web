@@ -7,10 +7,14 @@ const { supabase } = require('../config/database');
  */
 const authenticateToken = async (req, res, next) => {
   try {
+    console.log('🔍 Debug Auth - Headers:', req.headers);
     const authHeader = req.headers['authorization'];
+    console.log('🔍 Debug Auth - Auth Header:', authHeader);
     const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+    console.log('🔍 Debug Auth - Token:', token ? 'Presente' : 'Ausente');
 
     if (!token) {
+      console.log('❌ Debug Auth - No token provided');
       return res.status(401).json({
         error: 'Token de acceso requerido',
         message: 'Debes iniciar sesión para acceder a este recurso'
@@ -18,14 +22,20 @@ const authenticateToken = async (req, res, next) => {
     }
 
     // Verificar el token JWT
+    console.log('🔍 Debug Auth - Verificando token...');
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'tu_jwt_secret_muy_seguro');
+    console.log('🔍 Debug Auth - Token decodificado:', decoded);
     
     // Verificar que el usuario aún existe en la base de datos
+    console.log('🔍 Debug Auth - Consultando usuario en BD...');
     const { data: user, error } = await supabase
       .from('perfiles')
       .select('id, email, username, nombre_completo, rol, fecha_creacion')
       .eq('id', decoded.userId)
       .maybeSingle();
+    
+    console.log('🔍 Debug Auth - Usuario encontrado:', user);
+    console.log('🔍 Debug Auth - Error en consulta:', error);
 
     if (error) {
       console.error('Error verificando usuario en BD:', error);
@@ -43,8 +53,10 @@ const authenticateToken = async (req, res, next) => {
     }
 
     // Agregar información del usuario al request
+    console.log('🔍 Debug Auth - Asignando usuario al request:', user);
     req.user = user;
     req.userId = user.id;
+    console.log('🔍 Debug Auth - req.user asignado:', req.user);
     next();
   } catch (error) {
     if (error.name === 'JsonWebTokenError') {

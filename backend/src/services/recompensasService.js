@@ -1,5 +1,7 @@
 // services/recompensasService.js
 const { supabase } = require('../config/database');
+const pointsService = require('./pointsService');
+const logrosService = require('./logrosService');
 
 class RecompensasService {
   /**
@@ -72,13 +74,76 @@ class RecompensasService {
   }
 
   /**
-   * Otorgar puntos al usuario
+   * Otorgar puntos al usuario (MÉTODO LEGACY - usar pointsService para nuevos desarrollos)
    * @param {string} userId - ID del usuario
    * @param {number} puntos - Puntos a otorgar
    * @param {string} motivo - Motivo de los puntos
    * @param {string} descripcion - Descripción detallada
    */
   async otorgarPuntos(userId, puntos, motivo, descripcion = '') {
+    try {
+      // Determinar si son puntos de conocimiento o comunidad
+      const motivosConocimiento = [
+        'contribucion_diccionario',
+        'contribucion_aprobada',
+        'palabra_guardada',
+        'leccion_completada',
+        'evaluacion_aprobada'
+      ];
+
+      const motivosComunidad = [
+        'tema_creado',
+        'like_dado',
+        'like_recibido',
+        'share_dado',
+        'share_recibido',
+        'respuesta_creada',
+        'feedback_enviado',
+        'mencion_usuario'
+      ];
+
+      let resultado;
+      
+      if (motivosConocimiento.includes(motivo)) {
+        resultado = await pointsService.otorgarPuntosConocimiento(userId, puntos, motivo, descripcion);
+      } else if (motivosComunidad.includes(motivo)) {
+        resultado = await pointsService.otorgarPuntosComunidad(userId, puntos, motivo, descripcion);
+      } else {
+        // Fallback al método legacy para motivos no categorizados
+        resultado = await this.otorgarPuntosLegacy(userId, puntos, motivo, descripcion);
+      }
+
+      // Verificar logros automáticamente después de otorgar puntos
+      try {
+        const logrosNuevos = await logrosService.verificarLogrosAutomaticos(userId, motivo, { puntos, descripcion });
+        if (logrosNuevos && logrosNuevos.length > 0) {
+          console.log(`🎉 Usuario ${userId} obtuvo ${logrosNuevos.length} logros nuevos!`);
+          // Aquí podrías agregar notificaciones o actualizar la respuesta
+          if (resultado && typeof resultado === 'object') {
+            resultado.logros_nuevos = logrosNuevos;
+          }
+        }
+      } catch (logrosError) {
+        console.error('⚠️ Error verificando logros automáticos:', logrosError);
+        // No fallar la operación principal por errores en logros
+      }
+
+      return resultado;
+
+    } catch (error) {
+      console.error('Error otorgando puntos:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Método legacy para otorgar puntos (mantener compatibilidad)
+   * @param {string} userId - ID del usuario
+   * @param {number} puntos - Puntos a otorgar
+   * @param {string} motivo - Motivo de los puntos
+   * @param {string} descripcion - Descripción detallada
+   */
+  async otorgarPuntosLegacy(userId, puntos, motivo, descripcion = '') {
     try {
       // Registrar en historial
       await supabase
@@ -112,7 +177,7 @@ class RecompensasService {
       await this.verificarLogros(userId);
 
     } catch (error) {
-      console.error('Error otorgando puntos:', error);
+      console.error('Error otorgando puntos legacy:', error);
       throw error;
     }
   }

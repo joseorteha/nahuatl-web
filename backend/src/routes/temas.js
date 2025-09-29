@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { supabase } = require('../config/database');
 const { authenticateToken } = require('../middleware/auth');
+const { updateTemaCounters } = require('../utils/temasCounters');
 
 // GET /api/temas - Obtener todos los temas
 router.get('/', async (req, res) => {
@@ -321,22 +322,8 @@ router.post('/:id/respuestas', authenticateToken, async (req, res) => {
       es_respuesta_admin: false
     };
 
-    // Actualizar contadores del tema
-    const { error: updateError } = await supabase
-      .from('temas_conversacion')
-      .update({
-        respuestas_count: (tema.respuestas_count || 0) + 1,
-        ultima_actividad: new Date().toISOString()
-      })
-      .eq('id', id);
-
-    if (updateError) {
-      console.error('Error updating tema counters:', updateError);
-      return res.status(500).json({ 
-        success: false, 
-        error: 'Error al actualizar contadores' 
-      });
-    }
+    // Actualizar contadores automáticamente
+    await updateTemaCounters(id);
 
     res.status(201).json({
       success: true,
@@ -403,21 +390,8 @@ router.post('/:id/like', authenticateToken, async (req, res) => {
         });
       }
 
-      // Decrementar contador
-      const { error: updateError } = await supabase
-        .from('temas_conversacion')
-        .update({
-          contador_likes: tema.contador_likes - 1
-        })
-        .eq('id', id);
-
-      if (updateError) {
-        console.error('Error updating like count:', updateError);
-        return res.status(500).json({ 
-          success: false, 
-          error: 'Error al actualizar contador' 
-        });
-      }
+      // Actualizar contadores automáticamente
+      await updateTemaCounters(id);
 
       res.json({
         success: true,
@@ -440,21 +414,8 @@ router.post('/:id/like', authenticateToken, async (req, res) => {
         });
       }
 
-      // Incrementar contador
-      const { error: updateError } = await supabase
-        .from('temas_conversacion')
-        .update({
-          contador_likes: tema.contador_likes + 1
-        })
-        .eq('id', id);
-
-      if (updateError) {
-        console.error('Error updating like count:', updateError);
-        return res.status(500).json({ 
-          success: false, 
-          error: 'Error al actualizar contador' 
-        });
-      }
+      // Actualizar contadores automáticamente
+      await updateTemaCounters(id);
 
       res.json({
         success: true,
@@ -509,21 +470,8 @@ router.post('/:id/share', authenticateToken, async (req, res) => {
       });
     }
 
-    // Incrementar contador de compartidos
-    const { error: updateError } = await supabase
-      .from('temas_conversacion')
-      .update({
-        compartido_contador: tema.compartido_contador + 1
-      })
-      .eq('id', id);
-
-    if (updateError) {
-      console.error('Error updating share count:', updateError);
-      return res.status(500).json({ 
-        success: false, 
-        error: 'Error al actualizar contador' 
-      });
-    }
+    // Actualizar contadores automáticamente
+    await updateTemaCounters(id);
 
     res.json({
       success: true,

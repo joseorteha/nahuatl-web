@@ -2,24 +2,19 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { User, Mail, AtSign, Settings, Save, X, Edit3, RefreshCw, ExternalLink, Users, Heart, MessageCircle, Share2, Bookmark, CheckCircle, MapPin, Globe, Shield, Bell, Eye, Calendar, Trophy, Star, Target, Award, TrendingUp, Zap, Crown, Sparkles, ArrowUp, Flame, BarChart3, History, Gift, Clock } from 'lucide-react';
+import { User, Mail, AtSign, Settings, Save, X, Edit3, RefreshCw, ExternalLink, Users, Heart, MessageCircle, Share2, CheckCircle, MapPin, Globe, Shield, Bell, Eye, Calendar, Trophy, Star, Target, Award, TrendingUp, Zap, Crown, Sparkles, ArrowUp, Flame, BarChart3, History, Gift, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Avatar from 'boring-avatars';
 import ConditionalHeader from '@/components/navigation/ConditionalHeader';
 import Recompensas from '@/components/features/rewards/Recompensas';
+import ConocimientoTab from '@/components/features/profile/ConocimientoTab';
+import ComunidadTab from '@/components/features/profile/ComunidadTab';
+import LogrosTab from '@/components/features/profile/LogrosTab';
 import Image from 'next/image';
 import { useAuthBackend } from '@/hooks/useAuthBackend';
-import { useSocial, Seguimiento, FeedbackGuardado } from '@/hooks/useSocial';
+import { useSocial, Seguimiento } from '@/hooks/useSocial';
 import { UserCard } from '@/components/features/social/UserCard';
 
-interface SavedWord {
-  id: string;
-  diccionario?: {
-    word: string;
-    definition: string;
-    info_gramatical?: string;
-  };
-}
 
 interface AvatarData {
   name: string;
@@ -30,7 +25,7 @@ interface AvatarData {
 export default function ProfilePage() {
   // Hooks de autenticación y social
   const { user, loading, isAuthenticated } = useAuthBackend();
-  const { obtenerSeguidores, obtenerSiguiendo, obtenerFeedbackGuardado } = useSocial();
+  const { obtenerSeguidores, obtenerSiguiendo } = useSocial();
   const router = useRouter();
 
   // Estados del componente
@@ -58,15 +53,12 @@ export default function ProfilePage() {
     savedWords: 0
   });
   const [isLoadingStats, setIsLoadingStats] = useState(true);
-  const [savedWords, setSavedWords] = useState<SavedWord[]>([]);
-  const [isLoadingSavedWords, setIsLoadingSavedWords] = useState(true);
   
   // Estados sociales
   const [seguidores, setSeguidores] = useState<Seguimiento[]>([]);
   const [siguiendo, setSiguiendo] = useState<Seguimiento[]>([]);
-  const [feedbackGuardado, setFeedbackGuardado] = useState<FeedbackGuardado[]>([]);
   const [isLoadingSocial, setIsLoadingSocial] = useState(true);
-  const [activeTab, setActiveTab] = useState<'contributions' | 'social' | 'saved'>('contributions');
+  const [activeTab, setActiveTab] = useState<'conocimiento' | 'comunidad' | 'logros'>('conocimiento');
   
   // Nuevos estados para el sistema de contribuciones
   const [contributionsStats, setContributionsStats] = useState({
@@ -200,43 +192,16 @@ export default function ProfilePage() {
     }
   }, [API_URL]);
 
-  const loadSavedWords = useCallback(async (userId: string) => {
-    try {
-      setIsLoadingSavedWords(true);
-      const token = localStorage.getItem('auth_tokens');
-      const parsedTokens = token ? JSON.parse(token) : null;
-      
-      const response = await fetch(`${API_URL}/api/dictionary/saved/${userId}`, {
-        headers: {
-          'Authorization': `Bearer ${parsedTokens?.accessToken}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error('Error al cargar palabras guardadas');
-      }
-      
-      const result = await response.json();
-      setSavedWords(result.savedWords || []);
-    } catch (error) {
-      console.error('Error loading saved words:', error);
-      setSavedWords([]);
-    } finally {
-      setIsLoadingSavedWords(false);
-    }
-  }, [API_URL]);
 
   // Cargar datos sociales
   const loadSocialData = useCallback(async (userId: string) => {
     try {
       setIsLoadingSocial(true);
       
-      // Cargar seguidores, siguiendo y feedback guardado en paralelo
-      const [seguidoresRes, siguiendoRes, feedbackRes] = await Promise.all([
+      // Cargar seguidores y siguiendo en paralelo
+      const [seguidoresRes, siguiendoRes] = await Promise.all([
         obtenerSeguidores(userId),
-        obtenerSiguiendo(userId),
-        obtenerFeedbackGuardado()
+        obtenerSiguiendo(userId)
       ]);
 
       if (seguidoresRes && Array.isArray(seguidoresRes)) {
@@ -246,16 +211,12 @@ export default function ProfilePage() {
       if (siguiendoRes && Array.isArray(siguiendoRes)) {
         setSiguiendo(siguiendoRes);
       }
-      
-      if (feedbackRes && Array.isArray(feedbackRes)) {
-        setFeedbackGuardado(feedbackRes);
-      }
     } catch (error) {
       console.error('Error loading social data:', error);
     } finally {
       setIsLoadingSocial(false);
     }
-  }, [obtenerSeguidores, obtenerSiguiendo, obtenerFeedbackGuardado]);
+  }, [obtenerSeguidores, obtenerSiguiendo]);
 
   useEffect(() => {
     // Redirigir si no está autenticado
@@ -282,10 +243,9 @@ export default function ProfilePage() {
       generateAvatars(user.email || 'default');
       loadUserStats(user.id);
       loadContributionsStats(user.id);
-      loadSavedWords(user.id);
       loadSocialData(user.id);
     }
-  }, [loading, isAuthenticated, user, router, loadUserStats, loadContributionsStats, loadSavedWords, loadSocialData]);
+  }, [loading, isAuthenticated, user, router, loadUserStats, loadContributionsStats, loadSocialData]);
 
   const generateAvatars = (seed: string) => {
     const variants = ['marble', 'beam', 'pixel', 'sunset', 'ring', 'bauhaus'];
@@ -336,8 +296,8 @@ export default function ProfilePage() {
     
     if (type === 'checkbox') {
       const checked = (e.target as HTMLInputElement).checked;
-      setFormData({
-        ...formData,
+    setFormData({
+      ...formData,
         [name]: checked
       });
     } else {
@@ -450,8 +410,8 @@ export default function ProfilePage() {
               <div className="text-center lg:text-left flex-1 min-w-0">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-3">
                   <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white drop-shadow-lg break-words">
-                    {userData.nombre_completo || 'Usuario'}
-                  </h1>
+                  {userData.nombre_completo || 'Usuario'}
+                </h1>
                   <div className="flex items-center justify-center lg:justify-start gap-1.5 sm:gap-2 flex-wrap">
                     {user?.verificado && (
                       <div className="w-5 h-5 sm:w-6 sm:h-6 bg-cyan-500 rounded-full flex items-center justify-center shadow-lg">
@@ -545,66 +505,61 @@ export default function ProfilePage() {
         >
           <div className="flex border-b border-slate-200/50 dark:border-slate-700/50">
             <button
-              onClick={() => setActiveTab('contributions')}
+              onClick={() => setActiveTab('conocimiento')}
               className={`flex-1 px-3 sm:px-4 lg:px-6 py-3 sm:py-4 lg:py-5 text-center font-semibold transition-all duration-300 relative group ${
-                activeTab === 'contributions'
+                activeTab === 'conocimiento'
                   ? 'text-cyan-600 dark:text-cyan-400 bg-cyan-50/80 dark:bg-cyan-900/30'
                   : 'text-slate-600 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-cyan-50/50 dark:hover:bg-cyan-900/20'
               }`}
             >
               <div className="flex items-center justify-center gap-1.5 sm:gap-2 lg:gap-3">
-                <Target className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 ${activeTab === 'contributions' ? 'scale-110' : 'group-hover:scale-105'}`} />
-                <span className="text-xs sm:text-sm lg:text-base">Contribuciones</span>
+                <Target className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 ${activeTab === 'conocimiento' ? 'scale-110' : 'group-hover:scale-105'}`} />
+                <span className="text-xs sm:text-sm lg:text-base">Mi Conocimiento</span>
                 {contributionsStats.totalContributions > 0 && (
                   <span className="bg-cyan-500 text-white text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full font-bold shadow-lg">
                     {contributionsStats.totalContributions}
                   </span>
                 )}
               </div>
-              {activeTab === 'contributions' && (
+              {activeTab === 'conocimiento' && (
                 <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-t-full"></div>
               )}
             </button>
             <button
-              onClick={() => setActiveTab('social')}
+              onClick={() => setActiveTab('comunidad')}
               className={`flex-1 px-3 sm:px-4 lg:px-6 py-3 sm:py-4 lg:py-5 text-center font-semibold transition-all duration-300 relative group ${
-                activeTab === 'social'
+                activeTab === 'comunidad'
                   ? 'text-blue-600 dark:text-blue-400 bg-blue-50/80 dark:bg-blue-900/30'
                   : 'text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-900/20'
               }`}
             >
               <div className="flex items-center justify-center gap-1.5 sm:gap-2 lg:gap-3">
-                <Users className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 ${activeTab === 'social' ? 'scale-110' : 'group-hover:scale-105'}`} />
-                <span className="text-xs sm:text-sm lg:text-base">Social</span>
+                <Users className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 ${activeTab === 'comunidad' ? 'scale-110' : 'group-hover:scale-105'}`} />
+                <span className="text-xs sm:text-sm lg:text-base">Mi Comunidad</span>
                 {seguidores.length > 0 && (
                   <span className="bg-blue-500 text-white text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full font-bold shadow-lg">
                     {seguidores.length}
                   </span>
                 )}
               </div>
-              {activeTab === 'social' && (
+              {activeTab === 'comunidad' && (
                 <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-blue-600 rounded-t-full"></div>
               )}
             </button>
             <button
-              onClick={() => setActiveTab('saved')}
+              onClick={() => setActiveTab('logros')}
               className={`flex-1 px-3 sm:px-4 lg:px-6 py-3 sm:py-4 lg:py-5 text-center font-semibold transition-all duration-300 relative group ${
-                activeTab === 'saved'
-                  ? 'text-slate-600 dark:text-slate-400 bg-slate-50/80 dark:bg-slate-900/30'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-400 hover:bg-slate-50/50 dark:hover:bg-slate-900/20'
+                activeTab === 'logros'
+                  ? 'text-amber-600 dark:text-amber-400 bg-amber-50/80 dark:bg-amber-900/30'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50/50 dark:hover:bg-amber-900/20'
               }`}
             >
               <div className="flex items-center justify-center gap-1.5 sm:gap-2 lg:gap-3">
-                <Bookmark className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 ${activeTab === 'saved' ? 'scale-110' : 'group-hover:scale-105'}`} />
-                <span className="text-xs sm:text-sm lg:text-base">Guardados</span>
-                {feedbackGuardado.length > 0 && (
-                  <span className="bg-slate-500 text-white text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full font-bold shadow-lg">
-                    {feedbackGuardado.length}
-                  </span>
-                )}
+                <Trophy className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 ${activeTab === 'logros' ? 'scale-110' : 'group-hover:scale-105'}`} />
+                <span className="text-xs sm:text-sm lg:text-base">Logros</span>
               </div>
-              {activeTab === 'saved' && (
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-slate-500 to-slate-600 rounded-t-full"></div>
+              {activeTab === 'logros' && (
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-t-full"></div>
               )}
             </button>
           </div>
@@ -645,47 +600,47 @@ export default function ProfilePage() {
                   <User className="w-5 h-5" />
                   Información Básica
                 </h3>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Nombre Completo
-                    </label>
-                    <input
-                      type="text"
-                      name="nombre_completo"
-                      value={formData.nombre_completo}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:border-emerald-500 dark:focus:border-emerald-400 transition-all duration-200"
-                      placeholder="Tu nombre completo"
-                    />
-                  </div>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Nombre Completo
+                  </label>
+                  <input
+                    type="text"
+                    name="nombre_completo"
+                    value={formData.nombre_completo}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:border-emerald-500 dark:focus:border-emerald-400 transition-all duration-200"
+                    placeholder="Tu nombre completo"
+                  />
+                </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Nombre de Usuario
-                    </label>
-                    <input
-                      type="text"
-                      name="username"
-                      value={formData.username}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:border-emerald-500 dark:focus:border-emerald-400 transition-all duration-200"
-                      placeholder="@tu_usuario"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Nombre de Usuario
+                  </label>
+                  <input
+                    type="text"
+                    name="username"
+                    value={formData.username}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:border-emerald-500 dark:focus:border-emerald-400 transition-all duration-200"
+                    placeholder="@tu_usuario"
+                  />
+                </div>
 
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:border-emerald-500 dark:focus:border-emerald-400 transition-all duration-200"
-                      placeholder="tu@email.com"
-                    />
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:border-emerald-500 dark:focus:border-emerald-400 transition-all duration-200"
+                    placeholder="tu@email.com"
+                  />
                   </div>
 
                   <div className="md:col-span-2">
@@ -945,270 +900,21 @@ export default function ProfilePage() {
           transition={{ delay: 0.2 }}
           className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl rounded-3xl shadow-2xl p-4 sm:p-6 lg:p-8 border border-white/40 dark:border-slate-700/60"
         >
-          {/* Pestaña de Contribuciones */}
-          {activeTab === 'contributions' && (
-            <div>
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-                <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Sistema de Contribuciones</h2>
-                <Link href="/contribuir" className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 flex items-center gap-2 text-sm sm:text-base">
-                  <Target className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span className="hidden sm:inline">Nueva Contribución</span>
-                  <span className="sm:hidden">Nueva</span>
-                </Link>
-              </div>
-          
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-                {/* Estadísticas de contribuciones */}
-                <motion.div 
-                  whileHover={{ scale: 1.02 }}
-                  className="text-center p-4 sm:p-6 bg-gradient-to-br from-cyan-50 to-cyan-100/80 dark:from-cyan-900/30 dark:to-cyan-800/30 backdrop-blur-sm rounded-2xl border border-cyan-200/60 dark:border-cyan-700/60 hover:shadow-lg transition-all duration-300"
-                >
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-xl">
-                    <Target className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
-                  </div>
-                  <h3 className="font-bold text-slate-900 dark:text-white mb-2 text-base sm:text-lg">Total</h3>
-                  {isLoadingContributions ? (
-                    <div className="animate-pulse">
-                      <div className="h-6 sm:h-8 bg-slate-200 dark:bg-slate-600 rounded-lg mb-2"></div>
-                      <div className="h-3 sm:h-4 bg-slate-200 dark:bg-slate-600 rounded"></div>
-                    </div>
-                  ) : (
-                    <>
-                      <p className="text-2xl sm:text-3xl font-bold text-cyan-600 dark:text-cyan-400 mb-1">{contributionsStats.totalContributions}</p>
-                      <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">contribuciones</p>
-                    </>
-                  )}
-                </motion.div>
-                
-
-                <motion.div 
-                  whileHover={{ scale: 1.02 }}
-                  className="text-center p-4 sm:p-6 bg-gradient-to-br from-green-50 to-green-100/80 dark:from-green-900/30 dark:to-green-800/30 backdrop-blur-sm rounded-2xl border border-green-200/60 dark:border-green-700/60 hover:shadow-lg transition-all duration-300"
-                >
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-xl">
-                    <CheckCircle className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
-                  </div>
-                  <h3 className="font-bold text-slate-900 dark:text-white mb-2 text-base sm:text-lg">Aprobadas</h3>
-                  {isLoadingContributions ? (
-                    <div className="animate-pulse">
-                      <div className="h-6 sm:h-8 bg-slate-200 dark:bg-slate-600 rounded-lg mb-2"></div>
-                      <div className="h-3 sm:h-4 bg-slate-200 dark:bg-slate-600 rounded"></div>
-                    </div>
-                  ) : (
-                    <>
-                      <p className="text-2xl sm:text-3xl font-bold text-green-600 dark:text-green-400 mb-1">{contributionsStats.approvedContributions}</p>
-                      <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">aprobadas</p>
-                    </>
-                  )}
-                </motion.div>
-
-                <motion.div 
-                  whileHover={{ scale: 1.02 }}
-                  className="text-center p-4 sm:p-6 bg-gradient-to-br from-yellow-50 to-yellow-100/80 dark:from-yellow-900/30 dark:to-yellow-800/30 backdrop-blur-sm rounded-2xl border border-yellow-200/60 dark:border-yellow-700/60 hover:shadow-lg transition-all duration-300"
-                >
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-xl">
-                    <Clock className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
-                  </div>
-                  <h3 className="font-bold text-slate-900 dark:text-white mb-2 text-base sm:text-lg">Pendientes</h3>
-                  {isLoadingContributions ? (
-                    <div className="animate-pulse">
-                      <div className="h-6 sm:h-8 bg-slate-200 dark:bg-slate-600 rounded-lg mb-2"></div>
-                      <div className="h-3 sm:h-4 bg-slate-200 dark:bg-slate-600 rounded"></div>
-                    </div>
-                  ) : (
-                    <>
-                      <p className="text-2xl sm:text-3xl font-bold text-yellow-600 dark:text-yellow-400 mb-1">{contributionsStats.pendingContributions}</p>
-                      <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">pendientes</p>
-                    </>
-                  )}
-                </motion.div>
-
-                <motion.div 
-                  whileHover={{ scale: 1.02 }}
-                  className="text-center p-4 sm:p-6 bg-gradient-to-br from-blue-50 to-blue-100/80 dark:from-blue-900/30 dark:to-blue-800/30 backdrop-blur-sm rounded-2xl border border-blue-200/60 dark:border-blue-700/60 hover:shadow-lg transition-all duration-300"
-                >
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-xl">
-                    <Trophy className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
-                  </div>
-                  <h3 className="font-bold text-slate-900 dark:text-white mb-2 text-base sm:text-lg">Puntos</h3>
-                  {isLoadingContributions ? (
-                    <div className="animate-pulse">
-                      <div className="h-6 sm:h-8 bg-slate-200 dark:bg-slate-600 rounded-lg mb-2"></div>
-                      <div className="h-3 sm:h-4 bg-slate-200 dark:bg-slate-600 rounded"></div>
-                    </div>
-                  ) : (
-                    <>
-                      <p className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400 mb-1">{contributionsStats.totalPoints}</p>
-                      <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">puntos ganados</p>
-                    </>
-                  )}
-                </motion.div>
-              </div>
-
-              {/* Sistema de Recompensas/Educación */}
-              <div className="mb-8">
-                <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                  <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500" />
-                  Sistema de Recompensas Educativas
-                </h3>
-                <Recompensas userId={userData.id} />
-              </div>
-
-              {/* Sección de navegación rápida */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                <Link href="/feedback" className="block transform transition-all duration-300 hover:scale-105 hover:-translate-y-1">
-                  <div className="text-center p-4 sm:p-6 bg-gradient-to-br from-blue-50 to-blue-100/80 dark:from-blue-900/30 dark:to-blue-800/30 backdrop-blur-sm rounded-2xl border border-blue-200/60 dark:border-blue-700/60 hover:border-blue-300 dark:hover:border-blue-600 cursor-pointer transition-all duration-300 group shadow-lg hover:shadow-2xl">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-xl group-hover:shadow-2xl transition-all duration-300 group-hover:scale-110">
-                      <MessageCircle className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
-                    </div>
-                    <h3 className="font-bold text-slate-900 dark:text-white flex items-center justify-center gap-2 mb-2 text-base sm:text-lg">
-                      Comunidad
-                      <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 opacity-70 group-hover:opacity-100 transition-opacity" />
-                    </h3>
-                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">Participa en la comunidad</p>
-                  </div>
-                </Link>
-
-                <Link href="/experiencia-social" className="block transform transition-all duration-300 hover:scale-105 hover:-translate-y-1">
-                  <div className="text-center p-4 sm:p-6 bg-gradient-to-br from-purple-50 to-purple-100/80 dark:from-purple-900/30 dark:to-purple-800/30 backdrop-blur-sm rounded-2xl border border-purple-200/60 dark:border-purple-700/60 hover:border-purple-300 dark:hover:border-purple-600 cursor-pointer transition-all duration-300 group shadow-lg hover:shadow-2xl">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-xl group-hover:shadow-2xl transition-all duration-300 group-hover:scale-110">
-                      <Users className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
-                    </div>
-                    <h3 className="font-bold text-slate-900 dark:text-white flex items-center justify-center gap-2 mb-2 text-base sm:text-lg">
-                      Experiencia Social
-                      <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 opacity-70 group-hover:opacity-100 transition-opacity" />
-                    </h3>
-                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">Ve tu progreso social</p>
-                  </div>
-                </Link>
-              </div>
-            </div>
+          {/* Pestaña de Conocimiento */}
+          {activeTab === 'conocimiento' && (
+            <ConocimientoTab userId={userData.id} />
           )}
 
-          {/* Pestaña Social */}
-          {activeTab === 'social' && (
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-6">Actividad Social</h2>
-              
-              {isLoadingSocial ? (
-                <div className="flex justify-center py-12">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {/* Seguidores */}
-                  <div className="bg-gradient-to-br from-blue-50 to-blue-100/80 dark:from-blue-900/30 dark:to-blue-800/30 rounded-2xl p-6 border border-blue-200/60 dark:border-blue-700/60">
-                    <h3 className="font-bold text-blue-900 dark:text-blue-100 mb-4 flex items-center gap-2">
-                      <Users className="w-5 h-5" />
-                      Seguidores ({seguidores.length})
-                    </h3>
-                    {seguidores.length > 0 ? (
-                      <div className="space-y-3 max-h-64 overflow-y-auto">
-                        {seguidores.slice(0, 5).map((seguidor, index) => (
-                          <UserCard key={`seguidor-${seguidor.id}-${index}`} user={seguidor.seguidor} />
-                        ))}
-                        {seguidores.length > 5 && (
-                          <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">
-                            +{seguidores.length - 5} más
-                          </p>
-                        )}
-                      </div>
-                    ) : (
-                      <p className="text-blue-600 dark:text-blue-400 text-sm">No tienes seguidores aún</p>
-                    )}
-                  </div>
-
-                  {/* Siguiendo */}
-                  <div className="bg-gradient-to-br from-green-50 to-green-100/80 dark:from-green-900/30 dark:to-green-800/30 rounded-2xl p-6 border border-green-200/60 dark:border-green-700/60">
-                    <h3 className="font-bold text-green-900 dark:text-green-100 mb-4 flex items-center gap-2">
-                      <Heart className="w-5 h-5" />
-                      Siguiendo ({siguiendo.length})
-                    </h3>
-                    {siguiendo.length > 0 ? (
-                      <div className="space-y-3 max-h-64 overflow-y-auto">
-                        {siguiendo.slice(0, 5).map((seguido, index) => (
-                          <UserCard key={`siguiendo-${seguido.id}-${index}`} user={seguido.seguido} />
-                        ))}
-                        {siguiendo.length > 5 && (
-                          <p className="text-sm text-green-600 dark:text-green-400 font-medium">
-                            +{siguiendo.length - 5} más
-                          </p>
-                        )}
-                      </div>
-                    ) : (
-                      <p className="text-green-600 dark:text-green-400 text-sm">No sigues a nadie aún</p>
-                    )}
-                  </div>
-
-                  {/* Feedback Guardado */}
-                  <div className="bg-gradient-to-br from-purple-50 to-purple-100/80 dark:from-purple-900/30 dark:to-purple-800/30 rounded-2xl p-6 border border-purple-200/60 dark:border-purple-700/60">
-                    <h3 className="font-bold text-purple-900 dark:text-purple-100 mb-4 flex items-center gap-2">
-                      <Bookmark className="w-5 h-5" />
-                      Feedback Guardado ({feedbackGuardado.length})
-                    </h3>
-                    {feedbackGuardado.length > 0 ? (
-                      <div className="space-y-3 max-h-64 overflow-y-auto">
-                        {feedbackGuardado.slice(0, 3).map((feedback, index) => (
-                          <div key={`feedback-${feedback.id}-${index}`} className="bg-white/70 dark:bg-purple-800/30 rounded-lg p-3">
-                            <p className="text-sm text-purple-800 dark:text-purple-200 line-clamp-2">
-                              {feedback.retroalimentacion?.contenido || 'Sin contenido'}
-                            </p>
-                            <p className="text-xs text-purple-600 dark:text-purple-400 mt-1">
-                              Por {feedback.retroalimentacion?.usuario?.nombre_completo || 'Usuario'}
-                            </p>
-                          </div>
-                        ))}
-                        {feedbackGuardado.length > 3 && (
-                          <p className="text-sm text-purple-600 dark:text-purple-400 font-medium">
-                            +{feedbackGuardado.length - 3} más
-                          </p>
-                        )}
-                      </div>
-                    ) : (
-                      <p className="text-purple-600 dark:text-purple-400 text-sm">No has guardado feedback aún</p>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
+          {/* Pestaña de Comunidad */}
+          {activeTab === 'comunidad' && (
+            <ComunidadTab userId={userData.id} />
           )}
 
-          {/* Pestaña Guardados */}
-          {activeTab === 'saved' && (
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-6">Contenido Guardado</h2>
-              
-              {isLoadingSavedWords ? (
-                <div className="flex justify-center py-12">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-600"></div>
-                </div>
-              ) : savedWords.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {savedWords.map((word) => (
-                    <div key={word.id} className="bg-gradient-to-br from-slate-50 to-slate-100/80 dark:from-slate-800/50 dark:to-slate-700/50 rounded-2xl p-6 border border-slate-200/60 dark:border-slate-600/60 hover:shadow-lg transition-all duration-300">
-                      <h3 className="font-bold text-slate-900 dark:text-white text-lg mb-2">
-                        {word.diccionario?.word || 'Palabra'}
-                      </h3>
-                      <p className="text-slate-600 dark:text-slate-400 text-sm mb-2">
-                        {word.diccionario?.definition || 'Sin definición'}
-                      </p>
-                      {word.diccionario?.info_gramatical && (
-                        <span className="inline-block px-2 py-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs rounded-full">
-                          {word.diccionario.info_gramatical}
-                        </span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <Bookmark className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-slate-600 dark:text-slate-400 mb-2">No hay palabras guardadas</h3>
-                  <p className="text-slate-500 dark:text-slate-500">Guarda palabras del diccionario para verlas aquí</p>
-                </div>
-              )}
-            </div>
+          {/* Pestaña de Logros */}
+          {activeTab === 'logros' && (
+            <LogrosTab userId={userData.id} />
           )}
+
         </motion.div>
       </div>
     </div>
