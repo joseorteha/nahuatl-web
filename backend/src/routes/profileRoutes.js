@@ -31,6 +31,13 @@ router.get('/comunidad/:userId', authenticateToken, (req, res) => profileControl
 router.get('/resumen/:userId', authenticateToken, (req, res) => profileController.obtenerResumen(req, res));
 
 /**
+ * @route GET /api/profile/:userId
+ * @desc Obtener perfil completo de un usuario específico
+ * @access Public (no requiere autenticación para ver perfiles de otros)
+ */
+router.get('/:userId', (req, res) => profileController.obtenerPerfilUsuario(req, res));
+
+/**
  * @route GET /api/profile/test
  * @desc Ruta de prueba para verificar middleware
  * @access Private

@@ -755,6 +755,166 @@ class ProfileController {
     const puntosNecesarios = umbrales[siguienteNivel];
     return Math.max(0, puntosNecesarios - puntosActuales);
   }
+
+  // Obtener perfil completo de un usuario específico
+  async obtenerPerfilUsuario(req, res) {
+    try {
+      const { userId } = req.params;
+      
+      if (!userId) {
+        return res.status(400).json({
+          success: false,
+          error: 'ID de usuario requerido'
+        });
+      }
+
+      // Obtener datos básicos del usuario
+      const { data: perfil, error: perfilError } = await supabase
+        .from('perfiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (perfilError || !perfil) {
+        return res.status(404).json({
+          success: false,
+          error: 'Perfil no encontrado'
+        });
+      }
+
+      // Obtener puntos de recompensas
+      const { data: recompensas } = await supabase
+        .from('recompensas_usuario')
+        .select('*')
+        .eq('usuario_id', userId)
+        .single();
+
+      const puntosConocimiento = recompensas?.puntos_conocimiento || 0;
+      const experienciaSocial = recompensas?.puntos_comunidad || 0;
+
+      // Calcular niveles
+      const nivelConocimiento = this.calcularNivelConocimiento(puntosConocimiento);
+      const nivelSocial = this.calcularNivelComunidad(experienciaSocial);
+
+      // Obtener estadísticas de temas
+      const { data: temasCreados } = await supabase
+        .from('temas_conversacion')
+        .select('id, titulo, categoria, fecha_creacion, respuestas_count, contador_likes')
+        .eq('creador_id', userId)
+        .is('tema_padre_id', null)
+        .order('fecha_creacion', { ascending: false })
+        .limit(5);
+
+      const { data: respuestasCreadas } = await supabase
+        .from('temas_conversacion')
+        .select('id')
+        .eq('creador_id', userId)
+        .not('tema_padre_id', 'is', null);
+
+      // Obtener likes dados y recibidos
+      const { data: likesDados } = await supabase
+        .from('temas_likes')
+        .select('id')
+        .eq('usuario_id', userId);
+
+      const { data: likesRecibidos } = await supabase
+        .from('temas_likes')
+        .select('id, temas_conversacion!inner(creador_id)')
+        .eq('temas_conversacion.creador_id', userId);
+
+      // Obtener shares dados y recibidos
+      const { data: sharesDados } = await supabase
+        .from('temas_shares')
+        .select('id')
+        .eq('usuario_id', userId);
+
+      const { data: sharesRecibidos } = await supabase
+        .from('temas_shares')
+        .select('id, temas_conversacion!inner(creador_id)')
+        .eq('temas_conversacion.creador_id', userId);
+
+      // Obtener logros recientes
+      const { data: logrosRecientes } = await supabase
+        .from('logros_usuario')
+        .select(`
+          fecha_obtenido,
+          logros (
+            id,
+            nombre,
+            descripcion,
+            icono
+          )
+        `)
+        .eq('usuario_id', userId)
+        .order('fecha_obtenido', { ascending: false })
+        .limit(5);
+
+      // Obtener rankings (simulados por ahora)
+      const rankings = {
+        semanal: Math.floor(Math.random() * 50) + 1,
+        mensual: Math.floor(Math.random() * 100) + 1,
+        anual: Math.floor(Math.random() * 200) + 1
+      };
+
+      res.json({
+        success: true,
+        data: {
+          id: perfil.id,
+          nombre_completo: perfil.nombre_completo,
+          username: perfil.username,
+          email: perfil.email,
+          url_avatar: perfil.url_avatar,
+          fecha_registro: perfil.fecha_creacion,
+          ultima_actividad: perfil.fecha_actualizacion,
+          biografia: perfil.biografia,
+          ubicacion: perfil.ubicacion,
+          sitio_web: perfil.sitio_web,
+          verificado: perfil.verificado,
+          experiencia_social: experienciaSocial,
+          puntos_conocimiento: puntosConocimiento,
+          nivel_conocimiento: nivelConocimiento,
+          nivel_social: nivelSocial,
+          configuraciones: {
+            privacidad_perfil: perfil.privacidad_perfil,
+            mostrar_puntos: perfil.mostrar_puntos,
+            mostrar_nivel: perfil.mostrar_nivel,
+            notificaciones_email: perfil.notificaciones_email,
+            notificaciones_push: perfil.notificaciones_push
+          },
+          estadisticas: {
+            temas_creados: temasCreados?.length || 0,
+            respuestas_creadas: respuestasCreadas?.length || 0,
+            likes_dados: likesDados?.length || 0,
+            likes_recibidos: likesRecibidos?.length || 0,
+            shares_dados: sharesDados?.length || 0,
+            shares_recibidos: sharesRecibidos?.length || 0
+          },
+          rankings,
+          logros_recientes: logrosRecientes?.map(l => ({
+            id: l.logros.id,
+            nombre: l.logros.nombre,
+            descripcion: l.logros.descripcion,
+            icono: l.logros.icono,
+            fecha_obtenido: l.fecha_obtenido
+          })) || [],
+          temas_recientes: temasCreados?.map(t => ({
+            id: t.id,
+            titulo: t.titulo,
+            categoria: t.categoria,
+            fecha_creacion: t.fecha_creacion,
+            respuestas_count: t.respuestas_count,
+            contador_likes: t.contador_likes
+          })) || []
+        }
+      });
+    } catch (error) {
+      console.error('Error en obtenerPerfilUsuario:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Error interno del servidor'
+      });
+    }
+  }
 }
 
 module.exports = ProfileController;
