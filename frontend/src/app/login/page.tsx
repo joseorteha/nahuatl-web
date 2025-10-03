@@ -59,7 +59,7 @@ export default function LoginPage() {
             <div className="flex items-center gap-4">
               <div className="relative">
                 <Image 
-                  src="/logo.png" 
+                  src="/logooo.png" 
                   alt="Nawatlahtol Logo" 
                   width={60} 
                   height={60} 
