@@ -1,33 +1,21 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { 
-  BookText, 
-  Users, 
-  MessageCircle, 
+import {
+  BookText,
+  Users,
   Heart,
-  Star,
   TrendingUp,
   Award,
   ChevronRight,
-  Sparkles,
-  Trophy,
   BookOpen,
   Target,
   Clock,
-  Zap,
-  Crown,
   Activity,
-  Eye,
-  ThumbsUp,
-  Share2,
-  Calendar,
   ArrowRight,
-  TrendingDown,
-  User,
-  Bookmark
+  User
 } from 'lucide-react';
 import ConditionalHeader from '@/components/navigation/ConditionalHeader';
 import { useAuthBackend } from '@/hooks/useAuthBackend';
@@ -183,46 +171,23 @@ export default function Dashboard() {
     }
   }, [user?.id]);
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: 'spring' as const,
-        stiffness: 100,
-      },
-    },
-  };
-
-  const cardHover = {
-    scale: 1.02,
-    transition: { duration: 0.2 }
-  };
-
+  // Función para obtener el saludo apropiado
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Buenos días';
-    if (hour < 18) return 'Buenas tardes';
-    return 'Buenas noches';
+    if (hour < 12) {
+      return "¡Buenos días";
+    } else if (hour < 18) {
+      return "¡Buenas tardes";
+    } else {
+      return "¡Buenas noches";
+    }
   };
 
   const formatTimeAgo = (timestamp: string) => {
     const now = new Date();
     const time = new Date(timestamp);
     const diffInMinutes = Math.floor((now.getTime() - time.getTime()) / (1000 * 60));
-    
+
     if (diffInMinutes < 1) return 'Ahora';
     if (diffInMinutes < 60) return `${diffInMinutes}m`;
     if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h`;
@@ -230,500 +195,374 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
+    <div className="min-h-screen bg-gradient-to-br from-stone-50 via-amber-50/30 to-orange-50/40 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
       <ConditionalHeader />
-      
-      {/* Beta Banner */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 text-white py-4 px-4 relative overflow-hidden"
-      >
-        {/* Efecto de fondo animado */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform -translate-x-full animate-pulse"></div>
+
+      {/* Hero section con personalidad */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-cyan-600 via-blue-600 to-sky-600 dark:from-cyan-800 dark:via-blue-800 dark:to-sky-800">
+        {/* Elementos orgánicos de fondo */}
+        <div className="absolute inset-0">
+          <div className="absolute top-10 left-10 w-72 h-72 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-20 w-96 h-96 bg-cyan-300/20 rounded-full blur-3xl animate-bounce" style={{ animationDuration: '3s' }}></div>
+          <div className="absolute top-1/2 left-1/3 w-64 h-64 bg-blue-200/15 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        </div>
         
-        <div className="container mx-auto relative z-10">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 text-center sm:text-left">
-            {/* Icono y badge */}
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                  <Sparkles className="h-4 w-4 text-white" />
-                </div>
-                <span className="inline-flex items-center px-3 py-1 rounded-full bg-white/20 text-sm font-bold tracking-wider">
-                  BETA
-                </span>
-              </div>
-            </div>
-            
-            {/* Contenido principal */}
-            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
-              <div className="flex items-center gap-2">
-                <BookOpen className="h-5 w-5 text-yellow-300" />
-                <span className="text-lg font-bold">Nawatlajtol</span>
-              </div>
-              <span className="text-sm sm:text-base font-medium">
-                está en versión beta
-              </span>
-            </div>
-            
-            {/* Call to action */}
-            <div className="flex items-center gap-2 text-sm">
-              <Heart className="h-4 w-4 text-pink-300" />
-              <span className="font-medium">¡Ayúdanos a mejorarla!</span>
-            </div>
+        <div className="relative container mx-auto px-4 py-16 text-center text-white">
+          <div className="mb-6">
+            <h1 className="text-4xl md:text-6xl font-bold mb-2 tracking-tight">
+              {getGreeting()}, <span className="text-cyan-200">{user?.nombre_completo?.split(' ')[0] || 'Amigo'}</span>! 
+            </h1>
+            <p className="text-xl md:text-2xl text-cyan-100 font-light">
+              ¿Listo para otra aventura en náhuatl?
+            </p>
           </div>
           
-          {/* Barra de progreso decorativa */}
-          <div className="mt-3 w-full bg-white/20 rounded-full h-1">
-            <div className="bg-gradient-to-r from-yellow-300 to-pink-300 h-1 rounded-full w-3/4 animate-pulse"></div>
+          {/* CTA buttons con personalidad */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link 
+              href="/diccionario"
+              className="group bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 text-white px-8 py-4 rounded-full font-semibold transition-all duration-300 flex items-center gap-3 shadow-lg hover:shadow-xl hover:scale-105"
+            >
+              <BookText className="h-5 w-5" />
+              Explorar palabras
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <Link 
+              href="/contribuir"
+              className="group bg-cyan-400 hover:bg-cyan-300 text-cyan-900 px-8 py-4 rounded-full font-semibold transition-all duration-300 flex items-center gap-3 shadow-lg hover:shadow-xl hover:scale-105"
+            >
+              <Award className="h-5 w-5" />
+              Contribuir
+            </Link>
           </div>
         </div>
-      </motion.div>
-      
-      <main className="container mx-auto px-4 sm:px-6 py-8 max-w-7xl">
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={containerVariants}
-          className="space-y-8"
-        >
-          {/* Personalized Greeting */}
-          <motion.div variants={itemVariants} className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center">
-                <Sparkles className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100">
-                  {getGreeting()}, {user?.nombre_completo?.split(' ')[0] || 'Usuario'}!
-                </h1>
-                <p className="text-slate-600 dark:text-slate-400">
-                  Bienvenido a tu espacio de aprendizaje náhuatl
-                </p>
-              </div>
-            </div>
-          </motion.div>
+      </div>
 
-          {/* Diccionario - Diseño como landing page */}
-          <motion.div variants={itemVariants} whileHover={cardHover} className="group">
-            <Link 
-              href="/diccionario" 
-              className="block bg-white/90 dark:bg-slate-800/90 backdrop-blur-md rounded-2xl p-6 border border-slate-200/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden"
+      <main className="container mx-auto px-4 sm:px-6 py-12 max-w-7xl">
+        <div className="space-y-12">
+          
+          {/* Cards principales con diseño orgánico */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <Link
+              href="/diccionario"
+              className="group relative block bg-white dark:bg-slate-900 rounded-3xl p-8 border-2 border-cyan-200 dark:border-cyan-800 hover:border-cyan-400 dark:hover:border-cyan-600 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 overflow-hidden"
             >
-              {/* Efecto de brillo */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+              {/* Decoración orgánica */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-cyan-100 to-blue-200 dark:from-cyan-900/30 dark:to-blue-900/30 rounded-full blur-2xl -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-700"></div>
               
-              <div className="relative z-10">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <motion.div 
-                      className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-xl flex items-center justify-center"
-                      whileHover={{ rotate: 5 }}
-                      transition={{ type: "spring", stiffness: 300 }}
-                    >
-                      <BookText className="h-6 w-6 text-white" />
-                    </motion.div>
-                    <div className="flex items-center gap-1">
-                      <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                      <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                      <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                    </div>
+              <div className="relative">
+                <div className="flex items-start justify-between mb-6">
+                  <div className="w-16 h-16 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
+                    <BookText className="h-8 w-8 text-white" />
                   </div>
-                  <ChevronRight className="h-5 w-5 text-slate-400 group-hover:translate-x-1 transition-transform" />
+                  <div className="text-right">
+                    <div className="text-3xl font-bold text-cyan-600 dark:text-cyan-400">3,500+</div>
+                    <div className="text-sm text-slate-600 dark:text-slate-400">palabras</div>
+                  </div>
                 </div>
-                <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2">
+                
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-3">
                   Diccionario Náhuatl
                 </h3>
-                <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
-                  Explora y aprende palabras náhuatl con traducciones y ejemplos
+                <p className="text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">
+                  Sumérgete en la riqueza del náhuatl. Cada palabra tiene una historia que contar.
                 </p>
-                <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                  <BookOpen className="h-3 w-3" />
-                  <span>+3,500 palabras disponibles</span>
+                
+                <div className="flex items-center text-cyan-600 dark:text-cyan-400 font-semibold">
+                  <span>Descubrir</span>
+                  <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-2 transition-transform" />
                 </div>
               </div>
             </Link>
-          </motion.div>
 
-          {/* Lecciones Section - Diseño como landing page */}
-          <motion.div variants={itemVariants} whileHover={cardHover} className="group">
-            <Link 
-              href="/lecciones" 
-              className="block bg-white/90 dark:bg-slate-800/90 backdrop-blur-md rounded-2xl p-6 border border-slate-200/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden"
+            <Link
+              href="/lecciones"
+              className="group relative block bg-white dark:bg-slate-900 rounded-3xl p-8 border-2 border-emerald-200 dark:border-emerald-800 hover:border-emerald-400 dark:hover:border-emerald-600 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 overflow-hidden"
             >
-              {/* Efecto de brillo */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+              {/* Decoración orgánica */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-100 to-green-200 dark:from-emerald-900/30 dark:to-green-900/30 rounded-full blur-2xl -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-700"></div>
               
-              <div className="relative z-10">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <motion.div 
-                      className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center"
-                      whileHover={{ rotate: 5 }}
-                      transition={{ type: "spring", stiffness: 300 }}
-                    >
-                      <BookOpen className="h-6 w-6 text-white" />
-                    </motion.div>
-                    <div className="flex items-center gap-1">
-                      <Trophy className="h-4 w-4 text-yellow-400 fill-current" />
-                      <Trophy className="h-4 w-4 text-yellow-400 fill-current" />
-                      <Trophy className="h-4 w-4 text-yellow-400 fill-current" />
-                    </div>
+              <div className="relative">
+                <div className="flex items-start justify-between mb-6">
+                  <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-green-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
+                    <BookOpen className="h-8 w-8 text-white" />
                   </div>
-                  <ChevronRight className="h-5 w-5 text-slate-400 group-hover:translate-x-1 transition-transform" />
+                  <div className="text-right">
+                    <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">50+</div>
+                    <div className="text-sm text-slate-600 dark:text-slate-400">lecciones</div>
+                  </div>
                 </div>
-                <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2">
+                
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-3">
                   Lecciones Interactivas
                 </h3>
-                <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
-                  Aprende náhuatl paso a paso con lecciones estructuradas y ejercicios
+                <p className="text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">
+                  Aprende paso a paso. Cada lección te acerca más a dominar este hermoso idioma.
                 </p>
-                <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                  <Target className="h-3 w-3" />
-                  <span>+50 lecciones disponibles</span>
+                
+                <div className="flex items-center text-emerald-600 dark:text-emerald-400 font-semibold">
+                  <span>Empezar</span>
+                  <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-2 transition-transform" />
                 </div>
               </div>
             </Link>
-          </motion.div>
+          </div>
 
-          {/* Main Grid Layout - Notion Style */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Layout principal con sidebar */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
-            {/* Left Column - Recent Activity */}
-            <div className="lg:col-span-2 space-y-6">
-              {/* Recent Activity Card */}
-              <motion.div 
-                variants={itemVariants}
-                whileHover={cardHover}
-                className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20 dark:border-slate-700/50"
-              >
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
-                      <Activity className="h-5 w-5 text-white" />
+            {/* Columna principal */}
+            <div className="lg:col-span-2 space-y-8">
+              
+              {/* Actividad reciente con diseño humano */}
+              <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-200 dark:border-slate-800 shadow-lg">
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-2xl flex items-center justify-center">
+                      <Activity className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-                        Actividad Reciente
-                      </h3>
-                      <p className="text-sm text-slate-600 dark:text-slate-400">
-                        Tus últimas interacciones
+                      <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                        Tu Actividad
+                      </h2>
+                      <p className="text-slate-600 dark:text-slate-400">
+                        Lo que has estado haciendo últimamente
                       </p>
                     </div>
                   </div>
-                  <Link 
+                  <Link
                     href="/experiencia-social"
-                    className="text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 text-sm font-medium flex items-center gap-1"
+                    className="bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors flex items-center gap-2"
                   >
-                    Ver todas
+                    Ver todo
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                 </div>
 
                 <div className="space-y-4">
                   {isLoading ? (
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       {[...Array(3)].map((_, i) => (
-                        <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-slate-100 dark:bg-slate-700/50 animate-pulse">
-                          <div className="w-8 h-8 rounded-full bg-slate-300 dark:bg-slate-600"></div>
+                        <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800 animate-pulse">
+                          <div className="w-12 h-12 rounded-full bg-slate-200 dark:bg-slate-700"></div>
                           <div className="flex-1 space-y-2">
-                            <div className="h-4 bg-slate-300 dark:bg-slate-600 rounded w-3/4"></div>
-                            <div className="h-3 bg-slate-300 dark:bg-slate-600 rounded w-1/2"></div>
+                            <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4"></div>
+                            <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-1/2"></div>
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : recentActivity.length > 0 ? (
                     recentActivity.map((activity) => (
-                      <motion.div 
+                      <div
                         key={activity.id}
-                        whileHover={{ x: 4 }}
-                        className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+                        className="flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-300 hover:scale-[1.02] cursor-pointer"
                       >
-                        <div className="text-2xl">{activity.icon}</div>
+                        <div className="text-2xl w-12 h-12 bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/30 rounded-full flex items-center justify-center">
+                          {activity.icon}
+                        </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">
+                          <p className="font-medium text-slate-900 dark:text-slate-100 truncate">
                             {activity.title}
                           </p>
-                          <p className="text-xs text-slate-600 dark:text-slate-400 truncate">
+                          <p className="text-sm text-slate-600 dark:text-slate-400 truncate">
                             {activity.description}
                           </p>
                         </div>
-                        <span className="text-xs text-slate-500 dark:text-slate-400">
+                        <span className="text-sm text-slate-500 dark:text-slate-400 whitespace-nowrap bg-slate-100 dark:bg-slate-700 px-3 py-1 rounded-full">
                           {formatTimeAgo(activity.timestamp)}
                         </span>
-                      </motion.div>
+                      </div>
                     ))
                   ) : (
-                    <div className="text-center py-8">
-                      <Clock className="h-12 w-12 text-slate-400 mx-auto mb-3" />
-                      <p className="text-slate-600 dark:text-slate-400">
-                        No hay actividad reciente
+                    <div className="text-center py-16">
+                      <div className="w-20 h-20 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Clock className="h-8 w-8 text-slate-400" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                        ¡Comienza tu aventura!
+                      </h3>
+                      <p className="text-slate-500 dark:text-slate-400 mb-4">
+                        Interactúa con la comunidad y tu actividad aparecerá aquí
                       </p>
+                      <Link 
+                        href="/contribuir"
+                        className="inline-flex items-center gap-2 bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-full font-medium transition-colors"
+                      >
+                        <Award className="h-4 w-4" />
+                        Haz tu primera contribución
+                      </Link>
                     </div>
                   )}
                 </div>
-              </motion.div>
+              </div>
 
-              {/* Quick Actions */}
-              <motion.div 
-                variants={containerVariants}
-                className="grid grid-cols-1 sm:grid-cols-2 gap-4"
-              >
-                <motion.div variants={itemVariants} whileHover={cardHover} className="group">
-                  <Link 
-                    href="/feedback" 
-                    className="block bg-white/90 dark:bg-slate-800/90 backdrop-blur-md rounded-2xl p-6 border border-slate-200/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden"
-                  >
-                    {/* Efecto de brillo */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                    
-                    <div className="relative z-10">
-                      <div className="flex items-center justify-between mb-4">
-                        <motion.div 
-                          className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center"
-                          whileHover={{ rotate: 5 }}
-                          transition={{ type: "spring", stiffness: 300 }}
-                        >
-                          <Users className="h-5 w-5 text-white" />
-                        </motion.div>
-                        <ChevronRight className="h-5 w-5 text-slate-400 group-hover:translate-x-1 transition-transform" />
-                      </div>
-                      <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
-                        Comunidad
-                      </h3>
-                      <p className="text-sm text-slate-600 dark:text-slate-400">
-                        Únete a conversaciones
-                      </p>
+              {/* Accesos rápidos */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <Link
+                  href="/feedback"
+                  className="group block bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl p-6 border border-purple-200 dark:border-purple-800 hover:border-purple-400 dark:hover:border-purple-600 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <Users className="h-6 w-6 text-white" />
                     </div>
-                  </Link>
-                </motion.div>
+                    <ChevronRight className="h-5 w-5 text-purple-400 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
+                    Comunidad
+                  </h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    Conecta con otros aprendices
+                  </p>
+                </Link>
 
-                <motion.div variants={itemVariants} whileHover={cardHover} className="group">
-                  <Link 
-                    href="/contribuir" 
-                    className="block bg-white/90 dark:bg-slate-800/90 backdrop-blur-md rounded-2xl p-6 border border-slate-200/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden"
-                  >
-                    {/* Efecto de brillo */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                    
-                    <div className="relative z-10">
-                      <div className="flex items-center justify-between mb-4">
-                        <motion.div 
-                          className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center"
-                          whileHover={{ rotate: 5 }}
-                          transition={{ type: "spring", stiffness: 300 }}
-                        >
-                          <Award className="h-5 w-5 text-white" />
-                        </motion.div>
-                        <ChevronRight className="h-5 w-5 text-slate-400 group-hover:translate-x-1 transition-transform" />
-                      </div>
-                      <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
-                        Contribuir
-                      </h3>
-                      <p className="text-sm text-slate-600 dark:text-slate-400">
-                        Añade palabras
-                      </p>
+                <Link
+                  href="/contribuir"
+                  className="group block bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-2xl p-6 border border-cyan-200 dark:border-cyan-800 hover:border-cyan-400 dark:hover:border-cyan-600 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <Award className="h-6 w-6 text-white" />
                     </div>
-                  </Link>
-                </motion.div>
-              </motion.div>
+                    <ChevronRight className="h-5 w-5 text-cyan-400 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
+                    Contribuir
+                  </h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    Ayuda a crecer el diccionario
+                  </p>
+                </Link>
+              </div>
             </div>
 
-            {/* Right Column - Featured Content */}
-            <div className="space-y-6">
-              {/* Featured Word */}
+            {/* Sidebar */}
+            <div className="space-y-8">
+              
+              {/* Palabra destacada */}
               {featuredContent?.featuredWord && (
-                <motion.div 
-                  variants={itemVariants}
-                  whileHover={cardHover}
-                  className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md rounded-2xl p-6 border border-slate-200/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
-                >
-                  {/* Efecto de brillo */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                <div className="bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-3xl p-6 border border-cyan-200 dark:border-cyan-800 shadow-lg">
+                  <div className="text-center mb-6">
+                    <div className="w-16 h-16 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                      <span className="text-2xl">👑</span>
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-1">
+                      Palabra del Día
+                    </h3>
+                    <p className="text-sm text-cyan-600 dark:text-cyan-400">
+                      La más buscada hoy
+                    </p>
+                  </div>
+
+                  <div className="text-center p-6 bg-white/60 dark:bg-slate-800/60 rounded-2xl border border-cyan-200/50 dark:border-cyan-700/50 mb-6">
+                    <div className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+                      {featuredContent.featuredWord.palabra}
+                    </div>
+                    <div className="text-lg text-slate-600 dark:text-slate-400 mb-4">
+                      "{featuredContent.featuredWord.traduccion}"
+                    </div>
+                    <div className="flex items-center justify-center gap-2 text-cyan-600 dark:text-cyan-400">
+                      <Heart className="h-4 w-4" />
+                      <span className="text-sm font-medium">
+                        {featuredContent.featuredWord.busquedas} personas la buscaron
+                      </span>
+                    </div>
+                  </div>
                   
-                  <div className="relative z-10">
-                    <div className="flex items-center gap-3 mb-4">
-                      <motion.div 
-                        className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center"
-                        whileHover={{ rotate: 5 }}
-                        transition={{ type: "spring", stiffness: 300 }}
-                      >
-                        <Crown className="h-5 w-5 text-white" />
-                      </motion.div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-                          Palabra Destacada
-                        </h3>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">
-                          Más buscada hoy
-                        </p>
+                  <Link
+                    href="/diccionario"
+                    className="block w-full text-center bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-6 py-3 rounded-2xl font-semibold hover:from-cyan-600 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl"
+                  >
+                    Explorar más palabras
+                  </Link>
+                </div>
+              )}
+
+              {/* Usuario destacado */}
+              {featuredContent?.featuredUser && (
+                <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-3xl p-6 border border-blue-200 dark:border-blue-800 shadow-lg">
+                  <div className="text-center mb-6">
+                    <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                      <span className="text-2xl">🏆</span>
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-1">
+                      Usuario Destacado
+                    </h3>
+                    <p className="text-sm text-blue-600 dark:text-blue-400">
+                      El más activo esta semana
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-4 p-4 bg-white/60 dark:bg-slate-800/60 rounded-2xl border border-blue-200/50 dark:border-blue-700/50 mb-6">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-full flex items-center justify-center shadow-lg">
+                      <User className="h-6 w-6 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-bold text-slate-900 dark:text-slate-100 truncate">
+                        {featuredContent.featuredUser.nombre}
+                      </div>
+                      <div className="text-sm text-slate-600 dark:text-slate-400">
+                        @{featuredContent.featuredUser.username}
+                      </div>
+                      <div className="flex items-center gap-2 mt-1 text-blue-600 dark:text-blue-400">
+                        <span className="text-sm font-medium">
+                          {featuredContent.featuredUser.actividad} contribuciones
+                        </span>
                       </div>
                     </div>
-                    
-                    <div className="space-y-3">
-                      <div className="text-center p-4 bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-xl">
-                        <div className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-1">
-                          {featuredContent.featuredWord.palabra}
+                  </div>
+                  
+                  <Link
+                    href={`/profile/${featuredContent.featuredUser.id}`}
+                    className="block w-full text-center bg-gradient-to-r from-blue-500 to-cyan-600 text-white px-6 py-3 rounded-2xl font-semibold hover:from-blue-600 hover:to-cyan-700 transition-all duration-300 shadow-lg hover:shadow-xl"
+                    onClick={(e) => {
+                      if (featuredContent.featuredUser?.id === '1') {
+                        e.preventDefault();
+                        console.log('Usuario destacado con ID de fallback, no navegando');
+                      }
+                    }}
+                  >
+                    Ver perfil
+                  </Link>
+                </div>
+              )}
+
+              {/* Accesos rápidos sidebar */}
+              <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-lg">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+                  <span>⚡</span>
+                  Accesos Rápidos
+                </h3>
+                <div className="space-y-3">
+                  {[
+                    { href: "/profile", icon: Target, label: "Mi Perfil", desc: "Ve tu progreso", color: "blue" },
+                    { href: "/experiencia-social", icon: TrendingUp, label: "Experiencia Social", desc: "Tu actividad", color: "green" }
+                  ].map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-300 hover:scale-[1.02] group"
+                    >
+                      <div className={`w-10 h-10 bg-${item.color}-100 dark:bg-${item.color}-900/30 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                        <item.icon className={`h-5 w-5 text-${item.color}-600 dark:text-${item.color}-400`} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-slate-900 dark:text-slate-100">
+                          {item.label}
                         </div>
                         <div className="text-sm text-slate-600 dark:text-slate-400">
-                          {featuredContent.featuredWord.traduccion}
+                          {item.desc}
                         </div>
                       </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-slate-600 dark:text-slate-400">
-                          {featuredContent.featuredWord.busquedas} búsquedas
-                        </span>
-                        <Link 
-                          href="/diccionario"
-                          className="text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 font-medium flex items-center gap-1"
-                        >
-                          Explorar
-                          <ArrowRight className="h-4 w-4" />
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Featured User */}
-              {featuredContent?.featuredUser && (
-                <motion.div 
-                  variants={itemVariants}
-                  whileHover={cardHover}
-                  className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md rounded-2xl p-6 border border-slate-200/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
-                >
-                  {/* Efecto de brillo */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                  
-                  <div className="relative z-10">
-                    <div className="flex items-center gap-3 mb-4">
-                      <motion.div 
-                        className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center"
-                        whileHover={{ rotate: 5 }}
-                        transition={{ type: "spring", stiffness: 300 }}
-                      >
-                        <Trophy className="h-5 w-5 text-white" />
-                      </motion.div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-                          Usuario Destacado
-                        </h3>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">
-                          Más activo hoy
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-3 p-3 bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-xl">
-                        <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-full flex items-center justify-center">
-                          <User className="h-5 w-5 text-white" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="font-medium text-slate-900 dark:text-slate-100 truncate">
-                            {featuredContent.featuredUser.nombre}
-                          </div>
-                          <div className="text-sm text-slate-600 dark:text-slate-400">
-                            @{featuredContent.featuredUser.username}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-slate-600 dark:text-slate-400">
-                          {featuredContent.featuredUser.actividad} interacciones
-                        </span>
-                        <Link 
-                          href={`/profile/${featuredContent.featuredUser.id}`}
-                          className="text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 font-medium flex items-center gap-1"
-                          onClick={(e) => {
-                            // Verificar si el ID es válido antes de navegar
-                            if (featuredContent.featuredUser?.id === '1') {
-                              e.preventDefault();
-                              console.log('Usuario destacado con ID de fallback, no navegando');
-                            }
-                          }}
-                        >
-                          Ver perfil
-                          <ArrowRight className="h-4 w-4" />
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Quick Stats */}
-              <motion.div 
-                variants={itemVariants}
-                className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md rounded-2xl p-6 border border-slate-200/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
-              >
-                {/* Efecto de brillo */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                
-                <div className="relative z-10">
-                  <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">
-                    Accesos Rápidos
-                  </h3>
-                  <div className="space-y-3">
-                    <Link 
-                      href="/contribuir"
-                      className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors group"
-                    >
-                      <motion.div 
-                        className="w-8 h-8 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-lg flex items-center justify-center"
-                        whileHover={{ rotate: 5 }}
-                        transition={{ type: "spring", stiffness: 300 }}
-                      >
-                        <Award className="h-4 w-4 text-white" />
-                      </motion.div>
-                      <span className="text-sm font-medium text-slate-900 dark:text-slate-100">
-                        Contribuir
-                      </span>
-                      <ChevronRight className="h-4 w-4 text-slate-400 group-hover:translate-x-1 transition-transform ml-auto" />
+                      <ChevronRight className="h-4 w-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
                     </Link>
-                    
-                    <Link 
-                      href="/profile"
-                      className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors group"
-                    >
-                      <motion.div 
-                        className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center"
-                        whileHover={{ rotate: 5 }}
-                        transition={{ type: "spring", stiffness: 300 }}
-                      >
-                        <Target className="h-4 w-4 text-white" />
-                      </motion.div>
-                      <span className="text-sm font-medium text-slate-900 dark:text-slate-100">
-                        Mi Perfil
-                      </span>
-                      <ChevronRight className="h-4 w-4 text-slate-400 group-hover:translate-x-1 transition-transform ml-auto" />
-                    </Link>
-                    
-                    <Link 
-                      href="/experiencia-social"
-                      className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors group"
-                    >
-                      <motion.div 
-                        className="w-8 h-8 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-lg flex items-center justify-center"
-                        whileHover={{ rotate: 5 }}
-                        transition={{ type: "spring", stiffness: 300 }}
-                      >
-                        <TrendingUp className="h-4 w-4 text-white" />
-                      </motion.div>
-                      <span className="text-sm font-medium text-slate-900 dark:text-slate-100">
-                        Experiencia Social
-                      </span>
-                      <ChevronRight className="h-4 w-4 text-slate-400 group-hover:translate-x-1 transition-transform ml-auto" />
-                    </Link>
-                  </div>
+                  ))}
                 </div>
-              </motion.div>
+              </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       </main>
     </div>
   );

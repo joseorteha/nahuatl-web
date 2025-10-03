@@ -150,25 +150,25 @@ export default function Header() {
           <Link href={user ? "/dashboard" : "/"} className="group flex items-center gap-2 sm:gap-3">
             <div className="relative">
               <Image 
-                src="/logo.png" 
+                src="/logooo.svg" 
                 alt="Nawatlahtol Logo" 
-                width={32} 
-                height={32} 
-                className="sm:w-10 sm:h-10 object-contain group-hover:scale-105 transition-transform duration-300"
+                width={48} 
+                height={48} 
+                className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 object-contain group-hover:scale-105 transition-all duration-300"
                 priority
               />
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-2">
-                <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-cyan-600 via-blue-600 to-slate-600 bg-clip-text text-transparent group-hover:from-cyan-500 group-hover:via-blue-500 group-hover:to-slate-500 transition-all duration-300">
+                <span className="text-lg sm:text-xl lg:text-2xl font-bold bg-gradient-to-r from-cyan-600 via-blue-600 to-sky-600 dark:from-cyan-400 dark:via-blue-400 dark:to-sky-400 bg-clip-text text-transparent group-hover:from-cyan-700 group-hover:via-blue-700 group-hover:to-sky-700 transition-all duration-300">
                   NAWATLAHTOL
                 </span>
-                <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-gradient-to-r from-cyan-500 to-blue-600 text-white">
+                <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-sm">
                   BETA
                 </span>
               </div>
-              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium tracking-wide hidden sm:block">
-                Lengua Náhuatl Digital
+              <span className="text-xs text-cyan-600 dark:text-cyan-400 font-medium tracking-wide hidden sm:block">
+                TLAHTOLNEMILIZTLI
               </span>
             </div>
           </Link>

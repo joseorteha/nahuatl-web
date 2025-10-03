@@ -13,22 +13,27 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8 mb-8 sm:mb-10">
           <div className="flex flex-col items-center md:items-start col-span-1 md:col-span-1 lg:col-span-2">
             <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-              <div className="relative overflow-hidden rounded-lg h-8 w-8 sm:h-10 sm:w-10">
+              <div className="relative overflow-hidden rounded-xl h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14 shadow-lg hover:shadow-xl transition-all duration-300 group">
                 <Image 
-                  src="/logo.png" 
+                  src="/logooo.svg" 
                   alt="Nawatlahtol Logo" 
-                  width={32} 
-                  height={32} 
-                  className="sm:w-10 sm:h-10 object-cover"
+                  width={56} 
+                  height={56} 
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                 />
-                <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/20 to-blue-500/20 dark:from-cyan-400/20 dark:to-blue-400/20"></div>
               </div>
               <div>
                 <div className="flex items-center gap-1 sm:gap-2">
-                  <h2 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600 dark:from-cyan-400 dark:to-blue-400">Nawatlahtol</h2>
-                  <span className="px-1.5 sm:px-2 py-0.5 text-xs bg-gradient-to-r from-cyan-100 to-blue-100 dark:from-cyan-900/40 dark:to-blue-900/40 text-cyan-800 dark:text-cyan-200 rounded-full font-medium">Beta</span>
+                  <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-cyan-600 via-blue-600 to-sky-600 dark:from-cyan-400 dark:via-blue-400 dark:to-sky-400 bg-clip-text text-transparent">
+                    Nawatlahtol
+                  </h2>
+                  <span className="px-2 py-0.5 text-xs bg-gradient-to-r from-cyan-100 to-blue-100 dark:from-cyan-900/40 dark:to-blue-900/40 text-cyan-800 dark:text-cyan-200 rounded-full font-medium shadow-sm">
+                    Beta
+                  </span>
                 </div>
-                <span className="text-xs text-slate-500 dark:text-slate-400 block">Tlahtolnemiliztli</span>
+                <span className="text-xs sm:text-sm text-cyan-600 dark:text-cyan-400 font-medium block tracking-wide">
+                  Tlahtolnemiliztli
+                </span>
               </div>
             </div>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 text-center md:text-left mb-3 sm:mb-4">

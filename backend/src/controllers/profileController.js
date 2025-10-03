@@ -782,15 +782,22 @@ class ProfileController {
         });
       }
 
-      // Obtener puntos de recompensas
+      // Obtener puntos de recompensas actualizados
       const { data: recompensas } = await supabase
         .from('recompensas_usuario')
         .select('*')
         .eq('usuario_id', userId)
         .single();
 
-      const puntosConocimiento = recompensas?.puntos_conocimiento || 0;
-      const experienciaSocial = recompensas?.puntos_comunidad || 0;
+      // Usar puntos_totales como base para conocimiento si puntos_conocimiento es 0
+      const puntosConocimiento = recompensas?.puntos_conocimiento || recompensas?.puntos_totales || 0;
+      const experienciaSocial = recompensas?.experiencia_social || 0;
+
+      // Debug: ver qué datos tenemos
+      console.log('🔍 Debug recompensas para userId:', userId);
+      console.log('📊 Recompensas data:', recompensas);
+      console.log('🎓 Puntos Conocimiento calculados:', puntosConocimiento);
+      console.log('👥 Experiencia Social calculada:', experienciaSocial);
 
       // Calcular niveles
       const nivelConocimiento = this.calcularNivelConocimiento(puntosConocimiento);
@@ -875,11 +882,11 @@ class ProfileController {
           nivel_conocimiento: nivelConocimiento,
           nivel_social: nivelSocial,
           configuraciones: {
-            privacidad_perfil: perfil.privacidad_perfil,
-            mostrar_puntos: perfil.mostrar_puntos,
-            mostrar_nivel: perfil.mostrar_nivel,
-            notificaciones_email: perfil.notificaciones_email,
-            notificaciones_push: perfil.notificaciones_push
+            privacidad_perfil: perfil.privacidad_perfil || 'publico',
+            mostrar_puntos: perfil.mostrar_puntos ?? true,
+            mostrar_nivel: perfil.mostrar_nivel ?? true,
+            notificaciones_email: perfil.notificaciones_email ?? true,
+            notificaciones_push: perfil.notificaciones_push ?? true
           },
           estadisticas: {
             temas_creados: temasCreados?.length || 0,

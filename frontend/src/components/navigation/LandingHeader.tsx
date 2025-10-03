@@ -15,16 +15,20 @@ export default function LandingHeader() {
           <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
             <div className="relative transition-all duration-300 group-hover:scale-105">
               <Image 
-                src="/logo.png" 
+                src="/logooo.svg" 
                 alt="Nawatlahtol Logo" 
-                width={28} 
-                height={28} 
-                className="sm:w-8 sm:h-8 transition-transform duration-500 group-hover:scale-110 rounded-lg"
+                width={48} 
+                height={48} 
+                className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 transition-all duration-300"
               />
             </div>
             <div className="flex flex-col">
-              <span className="font-black text-base sm:text-lg bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent group-hover:from-cyan-500 group-hover:to-blue-500 transition-all duration-300">Nawatlahtol</span>
-              <span className="text-xs text-slate-400 dark:text-slate-500 tracking-wide hidden sm:block">Tlahtolnemiliztli</span>
+              <span className="font-black text-lg sm:text-xl lg:text-2xl bg-gradient-to-r from-cyan-600 via-blue-600 to-sky-600 dark:from-cyan-400 dark:via-blue-400 dark:to-sky-400 bg-clip-text text-transparent group-hover:from-cyan-700 group-hover:via-blue-700 group-hover:to-sky-700 transition-all duration-300">
+                Nawatlahtol
+              </span>
+              <span className="text-xs sm:text-sm text-cyan-600 dark:text-cyan-400 font-medium tracking-wide hidden sm:block">
+                Tlahtolnemiliztli
+              </span>
             </div>
           </Link>
 

@@ -43,7 +43,7 @@ interface PerfilUsuario {
   puntos_conocimiento: number;
   nivel_conocimiento: string;
   nivel_social: string;
-  configuraciones: {
+  configuraciones?: {
     privacidad_perfil: string;
     mostrar_puntos: boolean;
     mostrar_nivel: boolean;
@@ -284,7 +284,7 @@ export default function PerfilUsuarioPage() {
                   
                   {/* Niveles y puntos */}
                   <div className="flex flex-col sm:flex-row lg:flex-col gap-3 lg:gap-4">
-                    {perfilUsuario.configuraciones.mostrar_nivel && (
+                    {(perfilUsuario.configuraciones?.mostrar_nivel ?? true) && (
                       <div className="flex gap-2">
                         <div className={`px-4 py-2 rounded-2xl text-sm font-semibold bg-gradient-to-r ${getNivelColor(perfilUsuario.nivel_social)} text-white shadow-lg`}>
                           {getNivelIcon(perfilUsuario.nivel_social)} {perfilUsuario.nivel_social}
@@ -295,7 +295,7 @@ export default function PerfilUsuarioPage() {
                       </div>
                     )}
                     
-                    {perfilUsuario.configuraciones.mostrar_puntos && (
+                    {(perfilUsuario.configuraciones?.mostrar_puntos ?? true) && (
                       <div className="flex gap-4">
                         <div className="text-center">
                           <div className="text-2xl font-bold text-cyan-600 dark:text-cyan-400">
