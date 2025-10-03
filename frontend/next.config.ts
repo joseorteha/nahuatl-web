@@ -47,6 +47,30 @@ const nextConfig: NextConfig = {
     // Habilitar características experimentales si es necesario
   },
   
+  // Configuración de headers para archivos estáticos
+  async headers() {
+    return [
+      {
+        source: '/favico.ico',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400, immutable',
+          },
+        ],
+      },
+      {
+        source: '/logooo.png',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400, immutable',
+          },
+        ],
+      },
+    ]
+  },
+  
   // Configuración de variables de entorno
   env: {
     // Variables del lado del servidor

@@ -61,8 +61,8 @@ export default function LoginPage() {
                 <Image 
                   src="/logooo.png" 
                   alt="Nawatlahtol Logo" 
-                  width={60} 
-                  height={60} 
+                  width={100} 
+                  height={100} 
                   className="rounded-2xl shadow-lg"
                 />
               </div>

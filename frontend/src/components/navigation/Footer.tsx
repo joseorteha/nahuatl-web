@@ -15,7 +15,7 @@ const Footer = () => {
             <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
               <div className="relative overflow-hidden rounded-xl h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14 shadow-lg hover:shadow-xl transition-all duration-300 group">
                 <Image 
-                  src="/logooo.svg" 
+                  src="/logooo.png" 
                   alt="Nawatlahtol Logo" 
                   width={56} 
                   height={56} 
