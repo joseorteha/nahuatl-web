@@ -93,7 +93,7 @@ export default function LandingHeader() {
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center">
                 <Image 
-                  src="/logo.png" 
+                  src="/logooo.png" 
                   alt="Nawatlahtol Logo" 
                   width={16} 
                   height={16} 
