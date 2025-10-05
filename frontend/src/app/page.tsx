@@ -7,6 +7,7 @@ import LandingHeader from '../components/navigation/LandingHeader';
 import { AdvancedBackground } from '@/components/effects/AdvancedBackground';
 import { FloatingElements } from '@/components/effects/PremiumEffects';
 import PWAInstallPrompt from '@/components/features/pwa/PWAInstallPrompt';
+import AutoRedirect from '@/components/auth/AutoRedirect';
 
 export default function LandingPage() {
   
@@ -90,6 +91,9 @@ export default function LandingPage() {
         <meta name="theme-color" content="#06B6D4" />
         <meta name="msapplication-TileColor" content="#06B6D4" />
       </Head>
+      
+      {/* Auto-redirect para usuarios autenticados */}
+      <AutoRedirect />
       
       <AdvancedBackground />
       <FloatingElements />
