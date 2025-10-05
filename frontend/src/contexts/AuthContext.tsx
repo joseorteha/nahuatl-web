@@ -1,7 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, ReactNode, useRef, useEffect } from 'react';
-import { useAuthBackend } from '@/hooks/useAuthBackend';
+import React, { createContext, useContext, ReactNode, useState, useEffect, useCallback } from 'react';
 
 interface User {
   id: string;
@@ -43,49 +42,221 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-// 🔥 SINGLETON MEJORADO CON CONTROL DE INICIALIZACIÓN
-let GLOBAL_AUTH_INSTANCE: AuthContextType | null = null;
-let PROVIDER_INITIALIZED = false;
-let RENDER_COUNT = 0;
+// 🔥 SINGLETON GLOBAL - ÚNICA INSTANCIA
+let GLOBAL_AUTH_INITIALIZED = false;
 
 /**
- * 🔒 AUTH CONTEXT PROVIDER - ROBUST SINGLETON
+ * 🔒 AUTH CONTEXT PROVIDER - IMPLEMENTACIÓN SIMPLE Y REACTIVA
  */
 export function AuthProvider({ children }: AuthProviderProps) {
-  RENDER_COUNT++;
-  
-  // ⚠️ DETECTAR LOOPS INFINITOS
-  if (RENDER_COUNT > 5) {
-    console.warn(`⚠️ AuthProvider rendered ${RENDER_COUNT} times - possible infinite loop`);
+  // ✅ SINGLETON: Solo inicializar una vez
+  if (GLOBAL_AUTH_INITIALIZED) {
+    // Retornar sin re-renderizar el hook
+    return <AuthContextComponent>{children}</AuthContextComponent>;
   }
-  
-  const localAuth = useAuthBackend();
-  
-  // ✅ PREVENIR MULTIPLE INICIALIZACIONES
-  if (!PROVIDER_INITIALIZED) {
-    console.log(`✅ Inicializando AuthProvider por primera vez (render #${RENDER_COUNT})`);
-    GLOBAL_AUTH_INSTANCE = localAuth;
-    PROVIDER_INITIALIZED = true;
-  } else {
-    // Solo actualizar si hay cambios MUY específicos
-    const hasSignificantChange = (
-      GLOBAL_AUTH_INSTANCE &&
-      (
-        // Usuario cambió
-        (GLOBAL_AUTH_INSTANCE.user?.id !== localAuth.user?.id) ||
-        // Se completó la carga inicial  
-        (GLOBAL_AUTH_INSTANCE.loading && !localAuth.loading && localAuth.user)
-      )
-    );
 
-    if (hasSignificantChange) {
-      console.log(`🔄 AuthProvider: Cambio significativo detectado (render #${RENDER_COUNT})`);
-      GLOBAL_AUTH_INSTANCE = localAuth;
+  GLOBAL_AUTH_INITIALIZED = true;
+  console.log('🚀 AuthProvider: Inicializando por primera vez');
+  
+  return <AuthContextComponent>{children}</AuthContextComponent>;
+}
+
+/**
+ * 🎯 COMPONENTE DE CONTEXTO INTERNO - CON REACT HOOKS
+ */
+function AuthContextComponent({ children }: AuthProviderProps) {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [tokens, setTokens] = useState<any>(null);
+  
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
+  // 🔥 FUNCIÓN PARA HACER LLAMADAS AUTENTICADAS
+  const apiCall = useCallback(async (endpoint: string, options: RequestInit = {}): Promise<Response> => {
+    const token = tokens?.accessToken;
+    
+    console.log(`🔗 API Call: ${endpoint}`);
+    console.log(`🎫 Token: ${token ? `${token.substring(0, 20)}...` : 'AUSENTE'}`);
+    console.log(`👤 User: ${user ? user.id : 'NO USER'}`);
+    
+    return await fetch(`${API_URL}${endpoint}`, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token && { Authorization: `Bearer ${token}` }),
+        ...options.headers,
+      },
+      credentials: 'include',
+    });
+  }, [tokens?.accessToken, API_URL, user]);
+
+  // 🔑 FUNCIÓN DE LOGIN
+  const login = useCallback(async (email: string, password: string, rememberMe?: boolean) => {
+    try {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, password, rememberMe }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('✅ Login exitoso, guardando datos...', { user: data.user.id });
+        
+        setUser(data.user);
+        setTokens({
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken,
+          expiresIn: data.expiresIn,
+        });
+        
+        // Guardar en localStorage para persistencia
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('auth_user', JSON.stringify(data.user));
+          localStorage.setItem('auth_tokens', JSON.stringify({
+            accessToken: data.accessToken,
+            refreshToken: data.refreshToken,
+            expiresIn: data.expiresIn,
+          }));
+        }
+        
+        return { success: true, user: data.user };
+      } else {
+        const error = await response.json();
+        return { success: false, error: error.message };
+      }
+    } catch (error) {
+      return { success: false, error: 'Error de conexión' };
     }
-  }
+  }, [API_URL]);
+
+  // 📝 FUNCIÓN DE REGISTRO
+  const register = useCallback(async (userData: any) => {
+    try {
+      const response = await fetch(`${API_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(userData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return { success: true, user: data.user };
+      } else {
+        const error = await response.json();
+        return { success: false, error: error.message };
+      }
+    } catch (error) {
+      return { success: false, error: 'Error de conexión' };
+    }
+  }, [API_URL]);
+
+  // 🚪 FUNCIÓN DE LOGOUT
+  const signOut = useCallback(async () => {
+    try {
+      await fetch(`${API_URL}/api/auth/logout`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch (error) {
+      console.error('Error en logout:', error);
+    }
+    
+    setUser(null);
+    setTokens(null);
+    
+    // Limpiar localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('auth_user');
+      localStorage.removeItem('auth_tokens');
+    }
+  }, [API_URL]);
+
+  // ✏️ FUNCIÓN PARA ACTUALIZAR PERFIL
+  const updateProfile = useCallback(async (updateData: Partial<User>) => {
+    try {
+      const response = await apiCall(`/api/usuarios/profile`, {
+        method: 'PUT',
+        body: JSON.stringify(updateData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data.user);
+        return { success: true, user: data.user };
+      } else {
+        const error = await response.json();
+        return { success: false, error: error.message };
+      }
+    } catch (error) {
+      return { success: false, error: 'Error de conexión' };
+    }
+  }, [apiCall]);
+
+  // 🔄 INICIALIZACIÓN UNA SOLA VEZ
+  useEffect(() => {
+    const initAuth = async () => {
+      console.log('🔑 AuthProvider: Inicializando autenticación...');
+      
+      try {
+        // Intentar cargar desde localStorage
+        if (typeof window !== 'undefined') {
+          const savedUser = localStorage.getItem('auth_user');
+          const savedTokens = localStorage.getItem('auth_tokens');
+          
+          if (savedUser && savedTokens) {
+            console.log('📱 Restaurando sesión desde localStorage...');
+            const userData = JSON.parse(savedUser);
+            const tokensData = JSON.parse(savedTokens);
+            
+            setUser(userData);
+            setTokens(tokensData);
+            setLoading(false);
+            return;
+          }
+        }
+
+        // Verificar sesión en servidor (cookies)
+        console.log('🍪 Verificando sesión en servidor...');
+        const response = await fetch(`${API_URL}/api/auth/check-session`, {
+          credentials: 'include',
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('✅ Sesión restaurada desde cookies del servidor');
+          setUser(data.user);
+          
+          // Guardar en localStorage también
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('auth_user', JSON.stringify(data.user));
+          }
+        }
+      } catch (error) {
+        console.error('❌ Error iniciando sesión:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initAuth();
+  }, []); // Sin dependencias - solo una vez
+
+  const authValue = {
+    user,
+    loading,
+    isAuthenticated: !!user,
+    login,
+    register,
+    signOut,
+    updateProfile,
+    apiCall,
+  };
 
   return (
-    <AuthContext.Provider value={GLOBAL_AUTH_INSTANCE || localAuth}>
+    <AuthContext.Provider value={authValue}>
       {children}
     </AuthContext.Provider>
   );

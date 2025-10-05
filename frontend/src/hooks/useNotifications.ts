@@ -43,7 +43,7 @@ const POLLING_INTERVAL = 30000; // 30 segundos
 const NOTIFICATIONS_PER_PAGE = 20;
 
 export function useNotifications(): UseNotificationsReturn {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, apiCall } = useAuth();
   const [notifications, setNotifications] = useState<Notificacion[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -58,7 +58,7 @@ export function useNotifications(): UseNotificationsReturn {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
   // ✅ Verificación mejorada de autenticación
-  const isUserReady = !authLoading && user && user.id;
+  const isUserReady = !authLoading && user && user.id && apiCall;
 
   // Limpiar al desmontar
   useEffect(() => {
@@ -76,7 +76,7 @@ export function useNotifications(): UseNotificationsReturn {
   const fetchNotifications = useCallback(async (reset = false) => {
     // ✅ Verificación más estricta
     if (!isUserReady) {
-      console.log('🔔 useNotifications: Usuario no listo aún', { authLoading, hasUser: !!user, userId: user?.id });
+      console.log('🔔 useNotifications: Usuario no listo aún', { authLoading, hasUser: !!user, userId: user?.id, hasApiCall: !!apiCall });
       return;
     }
 
@@ -87,17 +87,14 @@ export function useNotifications(): UseNotificationsReturn {
       const currentOffset = reset ? 0 : offset;
       console.log(`🔔 Obteniendo notificaciones: offset=${currentOffset}, limite=${NOTIFICATIONS_PER_PAGE}`);
 
-      const response = await robustApiCall<NotificationsData>(
-        `${API_URL}/api/notifications?limite=${NOTIFICATIONS_PER_PAGE}&offset=${currentOffset}`,
-        {
-          method: 'GET',
-          timeout: 10000,
-          retries: 2
-        }
-      );
+      // 🔥 USAR APICALL DEL CONTEXTO (con token)
+      const response = await apiCall(`/api/notifications?limite=${NOTIFICATIONS_PER_PAGE}&offset=${currentOffset}`, {
+        method: 'GET',
+      });
 
-      if (response.success && response.data) {
-        const newNotifications = response.data.notificaciones;
+      if (response.ok) {
+        const data: NotificationsData = await response.json();
+        const newNotifications = data.notificaciones;
         
         if (!mountedRef.current) return;
 
@@ -109,12 +106,13 @@ export function useNotifications(): UseNotificationsReturn {
           setOffset(prev => prev + NOTIFICATIONS_PER_PAGE);
         }
 
-        setUnreadCount(response.data.total_no_leidas);
+        setUnreadCount(data.total_no_leidas);
         setHasMore(newNotifications.length === NOTIFICATIONS_PER_PAGE);
 
-        console.log(`✅ Notificaciones cargadas: ${newNotifications.length}, No leídas: ${response.data.total_no_leidas}`);
+        console.log(`✅ Notificaciones cargadas: ${newNotifications.length}, No leídas: ${data.total_no_leidas}`);
       } else {
-        throw new Error(response.error || 'Error obteniendo notificaciones');
+        const errorData = await response.json().catch(() => ({ message: 'Error de conexión' }));
+        throw new Error(errorData.message || 'Error obteniendo notificaciones');
       }
     } catch (err) {
       console.error('❌ Error en fetchNotifications:', err);
@@ -130,7 +128,7 @@ export function useNotifications(): UseNotificationsReturn {
         setLoading(false);
       }
     }
-  }, [isUserReady, authLoading, user, offset, API_URL]);
+  }, [isUserReady, authLoading, user, offset, apiCall]);
 
   /**
    * Marcar notificación como leída
@@ -141,16 +139,11 @@ export function useNotifications(): UseNotificationsReturn {
     try {
       console.log(`🔔 Marcando notificación como leída: ${notificationId}`);
 
-      const response = await robustApiCall(
-        `${API_URL}/api/notifications/${notificationId}/read`,
-        {
-          method: 'PUT',
-          timeout: 5000,
-          retries: 2
-        }
-      );
+      const response = await apiCall(`/api/notifications/${notificationId}/read`, {
+        method: 'PUT',
+      });
 
-      if (response.success) {
+      if (response.ok) {
         if (!mountedRef.current) return;
 
         // Actualizar localmente
@@ -170,7 +163,8 @@ export function useNotifications(): UseNotificationsReturn {
 
         console.log(`✅ Notificación marcada como leída: ${notificationId}`);
       } else {
-        throw new Error(response.error || 'Error marcando como leída');
+        const errorData = await response.json().catch(() => ({ message: 'Error marcando como leída' }));
+        throw new Error(errorData.message || 'Error marcando como leída');
       }
     } catch (err) {
       console.error('❌ Error en markAsRead:', err);
@@ -179,7 +173,7 @@ export function useNotifications(): UseNotificationsReturn {
         setError(errorMessage);
       }
     }
-  }, [isUserReady, notifications, API_URL]);
+  }, [isUserReady, notifications, apiCall]);
 
   /**
    * Marcar todas las notificaciones como leídas
@@ -190,16 +184,11 @@ export function useNotifications(): UseNotificationsReturn {
     try {
       console.log('🔔 Marcando todas las notificaciones como leídas');
 
-      const response = await robustApiCall(
-        `${API_URL}/api/notifications/read-all`,
-        {
-          method: 'PUT',
-          timeout: 10000,
-          retries: 2
-        }
-      );
+      const response = await apiCall(`/api/notifications/read-all`, {
+        method: 'PUT',
+      });
 
-      if (response.success) {
+      if (response.ok) {
         if (!mountedRef.current) return;
 
         // Marcar todas como leídas localmente
@@ -212,7 +201,8 @@ export function useNotifications(): UseNotificationsReturn {
         setUnreadCount(0);
         console.log('✅ Todas las notificaciones marcadas como leídas');
       } else {
-        throw new Error(response.error || 'Error marcando todas como leídas');
+        const errorData = await response.json().catch(() => ({ message: 'Error marcando todas como leídas' }));
+        throw new Error(errorData.message || 'Error marcando todas como leídas');
       }
     } catch (err) {
       console.error('❌ Error en markAllAsRead:', err);
@@ -221,7 +211,7 @@ export function useNotifications(): UseNotificationsReturn {
         setError(errorMessage);
       }
     }
-  }, [isUserReady, API_URL]);
+  }, [isUserReady, apiCall]);
 
   /**
    * Crear notificación de prueba (solo desarrollo)
@@ -239,25 +229,21 @@ export function useNotifications(): UseNotificationsReturn {
         relacionado_tipo: 'feedback'
       };
 
-      const response = await robustApiCall(
-        `${API_URL}/api/notifications/test`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(testData),
-          timeout: 5000,
-          retries: 2
-        }
-      );
+      const response = await apiCall(`/api/notifications/test`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(testData),
+      });
 
-      if (response.success) {
+      if (response.ok) {
         console.log('✅ Notificación de prueba creada');
         // Refresh notifications para mostrar la nueva
         await fetchNotifications(true);
       } else {
-        throw new Error(response.error || 'Error creando notificación de prueba');
+        const errorData = await response.json().catch(() => ({ message: 'Error creando notificación de prueba' }));
+        throw new Error(errorData.message || 'Error creando notificación de prueba');
       }
     } catch (err) {
       console.error('❌ Error en createTestNotification:', err);
@@ -266,7 +252,7 @@ export function useNotifications(): UseNotificationsReturn {
         setError(errorMessage);
       }
     }
-  }, [isUserReady, fetchNotifications, API_URL]);
+  }, [isUserReady, fetchNotifications, apiCall]);
 
   /**
    * Iniciar polling automático
