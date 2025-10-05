@@ -4,11 +4,13 @@ node_modules/
 
 # Environment variables
 .env
+.env.*
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 .env.production
+.env.push
 
 # Next.js
 .next/

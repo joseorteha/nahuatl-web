@@ -28,6 +28,8 @@ const dashboardRoutes = require('./routes/dashboard');
 const leccionesRoutes = require('./routes/lecciones');
 const profileRoutes = require('./routes/profileRoutes');
 const logrosRoutes = require('./routes/logrosRoutes');
+const pushNotificationRoutes = require('./routes/pushNotificationRoutes');
+const healthRoutes = require('./routes/healthRoutes');
 
 // Crear aplicación Express
 const app = express();
@@ -37,16 +39,16 @@ const app = express();
 // Seguridad
 app.use(helmet());
 
-// Rate limiting - Configuración más permisiva para desarrollo
+// Rate limiting - Configuración MÁS ESTRICTA para producción
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 1000, // 1000 peticiones por ventana de tiempo
+  max: process.env.NODE_ENV === 'production' ? 100 : 1000, // 100 en prod, 1000 en dev
   message: {
     error: 'Demasiadas peticiones',
     message: 'Has excedido el límite de peticiones. Intenta de nuevo en 15 minutos.'
   },
   standardHeaders: true,
-  legacyHeaders: false,
+  legacyHeaders: false
 });
 app.use(limiter);
 
@@ -131,7 +133,8 @@ app.get('/', (req, res) => {
       recompensas: '/api/recompensas/*',
       social: '/api/social/*',
       profile: '/api/profile/*',
-      logros: '/api/logros/*'
+      logros: '/api/logros/*',
+      push: '/api/push/*'
     },
     docs: 'https://github.com/joseorteha/nahuatl-web/blob/main/backend/README.md'
   });
@@ -154,6 +157,8 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/lecciones', leccionesRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/logros', logrosRoutes);
+app.use('/api/push', pushNotificationRoutes);
+app.use('/health', healthRoutes);
 
 // ===== MANEJO DE ERRORES =====
 

@@ -6,6 +6,7 @@ import { BookOpen, Code, Users, Feather, Languages, Star, ArrowRight, Play, Chec
 import LandingHeader from '../components/navigation/LandingHeader';
 import { AdvancedBackground } from '@/components/effects/AdvancedBackground';
 import { FloatingElements } from '@/components/effects/PremiumEffects';
+import PWAInstallPrompt from '@/components/features/pwa/PWAInstallPrompt';
 
 export default function LandingPage() {
   
@@ -188,6 +189,11 @@ export default function LandingPage() {
                     </motion.div>
                     Conoce más
                   </motion.button>
+                </motion.div>
+
+                {/* PWA Install Prompt */}
+                <motion.div variants={item} className="mb-8">
+                  <PWAInstallPrompt />
                 </motion.div>
 
                 {/* Stats - Colores más suaves */}

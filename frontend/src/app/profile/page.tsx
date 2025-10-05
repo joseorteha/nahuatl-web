@@ -14,6 +14,7 @@ import Image from 'next/image';
 import { useAuthBackend } from '@/hooks/useAuthBackend';
 import { useSocial, Seguimiento } from '@/hooks/useSocial';
 import { UserCard } from '@/components/features/social/UserCard';
+import PushNotificationSettings from '@/components/features/pwa/PushNotificationSettings';
 
 
 interface AvatarData {
@@ -760,7 +761,8 @@ export default function ProfilePage() {
                   <Bell className="w-5 h-5" />
                   Notificaciones
                 </h3>
-                <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  {/* Email Notifications */}
                   <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
                     <div className="flex items-center gap-3">
                       <Mail className="w-5 h-5 text-gray-600 dark:text-gray-400" />
@@ -781,25 +783,8 @@ export default function ProfilePage() {
                     </label>
                   </div>
 
-                  <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-                    <div className="flex items-center gap-3">
-                      <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                      <div>
-                        <p className="font-medium text-gray-900 dark:text-white">Notificaciones Push</p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Recibir notificaciones en el navegador</p>
-                      </div>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name="notificaciones_push"
-                        checked={formData.notificaciones_push}
-                        onChange={handleInputChange}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 dark:peer-focus:ring-emerald-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-emerald-600"></div>
-                    </label>
-                  </div>
+                  {/* Push Notifications - Advanced Component */}
+                  <PushNotificationSettings />
                 </div>
               </div>
 

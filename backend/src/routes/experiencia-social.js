@@ -354,6 +354,16 @@ router.post('/crear-notificacion', authenticateToken, async (req, res) => {
 
     console.log('✅ Notificación creada:', notificacion.id);
 
+    // Enviar push notification si está disponible
+    try {
+      const pushNotificationService = require('../services/pushNotificationService');
+      await pushNotificationService.sendNotificationByType(usuarioDestino, tipo, datosAdicionales);
+      console.log('✅ Push notification enviada');
+    } catch (pushError) {
+      console.warn('⚠️ Error enviando push notification (no crítico):', pushError.message);
+      // No fallar la operación principal si la push notification falla
+    }
+
     res.status(201).json({
       success: true,
       data: notificacion

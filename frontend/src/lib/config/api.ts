@@ -63,6 +63,16 @@ export const API_ENDPOINTS = {
     APPROVE: (id: string) => `${API_BASE_URL}/api/contributions/${id}/aprobar`,
     REJECT: (id: string) => `${API_BASE_URL}/api/contributions/${id}/rechazar`,
   },
+
+  // Push Notifications
+  PUSH: {
+    SUBSCRIBE: `${API_BASE_URL}/api/push/subscribe`,
+    UNSUBSCRIBE: `${API_BASE_URL}/api/push/unsubscribe`,
+    VAPID_KEY: `${API_BASE_URL}/api/push/vapid-public-key`,
+    TEST: `${API_BASE_URL}/api/push/test`,
+    SEND: `${API_BASE_URL}/api/push/send`,
+    STATS: `${API_BASE_URL}/api/push/stats`,
+  },
 };
 
 export default API_ENDPOINTS;

@@ -1,10 +1,29 @@
 // middleware/validation.js
 
 /**
+ * Función para sanitizar entrada de usuario
+ * @param {string} input - Entrada a sanitizar
+ * @returns {string} Entrada sanitizada
+ */
+function sanitizeInput(input) {
+  if (typeof input !== 'string') return '';
+  
+  return input
+    .trim()
+    .replace(/[<>\"']/g, '') // Remover caracteres peligrosos
+    .substring(0, 1000); // Limitar longitud
+}
+
+/**
  * Middleware para validar parámetros de búsqueda
  */
 const validateSearchParams = (req, res, next) => {
   const { query, limit } = req.query;
+  
+  // Sanitizar query
+  if (query) {
+    req.query.query = sanitizeInput(query);
+  }
   
   // Validar límite si se proporciona
   if (limit) {
@@ -18,7 +37,7 @@ const validateSearchParams = (req, res, next) => {
   }
 
   // Validar query si se proporciona
-  if (query && query.trim().length > 100) {
+  if (req.query.query && req.query.query.trim().length > 100) {
     return res.status(400).json({
       error: 'Query demasiado largo',
       message: 'La consulta no puede exceder 100 caracteres'

@@ -3,19 +3,62 @@
   "short_name": "Nawatlahtol",
   "description": "Plataforma moderna para aprender y preservar el idioma Náhuatl",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#ffffff",
   "theme_color": "#06b6d4",
+  "categories": ["education", "language", "culture"],
+  "lang": "es-MX",
   "icons": [
     {
       "src": "/favico.ico",
       "sizes": "32x32",
-      "type": "image/x-icon"
+      "type": "image/x-icon",
+      "purpose": "any"
     },
     {
       "src": "/logooo.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logooo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
-  ]
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/home.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/screenshots/mobile.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Diccionario",
+      "short_name": "Diccionario",
+      "description": "Buscar palabras en náhuatl",
+      "url": "/diccionario",
+      "icons": [{ "src": "/logooo.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Lecciones",
+      "short_name": "Lecciones",
+      "description": "Aprender náhuatl paso a paso",
+      "url": "/lecciones",
+      "icons": [{ "src": "/logooo.png", "sizes": "192x192" }]
+    }
+  ],
+  "prefer_related_applications": false
 }

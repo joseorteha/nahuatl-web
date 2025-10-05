@@ -106,9 +106,11 @@ class AuthController {
         return res.status(401).json({ error: 'Credenciales inválidas' });
       }
       
+      // NO EXPONER ERRORES INTERNOS EN PRODUCCIÓN
+      const isDevelopment = process.env.NODE_ENV === 'development';
       res.status(500).json({ 
         error: 'Error interno del servidor',
-        message: error.message 
+        ...(isDevelopment && { message: error.message })
       });
     }
   }

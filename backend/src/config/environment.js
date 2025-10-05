@@ -10,6 +10,10 @@ const config = {
   SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
   SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY,
   
+  // Push Notifications
+  VAPID_PUBLIC_KEY: process.env.VAPID_PUBLIC_KEY,
+  VAPID_PRIVATE_KEY: process.env.VAPID_PRIVATE_KEY,
+  
   // CORS - Permite múltiples orígenes
   CORS_ORIGIN: process.env.CORS_ORIGIN ? 
     process.env.CORS_ORIGIN.split(',').map(origin => origin.trim()) : 
