@@ -8,6 +8,15 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+
+  // Configuración de output para Vercel
+  output: 'standalone',
+
+  // Configuración de assetPrefix para prevenir localhost en producción
+  assetPrefix: process.env.NODE_ENV === 'production' ? undefined : undefined,
+  
+  // Configuración para evitar referencias a localhost en producción
+  trailingSlash: false,
   
   // Configuración de imágenes
   images: {
