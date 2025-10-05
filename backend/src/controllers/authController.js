@@ -438,13 +438,13 @@ class AuthController {
       const refreshToken = generateRefreshToken(user.id);
 
       // Redirigir al frontend con los tokens
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      const frontendUrl = process.env.FRONTEND_URL || 'https://nahuatl-web.vercel.app';
       const redirectUrl = `${frontendUrl}/auth/callback?token=${accessToken}&refresh=${refreshToken}&user=${encodeURIComponent(JSON.stringify(user))}`;
       
       res.redirect(redirectUrl);
     } catch (error) {
       console.error('Error en OAuth success:', error);
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      const frontendUrl = process.env.FRONTEND_URL || 'https://nahuatl-web.vercel.app';
       res.redirect(`${frontendUrl}/login?error=oauth_error`);
     }
   }
@@ -457,11 +457,11 @@ class AuthController {
   async oauthError(req, res) {
     try {
       console.error('Error de OAuth:', req.query.error);
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      const frontendUrl = process.env.FRONTEND_URL || 'https://nahuatl-web.vercel.app';
       res.redirect(`${frontendUrl}/login?error=oauth_error&details=${encodeURIComponent(req.query.error || 'Error desconocido')}`);
     } catch (error) {
       console.error('Error en OAuth error handler:', error);
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      const frontendUrl = process.env.FRONTEND_URL || 'https://nahuatl-web.vercel.app';
       res.redirect(`${frontendUrl}/login?error=oauth_error`);
     }
   }
