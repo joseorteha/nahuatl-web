@@ -79,9 +79,10 @@ self.addEventListener('fetch', (event) => {
   }
 
   // SKIP development mode completely to avoid interference
-  if (process.env.NODE_ENV === 'development' || 
-      url.hostname === 'localhost' || 
-      url.hostname === '127.0.0.1') {
+  if (url.hostname === 'localhost' || 
+      url.hostname === '127.0.0.1' ||
+      url.port === '3000' ||
+      url.port === '3001') {
     console.log('SW: Skipping development request:', url.pathname);
     return;
   }

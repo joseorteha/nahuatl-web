@@ -218,24 +218,31 @@ function AuthContextComponent({ children }: AuthProviderProps) {
           }
         }
 
-        // Verificar sesión en servidor (cookies)
-        console.log('🍪 Verificando sesión en servidor...');
-        const response = await fetch(`${API_URL}/api/auth/check-session`, {
-          credentials: 'include',
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          console.log('✅ Sesión restaurada desde cookies del servidor');
-          setUser(data.user);
+        // Solo verificar sesión en servidor si no hay datos locales y no es Vercel
+        if (typeof window !== 'undefined' && !window.location.hostname.includes('vercel.app')) {
+          console.log('🍪 Verificando sesión en servidor...');
+          const response = await fetch(`${API_URL}/api/auth/check-session`, {
+            credentials: 'include',
+          });
           
-          // Guardar en localStorage también
-          if (typeof window !== 'undefined') {
+          if (response.ok) {
+            const data = await response.json();
+            console.log('✅ Sesión restaurada desde cookies del servidor');
+            setUser(data.user);
+            
+            // Guardar en localStorage también
             localStorage.setItem('auth_user', JSON.stringify(data.user));
           }
         }
       } catch (error) {
         console.error('❌ Error iniciando sesión:', error);
+        
+        // En producción, mostrar información útil para debugging
+        if (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app')) {
+          console.log('🌍 Entorno de producción detectado');
+          console.log('📡 API_URL configurada:', API_URL);
+          console.log('🔗 Intentando conectar con backend...');
+        }
       } finally {
         setLoading(false);
       }

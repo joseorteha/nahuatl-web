@@ -63,11 +63,22 @@ app.use(cors({
     console.log('CORS: Checking origin:', origin);
     console.log('CORS: Allowed origins:', allowedOrigins);
     
+    // En desarrollo, ser más permisivo
+    if (process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
+    
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
       console.log('CORS: Origin no permitido:', origin);
-      callback(new Error('No permitido por CORS'));
+      // En producción, temporalmente permitir todos los orígenes de Vercel
+      if (origin.includes('vercel.app') || origin.includes('nahuatl-web')) {
+        console.log('CORS: Permitiendo origen de Vercel:', origin);
+        callback(null, true);
+      } else {
+        callback(new Error('No permitido por CORS'));
+      }
     }
   },
   credentials: true,
