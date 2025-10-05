@@ -42,7 +42,7 @@ const config = {
   GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL,
   
   // Frontend URL
-  FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
+  FRONTEND_URL: process.env.FRONTEND_URL || 'https://nahuatl-web.vercel.app',
   
   // Session Configuration
   SESSION_SECRET: process.env.SESSION_SECRET,
