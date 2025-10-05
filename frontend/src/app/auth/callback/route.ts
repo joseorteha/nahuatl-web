@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
               
               console.log('✅ Parámetros obtenidos correctamente');
               
-              // Guardar tokens y usuario en localStorage
+              // Guardar tokens y usuario en sessionStorage (por defecto) y localStorage (backup)
               const authTokens = {
                 accessToken: token,
                 refreshToken: refresh,
@@ -83,10 +83,19 @@ export async function GET(request: NextRequest) {
               
               const userData = JSON.parse(decodeURIComponent(userParam));
               
+              // Guardar en ambos lugares para máxima compatibilidad usando las claves correctas
+              sessionStorage.setItem('auth_tokens', JSON.stringify(authTokens));
+              sessionStorage.setItem('user_data', JSON.stringify(userData));
               localStorage.setItem('auth_tokens', JSON.stringify(authTokens));
-              localStorage.setItem('user', JSON.stringify(userData));
+              localStorage.setItem('user_data', JSON.stringify(userData));
+              localStorage.setItem('remember_me', 'true'); // Marcar como sesión persistente por OAuth
               
-              console.log('✅ Datos guardados en localStorage');
+              console.log('✅ Datos guardados en sessionStorage y localStorage con claves correctas');
+              
+              // Pequeño delay para asegurar que los datos se persistan antes del redirect
+              await new Promise(resolve => setTimeout(resolve, 100));
+              
+              console.log('🔄 Redirigiendo al dashboard...');
               
               // Redirigir al dashboard
               setTimeout(() => {
