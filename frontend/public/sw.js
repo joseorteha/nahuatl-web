@@ -70,8 +70,19 @@ self.addEventListener('fetch', (event) => {
   if (url.pathname.includes('/_next/') || 
       url.pathname.includes('webpack-hmr') || 
       url.pathname.includes('__nextjs_original-stack-frame') ||
-      url.pathname.includes('node_modules_')) {
+      url.pathname.includes('node_modules_') ||
+      url.pathname.includes('_next/static/') ||
+      url.pathname.includes('hot-reload') ||
+      url.search.includes('hot-reload')) {
     // Let Next.js handle these directly - no service worker interference
+    return;
+  }
+
+  // SKIP development mode completely to avoid interference
+  if (process.env.NODE_ENV === 'development' || 
+      url.hostname === 'localhost' || 
+      url.hostname === '127.0.0.1') {
+    console.log('SW: Skipping development request:', url.pathname);
     return;
   }
 

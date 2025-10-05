@@ -3,6 +3,7 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import Link from 'next/link';
+import errorMonitor from '@/utils/errorMonitor';
 
 interface Props {
   children: ReactNode;
@@ -29,7 +30,12 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    console.error('🚨 ErrorBoundary caught an error:', error, errorInfo);
+    console.error('🧵 Component stack:', errorInfo.componentStack);
+    console.error('📍 Error stack:', error.stack);
+    
+    // Reportar al monitor de errores
+    errorMonitor.reportErrorBoundary(error, errorInfo);
     
     this.setState({
       error,
@@ -53,6 +59,24 @@ class ErrorBoundary extends Component<Props, State> {
       error: undefined, 
       errorInfo: undefined 
     });
+    
+    // Forzar recarga de la página para limpiar el estado
+    if (typeof window !== 'undefined') {
+      window.location.reload();
+    }
+  };
+
+  handleGoHome = () => {
+    this.setState({ 
+      hasError: false, 
+      error: undefined, 
+      errorInfo: undefined 
+    });
+    
+    // Redirigir al inicio
+    if (typeof window !== 'undefined') {
+      window.location.href = '/';
+    }
   };
 
   render() {
@@ -99,13 +123,13 @@ class ErrorBoundary extends Component<Props, State> {
                 Intentar de nuevo
               </button>
               
-              <Link 
-                href="/"
+              <button
+                onClick={this.handleGoHome}
                 className="flex-1 inline-flex items-center justify-center bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 font-medium py-3 px-4 rounded-lg transition-colors duration-200"
               >
                 <Home className="w-4 h-4 mr-2" />
                 Ir al inicio
-              </Link>
+              </button>
             </div>
 
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-6">

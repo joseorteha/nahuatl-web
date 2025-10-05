@@ -6,6 +6,7 @@ import { ThemeProvider } from '@/components/shared/theme-provider';
 import ErrorBoundary from '@/components/shared/ErrorBoundary';
 import ServerStatusProvider from '@/components/providers/ServerStatusProvider';
 import AuthDebug from '@/components/debug/AuthDebug';
+import NotificationDebug from '@/components/debug/NotificationDebug';
 import { AuthProvider } from '@/contexts/AuthContext';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -47,6 +48,7 @@ export default function RootLayout({
                 </div>
                 <Footer />
                 {/* <AuthDebug /> TEMPORALMENTE DESHABILITADO - CAUSA LOOP INFINITO */}
+                <NotificationDebug />
               </ServerStatusProvider>
             </AuthProvider>
           </ThemeProvider>

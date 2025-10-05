@@ -11,11 +11,16 @@ export default function AutoRedirect({ redirectTo = '/dashboard' }: AutoRedirect
   const router = useRouter();
   const authPersistence = useAuthPersistence();
   const [isChecking, setIsChecking] = useState(true);
+  const [hasChecked, setHasChecked] = useState(false);
 
   useEffect(() => {
+    // ⛔ Evitar múltiples verificaciones
+    if (hasChecked) return;
+
     const checkAuthAndRedirect = async () => {
       try {
         setIsChecking(true);
+        setHasChecked(true);
         
         // Solo verificar en la página principal
         if (typeof window !== 'undefined' && window.location.pathname !== '/') {
@@ -45,8 +50,20 @@ export default function AutoRedirect({ redirectTo = '/dashboard' }: AutoRedirect
           }
         }
 
-        // 2. Si no hay JWT válido, verificar sesión de cookies en el servidor
-        console.log('🍪 Verificando sesión de cookies en el servidor...');
+        // 2. También verificar localStorage básico
+        if (typeof window !== 'undefined') {
+          const savedUser = localStorage.getItem('auth_user');
+          const savedTokens = localStorage.getItem('auth_tokens');
+          
+          if (savedUser && savedTokens) {
+            console.log('📱 Usuario encontrado en localStorage, redirigiendo a:', redirectTo);
+            router.push(redirectTo);
+            return;
+          }
+        }
+
+        // 3. Solo si no hay datos locales, verificar sesión de cookies en el servidor
+        console.log('🍪 No hay datos locales, verificando sesión de cookies en el servidor...');
         
         const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
         
@@ -104,7 +121,7 @@ export default function AutoRedirect({ redirectTo = '/dashboard' }: AutoRedirect
     };
 
     checkAuthAndRedirect();
-  }, [router, redirectTo, authPersistence]);
+  }, []); // ⛔ Solo ejecutar una vez al montar
 
   // Mostrar un indicador discreto mientras verifica
   if (isChecking) {

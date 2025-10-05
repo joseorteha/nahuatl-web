@@ -93,8 +93,11 @@ export function useNotifications(): UseNotificationsReturn {
       });
 
       if (response.ok) {
-        const data: NotificationsData = await response.json();
-        const newNotifications = data.notificaciones;
+        const result = await response.json();
+        
+        // 🔍 Manejar la estructura de respuesta del backend
+        const data = result.success ? result.data : result;
+        const newNotifications = data.notificaciones || [];
         
         if (!mountedRef.current) return;
 
@@ -106,7 +109,7 @@ export function useNotifications(): UseNotificationsReturn {
           setOffset(prev => prev + NOTIFICATIONS_PER_PAGE);
         }
 
-        setUnreadCount(data.total_no_leidas);
+        setUnreadCount(data.total_no_leidas || 0);
         setHasMore(newNotifications.length === NOTIFICATIONS_PER_PAGE);
 
         console.log(`✅ Notificaciones cargadas: ${newNotifications.length}, No leídas: ${data.total_no_leidas}`);

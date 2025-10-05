@@ -22,7 +22,8 @@ export default function NotificationCenter({ className = '' }: NotificationCente
     fetchNotifications,
     markAsRead,
     markAllAsRead,
-    createTestNotification
+    startPolling,
+    stopPolling
   } = useNotifications();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -44,7 +45,17 @@ export default function NotificationCenter({ className = '' }: NotificationCente
   }, [isOpen]);
 
   const handleToggle = () => {
-    setIsOpen(!isOpen);
+    const newIsOpen = !isOpen;
+    setIsOpen(newIsOpen);
+    
+    // 🔥 Auto-cargar notificaciones cuando se abre
+    if (newIsOpen && user) {
+      console.log('🔔 NotificationCenter: Abierto, cargando notificaciones...');
+      fetchNotifications(true); // Reset y cargar desde cero
+      startPolling(); // Iniciar polling automático
+    } else if (!newIsOpen) {
+      stopPolling(); // Detener polling cuando se cierra
+    }
   };
 
   const handleNotificationClick = async (notification: any) => {
@@ -151,17 +162,6 @@ export default function NotificationCenter({ className = '' }: NotificationCente
                     title="Marcar todas como leídas"
                   >
                     <CheckCheck className="w-4 h-4" />
-                  </button>
-                )}
-
-                {/* Crear notificación de prueba (solo desarrollo) */}
-                {process.env.NODE_ENV === 'development' && (
-                  <button
-                    onClick={createTestNotification}
-                    className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-xs"
-                    title="Crear notificación de prueba"
-                  >
-                    🧪
                   </button>
                 )}
 
