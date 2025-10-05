@@ -30,6 +30,7 @@ const profileRoutes = require('./routes/profileRoutes');
 const logrosRoutes = require('./routes/logrosRoutes');
 const pushNotificationRoutes = require('./routes/pushNotificationRoutes');
 const healthRoutes = require('./routes/healthRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 
 // Crear aplicación Express
 const app = express();
@@ -171,6 +172,7 @@ app.use('/api/lecciones', leccionesRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/logros', logrosRoutes);
 app.use('/api/push', pushNotificationRoutes);
+app.use('/api/notifications', notificationRoutes);
 app.use('/health', healthRoutes);
 
 // ===== MANEJO DE ERRORES =====

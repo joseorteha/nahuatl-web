@@ -3,6 +3,9 @@ const router = express.Router();
 const { supabase } = require('../config/database');
 const { authenticateToken } = require('../middleware/auth');
 const { updateTemaCounters } = require('../utils/temasCounters');
+const { NotificationService } = require('../services/notificationService');
+
+const notificationService = new NotificationService();
 
 // GET /api/temas - Obtener todos los temas
 router.get('/', async (req, res) => {
@@ -325,6 +328,9 @@ router.post('/:id/respuestas', authenticateToken, async (req, res) => {
     // Actualizar contadores automáticamente
     await updateTemaCounters(id);
 
+    // Crear notificación para el autor del tema original
+    await notificationService.notificarRespuestaTema(id, userId, tema.creador_id, contenido);
+
     res.status(201).json({
       success: true,
       data: respuestaConCreador
@@ -417,6 +423,18 @@ router.post('/:id/like', authenticateToken, async (req, res) => {
       // Actualizar contadores automáticamente
       await updateTemaCounters(id);
 
+      // Obtener autor del tema para notificación
+      const { data: temaCompleto, error: temaCompletoError } = await supabase
+        .from('temas_conversacion')
+        .select('creador_id')
+        .eq('id', id)
+        .single();
+
+      if (!temaCompletoError && temaCompleto) {
+        // Crear notificación para el autor del tema
+        await notificationService.notificarLikeTema(id, userId, temaCompleto.creador_id);
+      }
+
       res.json({
         success: true,
         data: { action: 'liked' }
@@ -472,6 +490,18 @@ router.post('/:id/share', authenticateToken, async (req, res) => {
 
     // Actualizar contadores automáticamente
     await updateTemaCounters(id);
+
+    // Obtener autor del tema para notificación
+    const { data: temaCompleto, error: temaCompletoError } = await supabase
+      .from('temas_conversacion')
+      .select('creador_id')
+      .eq('id', id)
+      .single();
+
+    if (!temaCompletoError && temaCompleto) {
+      // Crear notificación para el autor del tema
+      await notificationService.notificarCompartirTema(id, userId, temaCompleto.creador_id);
+    }
 
     res.json({
       success: true,

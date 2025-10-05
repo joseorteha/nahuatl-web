@@ -1,5 +1,8 @@
 const { supabase } = require('../config/database');
 const { authenticateToken } = require('../middleware/auth');
+const { NotificationService } = require('../services/notificationService');
+
+const notificationService = new NotificationService();
 
 /**
  * Controlador para funcionalidades sociales de la red de feedback
@@ -69,16 +72,7 @@ const seguirUsuario = async (req, res) => {
     }
 
     // Crear notificación para el usuario seguido
-    await supabase
-      .from('notificaciones')
-      .insert({
-        usuario_id: usuarioId,
-        tipo_notificacion: 'nuevo_seguidor',
-        titulo: 'Nuevo seguidor',
-        mensaje: `${req.user.nombre_completo} empezó a seguirte`,
-        relacionado_id: seguidorId,
-        relacionado_tipo: 'usuario'
-      });
+    await notificationService.notificarNuevoSeguidor(seguidorId, usuarioId);
 
     res.json({
       success: true,

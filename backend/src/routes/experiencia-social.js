@@ -151,7 +151,7 @@ router.get('/:userId', async (req, res) => {
 // POST /api/experiencia-social/update - Actualizar experiencia social del usuario
 router.post('/update', authenticateToken, async (req, res) => {
   try {
-    const { userId } = req.userId;
+    const userId = req.userId;
     const { accion, puntos } = req.body;
 
     // Calcular puntos de experiencia social
@@ -328,7 +328,7 @@ router.get('/notificaciones/:userId', async (req, res) => {
 router.post('/crear-notificacion', authenticateToken, async (req, res) => {
   try {
     const { usuarioDestino, tipo, titulo, mensaje, datosAdicionales } = req.body;
-    const { userId: usuarioOrigen } = req.userId;
+    const usuarioOrigen = req.userId;
 
     console.log('🔔 Creando notificación:', { usuarioDestino, tipo, titulo });
 
