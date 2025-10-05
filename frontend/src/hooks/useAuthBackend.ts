@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthPersistence } from './useAuthPersistence';
 import { robustApiCall, warmUpServer } from '@/lib/utils/apiUtils';
@@ -76,6 +76,8 @@ export function useAuthBackend() {
   
   // Ref para evitar múltiples llamadas simultáneas
   const refreshing = useRef(false);
+  // Ref para evitar múltiples cargas iniciales
+  const hasLoadedInitialData = useRef(false);
 
   // URL base de la API
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
@@ -314,7 +316,7 @@ export function useAuthBackend() {
     }
   }, [user, tokens, API_URL, authPersistence]);
 
-  // Cargar datos de autenticación al inicializar
+  // Cargar datos de autenticación al inicializar - SOLO UNA VEZ
   useEffect(() => {
     const loadAuthData = async () => {
       try {
@@ -323,10 +325,10 @@ export function useAuthBackend() {
         // Usar el nuevo sistema de persistencia
         const { user: storedUser, tokens: storedTokens } = authPersistence.loadAuthData();
 
-        console.log('🔄 Cargando datos de autenticación...', { storedUser, storedTokens });
+        console.log('🔄 Cargando datos de autenticación...', { storedUser: !!storedUser, storedTokens: !!storedTokens });
 
         if (storedTokens && storedUser) {
-          console.log('✅ Datos encontrados, estableciendo usuario:', storedUser);
+          console.log('✅ Datos encontrados, estableciendo usuario:', storedUser.email);
           
           // Establecer datos inmediatamente
           setUser(storedUser);
@@ -400,10 +402,14 @@ export function useAuthBackend() {
       // ✅ REMOVIDO: finally con setLoading(false) que causaba el problema
     };
 
-    loadAuthData();
-  }, [API_URL]); // ✅ SOLO API_URL COMO DEPENDENCIA
+    // Solo ejecutar si no hemos cargado ya
+    if (!user && !hasLoadedInitialData.current) {
+      hasLoadedInitialData.current = true;
+      loadAuthData();
+    }
+  }, []); // ✅ SIN DEPENDENCIAS - Solo ejecutar una vez
 
-  return {
+  return useMemo(() => ({
     user,
     loading,
     isAuthenticated: !!user,
@@ -412,5 +418,5 @@ export function useAuthBackend() {
     signOut,
     updateProfile,
     apiCall, // Exponer para llamadas personalizadas
-  };
+  }), [user, loading, login, register, signOut, updateProfile, apiCall]);
 }

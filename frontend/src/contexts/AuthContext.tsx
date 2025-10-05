@@ -43,34 +43,49 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-// 🔥 SINGLETON SIMPLE PERO EFECTIVO
+// 🔥 SINGLETON MEJORADO CON CONTROL DE INICIALIZACIÓN
 let GLOBAL_AUTH_INSTANCE: AuthContextType | null = null;
+let PROVIDER_INITIALIZED = false;
+let RENDER_COUNT = 0;
 
 /**
- * 🔒 AUTH CONTEXT PROVIDER - SIMPLE SINGLETON
+ * 🔒 AUTH CONTEXT PROVIDER - ROBUST SINGLETON
  */
 export function AuthProvider({ children }: AuthProviderProps) {
-  console.log(`🔥 AuthProvider ejecutándose...`, new Date().toISOString());
+  RENDER_COUNT++;
   
-  // SIEMPRE crear la instancia local (respeta reglas de hooks)
+  // ⚠️ DETECTAR LOOPS INFINITOS
+  if (RENDER_COUNT > 5) {
+    console.warn(`⚠️ AuthProvider rendered ${RENDER_COUNT} times - possible infinite loop`);
+  }
+  
   const localAuth = useAuthBackend();
   
-  // ✅ CORRECCIÓN SIMPLE: Siempre usar la instancia local más reciente
-  // Si no existe global O si el local no está loading, usar el local
-  if (!GLOBAL_AUTH_INSTANCE) {
-    console.log(`✅ Estableciendo instancia global por PRIMERA VEZ`);
+  // ✅ PREVENIR MULTIPLE INICIALIZACIONES
+  if (!PROVIDER_INITIALIZED) {
+    console.log(`✅ Inicializando AuthProvider por primera vez (render #${RENDER_COUNT})`);
     GLOBAL_AUTH_INSTANCE = localAuth;
-  } else if (!localAuth.loading && GLOBAL_AUTH_INSTANCE.loading) {
-    // Si la instancia local terminó loading pero la global no, actualizar
-    console.log(`🔄 Instancia local terminó loading, actualizando global`);
-    GLOBAL_AUTH_INSTANCE = localAuth;
+    PROVIDER_INITIALIZED = true;
   } else {
-    console.log(`♻️ Instancia global YA EXISTE - ignorando nueva instancia`);
-    console.log(`🔍 Loading states: global=${GLOBAL_AUTH_INSTANCE.loading}, local=${localAuth.loading}`);
+    // Solo actualizar si hay cambios MUY específicos
+    const hasSignificantChange = (
+      GLOBAL_AUTH_INSTANCE &&
+      (
+        // Usuario cambió
+        (GLOBAL_AUTH_INSTANCE.user?.id !== localAuth.user?.id) ||
+        // Se completó la carga inicial  
+        (GLOBAL_AUTH_INSTANCE.loading && !localAuth.loading && localAuth.user)
+      )
+    );
+
+    if (hasSignificantChange) {
+      console.log(`🔄 AuthProvider: Cambio significativo detectado (render #${RENDER_COUNT})`);
+      GLOBAL_AUTH_INSTANCE = localAuth;
+    }
   }
 
   return (
-    <AuthContext.Provider value={GLOBAL_AUTH_INSTANCE}>
+    <AuthContext.Provider value={GLOBAL_AUTH_INSTANCE || localAuth}>
       {children}
     </AuthContext.Provider>
   );
