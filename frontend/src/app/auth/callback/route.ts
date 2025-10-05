@@ -60,17 +60,33 @@ export async function GET(request: NextRequest) {
           </div>
           <script>
             try {
+              console.log('🔄 Procesando callback OAuth...');
+              
+              // Obtener parámetros de la URL actual
+              const urlParams = new URLSearchParams(window.location.search);
+              const token = urlParams.get('token');
+              const refresh = urlParams.get('refresh');
+              const userParam = urlParams.get('user');
+              
+              if (!token || !refresh || !userParam) {
+                throw new Error('Parámetros de autenticación incompletos');
+              }
+              
+              console.log('✅ Parámetros obtenidos correctamente');
+              
               // Guardar tokens y usuario en localStorage
               const authTokens = {
-                accessToken: '${token}',
-                refreshToken: '${refresh}',
+                accessToken: token,
+                refreshToken: refresh,
                 expiresIn: '7d'
               };
               
-              const userData = JSON.parse(decodeURIComponent('${user}'));
+              const userData = JSON.parse(decodeURIComponent(userParam));
               
               localStorage.setItem('auth_tokens', JSON.stringify(authTokens));
               localStorage.setItem('user', JSON.stringify(userData));
+              
+              console.log('✅ Datos guardados en localStorage');
               
               // Redirigir al dashboard
               setTimeout(() => {
@@ -79,7 +95,7 @@ export async function GET(request: NextRequest) {
             } catch (error) {
               console.error('Error procesando callback:', error);
               document.querySelector('.container').innerHTML = 
-                '<div class="error"><h2>Error</h2><p>Error procesando la autenticación</p></div>';
+                '<div class="error"><h2>Error</h2><p>Error procesando la autenticación: ' + error.message + '</p></div>';
               setTimeout(() => {
                 window.location.href = '/login';
               }, 3000);
