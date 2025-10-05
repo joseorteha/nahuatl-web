@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuthPersistence } from './useAuthPersistence';
 
 interface User {
   id: string;
@@ -42,6 +43,7 @@ export function useAuthBackend() {
   const [loading, setLoading] = useState(true);
   const [tokens, setTokens] = useState<AuthTokens | null>(null);
   const router = useRouter();
+  const authPersistence = useAuthPersistence();
   
   // Ref para evitar múltiples llamadas simultáneas
   const refreshing = useRef(false);
@@ -126,7 +128,7 @@ export function useAuthBackend() {
   }, [tokens, API_URL, refreshTokens]);
 
   // Función de login
-  const login = useCallback(async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string, rememberMe: boolean = false) => {
     try {
       setLoading(true);
       
@@ -149,8 +151,9 @@ export function useAuthBackend() {
 
         setUser(data.user);
         setTokens(authTokens);
-        localStorage.setItem('auth_tokens', JSON.stringify(authTokens));
-        localStorage.setItem('user', JSON.stringify(data.user));
+        
+        // Usar el nuevo sistema de persistencia
+        authPersistence.saveAuthData(data.user, authTokens, rememberMe);
         
         return { success: true, user: data.user };
       } else {
@@ -162,7 +165,7 @@ export function useAuthBackend() {
     } finally {
       setLoading(false);
     }
-  }, [API_URL]);
+  }, [API_URL, authPersistence]);
 
   // Función de registro
   const register = useCallback(async (userData: {
@@ -193,8 +196,9 @@ export function useAuthBackend() {
 
         setUser(data.user);
         setTokens(authTokens);
-        localStorage.setItem('auth_tokens', JSON.stringify(authTokens));
-        localStorage.setItem('user', JSON.stringify(data.user));
+        
+        // Usar el nuevo sistema de persistencia (por defecto no recordar en registro)
+        authPersistence.saveAuthData(data.user, authTokens, false);
         
         return { success: true, user: data.user };
       } else {
@@ -218,14 +222,13 @@ export function useAuthBackend() {
     } catch (error) {
       console.error('Error en logout:', error);
     } finally {
-      // Limpiar estado local
+      // Limpiar estado local usando el nuevo sistema
       setUser(null);
       setTokens(null);
-      localStorage.removeItem('auth_tokens');
-      localStorage.removeItem('user');
+      authPersistence.clearAuthData();
       router.push('/');
     }
-  }, [tokens, router]);
+  }, [tokens, router, authPersistence]);
 
   // Función para actualizar perfil
   const updateProfile = useCallback(async (updateData: Partial<User>) => {
@@ -241,7 +244,13 @@ export function useAuthBackend() {
 
       if (response.ok) {
         setUser(data.user);
-        localStorage.setItem('user', JSON.stringify(data.user));
+        
+        // Actualizar los datos del usuario manteniendo la persistencia actual
+        if (tokens) {
+          const rememberMe = authPersistence.shouldPersistSession();
+          authPersistence.saveAuthData(data.user, tokens, rememberMe);
+        }
+        
         return { success: true, user: data.user };
       } else {
         return { success: false, error: data.error || 'Error actualizando perfil' };
@@ -256,24 +265,26 @@ export function useAuthBackend() {
   useEffect(() => {
     const loadAuthData = async () => {
       try {
-        const storedTokens = localStorage.getItem('auth_tokens');
-        const storedUser = localStorage.getItem('user');
+        setLoading(true);
+        
+        // Usar el nuevo sistema de persistencia
+        const { user: storedUser, tokens: storedTokens } = authPersistence.loadAuthData();
 
         if (storedTokens && storedUser) {
-          const parsedTokens = JSON.parse(storedTokens);
-          const parsedUser = JSON.parse(storedUser);
-
-          setTokens(parsedTokens);
-          setUser(parsedUser);
+          setTokens(storedTokens);
+          setUser(storedUser);
+          
+          // Actualizar timestamp de actividad
+          authPersistence.updateLastActivity();
 
           // Verificar si el token sigue siendo válido (solo si tenemos tokens)
-          if (parsedTokens?.accessToken) {
+          if (storedTokens?.accessToken) {
             try {
-              const response = await fetch(`${API_URL}/api/auth/profile/${parsedUser.id}`, {
+              const response = await fetch(`${API_URL}/api/auth/profile/${storedUser.id}`, {
                 method: 'GET',
                 headers: {
                   'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${parsedTokens.accessToken}`,
+                  'Authorization': `Bearer ${storedTokens.accessToken}`,
                 },
               });
               
@@ -282,15 +293,13 @@ export function useAuthBackend() {
                 console.log('Token inválido, limpiando datos de autenticación');
                 setUser(null);
                 setTokens(null);
-                localStorage.removeItem('auth_tokens');
-                localStorage.removeItem('user');
+                authPersistence.clearAuthData();
               }
             } catch (error) {
               console.error('Error verificando token:', error);
               setUser(null);
               setTokens(null);
-              localStorage.removeItem('auth_tokens');
-              localStorage.removeItem('user');
+              authPersistence.clearAuthData();
             }
           }
         }
@@ -298,15 +307,14 @@ export function useAuthBackend() {
         console.error('Error cargando datos de autenticación:', error);
         setUser(null);
         setTokens(null);
-        localStorage.removeItem('auth_tokens');
-        localStorage.removeItem('user');
+        authPersistence.clearAuthData();
       } finally {
         setLoading(false);
       }
     };
 
     loadAuthData();
-  }, [API_URL]);
+  }, [API_URL, authPersistence]);
 
   return {
     user,

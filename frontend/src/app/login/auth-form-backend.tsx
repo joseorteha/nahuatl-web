@@ -1,6 +1,7 @@
 'use client';
 import { useState, FC, InputHTMLAttributes, ElementType } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthBackend } from '@/hooks/useAuthBackend';
 import { 
@@ -88,6 +89,7 @@ export default function AuthFormBackend() {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [username, setUsername] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -159,7 +161,7 @@ export default function AuthFormBackend() {
         }
       } else {
         // Login
-        const result = await login(email, password);
+        const result = await login(email, password, rememberMe);
 
         if (result.success) {
           setSuccess('¡Login exitoso! Redirigiendo...');
@@ -324,6 +326,33 @@ export default function AuthFormBackend() {
           autoComplete={isSignUp ? 'new-password' : 'current-password'}
           required
         />
+
+        {/* Checkbox "Recordarme" - Solo en login */}
+        {!isSignUp && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center justify-between"
+          >
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
+                Mantenerme conectado
+              </span>
+            </label>
+            <Link 
+              href="/forgot-password" 
+              className="text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+            >
+              ¿Olvidaste tu contraseña?
+            </Link>
+          </motion.div>
+        )}
 
         <motion.button
           type="submit"
