@@ -82,9 +82,17 @@ export default function AutoRedirect({ redirectTo = '/dashboard' }: AutoRedirect
               router.push(redirectTo);
               return;
             }
+          } else {
+            console.log('🍪 No hay sesión de cookies válida en el servidor');
           }
         } catch (error) {
-          console.log('⚠️ Error verificando sesión de cookies (normal si no hay sesión):', error);
+          // ⚠️ MANEJO MEJORADO DE ERRORES CORS
+          if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+            console.log('⚠️ Backend no disponible o problemas de CORS (normal durante despliegues)');
+            console.log('ℹ️ El usuario puede usar sesiones locales mientras el backend se actualiza');
+          } else {
+            console.log('⚠️ Error verificando sesión de cookies:', error);
+          }
         }
         
         console.log('ℹ️ No hay sesión activa (ni JWT ni cookies), mostrando landing');
