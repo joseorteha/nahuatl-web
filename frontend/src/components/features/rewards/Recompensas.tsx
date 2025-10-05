@@ -22,7 +22,7 @@ import {
   MessageCircle,
   Heart
 } from 'lucide-react';
-import { useAuthBackend } from '@/hooks/useAuthBackend';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface RecompensasUsuario {
   puntos_totales: number;
@@ -112,7 +112,7 @@ export default function Recompensas({ userId }: { userId: string }) {
   
   type TabKey = 'resumen' | 'logros' | 'historial';
   
-  const { } = useAuthBackend();
+  const { } = useAuth();
 
   const obtenerRecompensas = useCallback(async () => {
     try {

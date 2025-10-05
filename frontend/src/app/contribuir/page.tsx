@@ -7,7 +7,7 @@ import ConditionalHeader from '@/components/navigation/ConditionalHeader';
 import Footer from '@/components/navigation/Footer';
 import ContributeWordForm from '@/components/features/contributions/ContributeWordForm';
 import { getContributionStats, type ContributionStats } from '@/lib/utils/contributionStats';
-import { useAuthBackend } from '@/hooks/useAuthBackend';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface UserContribution {
   id: string;
@@ -23,7 +23,7 @@ interface UserContribution {
 }
 
 export default function ContributePage() {
-  const { user, loading: authLoading } = useAuthBackend();
+  const { user, loading: authLoading } = useAuth();
   const [contributions, setContributions] = useState<UserContribution[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'contribute' | 'history'>('contribute');

@@ -11,7 +11,7 @@ import ContributionModal from '@/components/features/admin/ContributionModal';
 import MessageModal from '@/components/features/admin/MessageModal';
 import RequestModal from '@/components/features/admin/RequestModal';
 import { obtenerMensajesNoLeidos, obtenerSolicitudesPendientes, marcarContactoComoLeido } from '@/services/api/contactService';
-import { useAuthBackend } from '@/hooks/useAuthBackend';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface AdminContribution {
   id: string;
@@ -65,7 +65,7 @@ interface SolicitudUnion {
 }
 
 export default function AdminPage() {
-  const { user: authUser, loading: authLoading } = useAuthBackend();
+  const { user: authUser, loading: authLoading } = useAuth();
   const [contributions, setContributions] = useState<AdminContribution[]>([]);
   const [mensajesContacto, setMensajesContacto] = useState<MensajeContacto[]>([]);
   const [solicitudesUnion, setSolicitudesUnion] = useState<SolicitudUnion[]>([]);

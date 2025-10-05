@@ -39,7 +39,35 @@ interface AuthResponse {
   expiresIn: string;
 }
 
+// 🔥 SISTEMA DE REQUEST POOLING GLOBAL
+// Evita peticiones duplicadas simultáneas
+const pendingRequests = new Map<string, Promise<any>>();
+
+function getOrCreateRequest<T>(
+  key: string, 
+  requestFn: () => Promise<T>
+): Promise<T> {
+  // Si ya existe una petición pendiente, retornarla
+  if (pendingRequests.has(key)) {
+    return pendingRequests.get(key) as Promise<T>;
+  }
+
+  // Crear nueva petición
+  const promise = requestFn().finally(() => {
+    // Limpiar cuando termine
+    pendingRequests.delete(key);
+  });
+
+  pendingRequests.set(key, promise);
+  return promise;
+}
+
 export function useAuthBackend() {
+  // ⚠️ DEBUG: Solo para desarrollo
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`🔥 useAuthBackend INSTANCE CREATED`);
+  }
+  
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [tokens, setTokens] = useState<AuthTokens | null>(null);
@@ -294,41 +322,57 @@ export function useAuthBackend() {
         // Usar el nuevo sistema de persistencia
         const { user: storedUser, tokens: storedTokens } = authPersistence.loadAuthData();
 
+        console.log('🔄 Cargando datos de autenticación...', { storedUser, storedTokens });
+
         if (storedTokens && storedUser) {
-          setTokens(storedTokens);
+          console.log('✅ Datos encontrados, estableciendo usuario:', storedUser);
+          
+          // Establecer datos inmediatamente
           setUser(storedUser);
+          setTokens(storedTokens);
           
           // Actualizar timestamp de actividad
           authPersistence.updateLastActivity();
 
-          // Verificar si el token sigue siendo válido (solo si tenemos tokens)
+          // 🔥 VERIFICACIÓN DE TOKEN CON REQUEST POOLING
+          // Evita múltiples verificaciones simultáneas
           if (storedTokens?.accessToken) {
-            try {
-              const response = await fetch(`${API_URL}/api/auth/profile/${storedUser.id}`, {
-                method: 'GET',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${storedTokens.accessToken}`,
-                },
-              });
-              
-              if (!response.ok) {
-                // Token inválido, limpiar datos
-                console.log('Token inválido, limpiando datos de autenticación');
-                setUser(null);
-                setTokens(null);
-                authPersistence.clearAuthData();
+            const requestKey = `verify-token-${storedUser.id}`;
+            
+            // Usar debounce de 2 segundos antes de verificar
+            setTimeout(async () => {
+              try {
+                await getOrCreateRequest(requestKey, async () => {
+                  const response = await fetch(`${API_URL}/api/auth/profile/${storedUser.id}`, {
+                    method: 'GET',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${storedTokens.accessToken}`,
+                    },
+                  });
+                  
+                  if (!response.ok) {
+                    console.log('❌ Token inválido, limpiando datos de autenticación');
+                    setUser(null);
+                    setTokens(null);
+                    authPersistence.clearAuthData();
+                  } else {
+                    console.log('✅ Token válido, usuario confirmado');
+                  }
+                  
+                  return response;
+                });
+              } catch (error) {
+                console.error('⚠️ Error verificando token (no crítico):', error);
+                // No limpiar datos en caso de error de red
               }
-            } catch (error) {
-              console.error('Error verificando token:', error);
-              setUser(null);
-              setTokens(null);
-              authPersistence.clearAuthData();
-            }
+            }, 2000); // Esperar 2 segundos antes de verificar
           }
+        } else {
+          console.log('❌ No hay datos de autenticación almacenados');
         }
       } catch (error) {
-        console.error('Error cargando datos de autenticación:', error);
+        console.error('💥 Error cargando datos de autenticación:', error);
         setUser(null);
         setTokens(null);
         authPersistence.clearAuthData();
@@ -338,7 +382,7 @@ export function useAuthBackend() {
     };
 
     loadAuthData();
-  }, [API_URL, authPersistence]);
+  }, [API_URL]); // ✅ SOLO API_URL COMO DEPENDENCIA
 
   return {
     user,

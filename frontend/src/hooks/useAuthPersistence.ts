@@ -1,5 +1,6 @@
 // hooks/useAuthPersistence.ts - Sistema de persistencia de autenticación mejorado
 import { useState, useEffect } from 'react';
+import { setAuthCookie, removeAuthCookie } from '@/lib/utils/cookies';
 
 interface AuthTokens {
   accessToken: string;
@@ -79,9 +80,17 @@ export function useAuthPersistence() {
         localStorage.removeItem(STORAGE_KEYS.REMEMBER_ME);
       }
       
+      // 🍪 IMPORTANTE: Establecer cookie para el middleware
+      const cookieData = JSON.stringify({
+        userId: user.id,
+        token: tokens.accessToken,
+        timestamp: Date.now()
+      });
+      setAuthCookie(cookieData, rememberMe);
+      
       setPersistenceType(rememberMe ? 'localStorage' : 'sessionStorage');
       
-      console.log(`✅ Datos guardados en ${rememberMe ? 'localStorage' : 'sessionStorage'}`);
+      console.log(`✅ Datos guardados en ${rememberMe ? 'localStorage' : 'sessionStorage'} y cookie`);
       
     } catch (error) {
       console.error('Error guardando datos de autenticación:', error);
@@ -151,7 +160,10 @@ export function useAuthPersistence() {
       sessionStorage.removeItem(STORAGE_KEYS.USER_DATA);
       sessionStorage.removeItem(STORAGE_KEYS.LAST_LOGIN);
       
-      console.log('🧹 Datos de autenticación limpiados');
+      // 🍪 IMPORTANTE: Eliminar cookie de autenticación
+      removeAuthCookie();
+      
+      console.log('🧹 Datos de autenticación limpiados (storage + cookie)');
       
     } catch (error) {
       console.error('Error limpiando datos de autenticación:', error);

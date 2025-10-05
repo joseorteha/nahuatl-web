@@ -15,7 +15,7 @@ import {
   ExternalLink,
   User
 } from 'lucide-react';
-import { useAuthBackend } from '@/hooks/useAuthBackend';
+import { useAuth } from '@/contexts/AuthContext';
 import ConditionalHeader from '@/components/navigation/ConditionalHeader';
 import UserSearch from '@/components/features/social/UserSearch';
 import Link from 'next/link';
@@ -54,7 +54,7 @@ interface ExperienciaSocialData {
 }
 
 export default function ExperienciaSocialPage() {
-  const { user, loading } = useAuthBackend();
+  const { user, loading } = useAuth();
   const router = useRouter();
   const [data, setData] = useState<ExperienciaSocialData | null>(null);
   const [isLoading, setIsLoading] = useState(true);

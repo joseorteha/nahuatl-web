@@ -11,7 +11,7 @@ import ConocimientoTab from '@/components/features/profile/ConocimientoTab';
 import ComunidadTab from '@/components/features/profile/ComunidadTab';
 import LogrosTab from '@/components/features/profile/LogrosTab';
 import Image from 'next/image';
-import { useAuthBackend } from '@/hooks/useAuthBackend';
+import { useAuth } from '@/contexts/AuthContext';
 import { useSocial, Seguimiento } from '@/hooks/useSocial';
 import { UserCard } from '@/components/features/social/UserCard';
 import PushNotificationSettings from '@/components/features/pwa/PushNotificationSettings';
@@ -25,7 +25,7 @@ interface AvatarData {
 
 export default function ProfilePage() {
   // Hooks de autenticación y social
-  const { user, loading, isAuthenticated } = useAuthBackend();
+  const { user, loading, isAuthenticated } = useAuth();
   const { obtenerSeguidores, obtenerSiguiendo } = useSocial();
   const router = useRouter();
 

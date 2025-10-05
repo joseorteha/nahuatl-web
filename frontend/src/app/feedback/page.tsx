@@ -25,7 +25,7 @@ import {
   Tag,
   Trophy
 } from 'lucide-react';
-import { useAuthBackend } from '@/hooks/useAuthBackend';
+import { useAuth } from '@/contexts/AuthContext';
 import { useSocial, Notificacion, Hashtag } from '@/hooks/useSocial';
 import ConditionalHeader from '@/components/navigation/ConditionalHeader';
 import ApiService from '@/services/api/apiService';
@@ -126,7 +126,7 @@ const priorityConfig = {
 
 
 export default function FeedbackPage() {
-  const { user, loading } = useAuthBackend();
+  const { user, loading } = useAuth();
   const { 
     obtenerNotificaciones, 
     marcarNotificacionLeida, 

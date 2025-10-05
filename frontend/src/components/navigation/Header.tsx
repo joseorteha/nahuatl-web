@@ -22,10 +22,10 @@ import {
   Shield
 } from 'lucide-react';
 import { ThemeToggle } from '../shared/ThemeToggle';
-import { useAuthBackend } from '@/hooks/useAuthBackend';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Header() {
-  const { user, loading, signOut } = useAuthBackend();
+  const { user, loading, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = async () => {

@@ -18,7 +18,7 @@ import {
   User
 } from 'lucide-react';
 import ConditionalHeader from '@/components/navigation/ConditionalHeader';
-import { useAuthBackend } from '@/hooks/useAuthBackend';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface RecentActivity {
   id: string;
@@ -45,12 +45,19 @@ interface FeaturedContent {
 }
 
 export default function Dashboard() {
-  const { user } = useAuthBackend();
+  const { user, loading } = useAuth();
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [featuredContent, setFeaturedContent] = useState<FeaturedContent | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch dashboard data with REAL algorithms
+  // Protección: redirigir si no hay usuario (después de cargar)
+  useEffect(() => {
+    if (!loading && !user) {
+      window.location.href = '/login';
+    }
+  }, [user, loading]);
+
+  // Fetch dashboard data with REAL algorithms - MOVER ANTES DE useEffect
   const fetchDashboardData = async () => {
     try {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
@@ -194,6 +201,24 @@ export default function Dashboard() {
     return `${Math.floor(diffInMinutes / 1440)}d`;
   };
 
+  // RENDERS CONDICIONALES AL FINAL - DESPUÉS DE TODOS LOS HOOKS
+  // Mostrar loading mientras se verifica autenticación
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Cargando dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // No mostrar nada si no hay usuario
+  if (!user) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-cyan-50/30 to-blue-50/40 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
       <ConditionalHeader />
@@ -210,7 +235,7 @@ export default function Dashboard() {
         <div className="relative container mx-auto px-4 py-16 text-center text-white">
           <div className="mb-6">
             <h1 className="text-4xl md:text-6xl font-bold mb-2 tracking-tight">
-              {getGreeting()}, <span className="text-cyan-200">{user?.nombre_completo?.split(' ')[0] || 'Amigo'}</span>! 
+              {getGreeting()}, <span className="text-cyan-200">{user?.nombre_completo?.split(' ')[0] || user?.username || 'Amigo'}</span>! 
             </h1>
             <p className="text-xl md:text-2xl text-cyan-100 font-light">
               ¿Listo para otra aventura en náhuatl?

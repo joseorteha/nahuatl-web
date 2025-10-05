@@ -1,9 +1,9 @@
 'use client';
-import { useState, FC, InputHTMLAttributes, ElementType } from 'react';
+import { useState, useEffect, FC, InputHTMLAttributes, ElementType } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAuthBackend } from '@/hooks/useAuthBackend';
+import { useAuth } from '@/contexts/AuthContext';
 import { 
   Mail, 
   Lock, 
@@ -83,7 +83,7 @@ const InputField: FC<InputFieldProps> = ({ icon: Icon, label, error, type, ...pr
 
 export default function AuthFormBackend() {
   const router = useRouter();
-  const { login, register } = useAuthBackend();
+  const { login, register } = useAuth();
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -94,6 +94,26 @@ export default function AuthFormBackend() {
   const [success, setSuccess] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<{[key: string]: string}>({});
+  const [redirectMessage, setRedirectMessage] = useState<string | null>(null);
+
+  // Verificar si fue redirigido por el middleware
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      const reason = searchParams.get('reason');
+      
+      const messages: Record<string, string> = {
+        'auth_required': 'Debes iniciar sesión para acceder a esta página',
+        'invalid_session': 'Tu sesión ha expirado o es inválida',
+        'session_expired': 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente'
+      };
+      
+      if (reason && messages[reason]) {
+        setRedirectMessage(messages[reason]);
+        setError(messages[reason]);
+      }
+    }
+  }, []);
 
   // Validación en tiempo real
   const validateField = (name: string, value: string) => {
@@ -153,9 +173,10 @@ export default function AuthFormBackend() {
 
         if (result.success) {
           setSuccess('¡Registro exitoso! Redirigiendo...');
+          // Dar tiempo para que el estado se actualice antes de redirigir
           setTimeout(() => {
             router.push('/dashboard');
-          }, 1500);
+          }, 500);
         } else {
           setError(result.error || 'Error al registrar usuario');
         }
@@ -165,9 +186,10 @@ export default function AuthFormBackend() {
 
         if (result.success) {
           setSuccess('¡Login exitoso! Redirigiendo...');
+          // Dar tiempo para que el estado se actualice antes de redirigir
           setTimeout(() => {
             router.push('/dashboard');
-          }, 1500);
+          }, 500);
         } else {
           setError(result.error || 'Credenciales incorrectas');
         }

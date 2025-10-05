@@ -23,7 +23,7 @@ import {
   Star,
   TrendingUp
 } from 'lucide-react';
-import { useAuthBackend } from '@/hooks/useAuthBackend';
+import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/navigation/Header';
 import { useSocial } from '@/hooks/useSocial';
 
@@ -81,7 +81,7 @@ interface PerfilUsuario {
 }
 
 export default function PerfilUsuarioPage() {
-  const { user: currentUser, loading } = useAuthBackend();
+  const { user: currentUser, loading } = useAuth();
   const params = useParams();
   const router = useRouter();
   const userId = params.userId as string;

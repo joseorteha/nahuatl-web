@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: nahuatl-backend-v2
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: SUPABASE_URL
+        fromService: 
+          type: supabase
+          name: nahuatl-db
+          property: url
+      - key: SUPABASE_ANON_KEY
+        fromService:
+          type: supabase
+          name: nahuatl-db
+          property: anonKey
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        fromService:
+          type: supabase  
+          name: nahuatl-db
+          property: serviceRoleKey
+      - key: JWT_SECRET
+        generateValue: true
+      - key: VAPID_PUBLIC_KEY
+        value: ""
+      - key: VAPID_PRIVATE_KEY
+        value: ""

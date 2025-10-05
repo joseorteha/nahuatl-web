@@ -1,10 +1,20 @@
 'use client';
-import { useAuthBackend } from '@/hooks/useAuthBackend';
+import { useAuth } from '@/contexts/AuthContext';
+import { useContext } from 'react';
+import { AuthContext } from '@/contexts/AuthContext';
 import Header from './Header';
 import LandingHeader from './LandingHeader';
 
 export default function ConditionalHeader() {
-  const { user, loading } = useAuthBackend();
+  // Usar useContext directamente para manejar el caso cuando no está dentro del Provider
+  const authContext = useContext(AuthContext);
+  
+  // Si no está dentro del AuthProvider (como en not-found.tsx), mostrar LandingHeader
+  if (!authContext) {
+    return <LandingHeader />;
+  }
+
+  const { user, loading } = authContext;
 
   // Si está cargando, mostrar LandingHeader por defecto
   if (loading) {

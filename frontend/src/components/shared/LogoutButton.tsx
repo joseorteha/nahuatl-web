@@ -1,11 +1,11 @@
 'use client';
 
-import { useAuthBackend } from '@/hooks/useAuthBackend';
+import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 
 export default function LogoutButton() {
   const router = useRouter();
-  const { signOut } = useAuthBackend();
+  const { signOut } = useAuth();
 
   const handleSignOut = async () => {
     await signOut();

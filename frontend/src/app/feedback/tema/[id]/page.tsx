@@ -16,7 +16,7 @@ import {
   CheckCircle,
   AlertCircle
 } from 'lucide-react';
-import { useAuthBackend } from '@/hooks/useAuthBackend';
+import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/navigation/Header';
 import RespuestaForm from '@/app/feedback/components/RespuestaForm';
 
@@ -55,7 +55,7 @@ interface Respuesta {
 }
 
 export default function TemaPage() {
-  const { user, loading } = useAuthBackend();
+  const { user, loading } = useAuth();
   const router = useRouter();
   const params = useParams();
   const temaId = params.id as string;

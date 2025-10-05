@@ -131,6 +131,16 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Ruta de salud con prefijo API (para compatibilidad)
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'OK',
+    timestamp: new Date().toISOString(),
+    environment: config.NODE_ENV,
+    version: '2.2.0'
+  });
+});
+
 // Ruta raíz
 app.get('/', (req, res) => {
   res.json({

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useAuthBackend } from './useAuthBackend';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Interfaces para las funcionalidades sociales
 export interface Hashtag {
@@ -92,7 +92,7 @@ export interface FeedbackCompartido {
 
 
 export const useSocial = () => {
-  const { apiCall } = useAuthBackend();
+  const { apiCall } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
