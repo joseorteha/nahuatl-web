@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "installCommand": "npm install",
+  "devCommand": "npm run dev",
+  "env": {
+    "NEXT_PUBLIC_API_URL": "https://nahuatl-web-xmeo.onrender.com",
+    "NEXT_PUBLIC_SUPABASE_URL": "https://lygfsgtwwijrkrqkvxjh.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5Z2ZzZ3R3d2lqcmtycWt2eGpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4Mjg0NjIsImV4cCI6MjA2NjQwNDQ2Mn0.TivCXR5uDPyLGRU7cNloMsK4lMrLQN3XjqGywCSLnao"
+  },
+  "functions": {
+    "app/api/**/*": {
+      "maxDuration": 30
+    }
+  }
+}
