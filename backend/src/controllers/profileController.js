@@ -108,12 +108,23 @@ class ProfileController {
     try {
       const { userId } = req.params;
       
-      // Debug logs
-      console.log('Debug - req.user:', req.user);
-      console.log('Debug - userId from params:', userId);
+      // Debug logs detallados
+      console.log('🔍 Debug obtenerConocimiento - req.user:', req.user);
+      console.log('🔍 Debug obtenerConocimiento - userId from params:', userId);
+      console.log('🔍 Debug obtenerConocimiento - req.user.id:', req.user?.id);
+      console.log('🔍 Debug obtenerConocimiento - req.user.rol:', req.user?.rol);
+      console.log('🔍 Debug obtenerConocimiento - tipos:', {
+        userIdType: typeof req.user?.id,
+        paramsUserIdType: typeof userId,
+        userIdValue: req.user?.id,
+        paramsUserIdValue: userId,
+        areEqual: req.user?.id === userId,
+        areEqualStrict: String(req.user?.id) === String(userId)
+      });
       
       // Verificar permisos
       if (!req.user) {
+        console.log('❌ Debug obtenerConocimiento - No autenticado');
         return res.status(401).json({ 
           success: false,
           error: 'No autenticado',
@@ -121,12 +132,27 @@ class ProfileController {
         });
       }
       
-      if (req.user.id !== userId && req.user.rol !== 'admin') {
+      // Comparación más robusta usando strings
+      const userIdString = String(req.user.id);
+      const paramsUserIdString = String(userId);
+      
+      if (userIdString !== paramsUserIdString && req.user.rol !== 'admin') {
+        console.log('❌ Debug obtenerConocimiento - Sin permisos:', {
+          reqUserId: req.user.id,
+          paramsUserId: userId,
+          userRole: req.user.rol,
+          userIdString,
+          paramsUserIdString,
+          originalComparison: req.user.id !== userId,
+          stringComparison: userIdString !== paramsUserIdString
+        });
         return res.status(403).json({ 
           success: false,
           error: 'No tienes permisos para acceder a estos datos' 
         });
       }
+      
+      console.log('✅ Debug obtenerConocimiento - Permisos OK, continuando...');
 
       // Obtener datos de conocimiento del usuario
       const { data: recompensas, error: recompensasError } = await supabase
@@ -319,13 +345,51 @@ class ProfileController {
     try {
       const { userId } = req.params;
       
+      // Debug logs detallados
+      console.log('🔍 Debug obtenerComunidad - req.user:', req.user);
+      console.log('🔍 Debug obtenerComunidad - userId from params:', userId);
+      console.log('🔍 Debug obtenerComunidad - req.user.id:', req.user?.id);
+      console.log('🔍 Debug obtenerComunidad - req.user.rol:', req.user?.rol);
+      console.log('🔍 Debug obtenerComunidad - tipos:', {
+        userIdType: typeof req.user?.id,
+        paramsUserIdType: typeof userId,
+        userIdValue: req.user?.id,
+        paramsUserIdValue: userId,
+        areEqual: req.user?.id === userId,
+        areEqualStrict: String(req.user?.id) === String(userId)
+      });
+      
       // Verificar permisos
-      if (req.user.id !== userId && req.user.rol !== 'admin') {
+      if (!req.user) {
+        console.log('❌ Debug obtenerComunidad - No autenticado');
+        return res.status(401).json({ 
+          success: false,
+          error: 'No autenticado',
+          message: 'Debes iniciar sesión para acceder a este recurso'
+        });
+      }
+      
+      // Comparación más robusta usando strings
+      const userIdString = String(req.user.id);
+      const paramsUserIdString = String(userId);
+      
+      if (userIdString !== paramsUserIdString && req.user.rol !== 'admin') {
+        console.log('❌ Debug obtenerComunidad - Sin permisos:', {
+          reqUserId: req.user.id,
+          paramsUserId: userId,
+          userRole: req.user.rol,
+          userIdString,
+          paramsUserIdString,
+          originalComparison: req.user.id !== userId,
+          stringComparison: userIdString !== paramsUserIdString
+        });
         return res.status(403).json({ 
           success: false,
           error: 'No tienes permisos para acceder a estos datos' 
         });
       }
+      
+      console.log('✅ Debug obtenerComunidad - Permisos OK, continuando...');
 
       // Obtener datos sociales del usuario
       const { data: recompensas, error: recompensasError } = await supabase

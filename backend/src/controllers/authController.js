@@ -211,9 +211,53 @@ class AuthController {
     try {
       const { userId } = req.params;
 
+      // Debug logs detallados
+      console.log('🔍 Debug getUserStats - req.user:', req.user);
+      console.log('🔍 Debug getUserStats - userId from params:', userId);
+      console.log('🔍 Debug getUserStats - req.user.id:', req.user?.id);
+      console.log('🔍 Debug getUserStats - req.user.rol:', req.user?.rol);
+      console.log('🔍 Debug getUserStats - tipos:', {
+        userIdType: typeof req.user?.id,
+        paramsUserIdType: typeof userId,
+        userIdValue: req.user?.id,
+        paramsUserIdValue: userId,
+        areEqual: req.user?.id === userId,
+        areEqualStrict: String(req.user?.id) === String(userId)
+      });
+
       if (!userId) {
         return res.status(400).json({ error: 'ID de usuario requerido' });
       }
+      
+      // Verificar permisos (nota: getUserStats no parece tener esta verificación explícita)
+      if (!req.user) {
+        console.log('❌ Debug getUserStats - No autenticado');
+        return res.status(401).json({ 
+          error: 'No autenticado',
+          message: 'Debes iniciar sesión para acceder a este recurso'
+        });
+      }
+      
+      // Comparación más robusta usando strings
+      const userIdString = String(req.user.id);
+      const paramsUserIdString = String(userId);
+      
+      if (userIdString !== paramsUserIdString && req.user.rol !== 'admin') {
+        console.log('❌ Debug getUserStats - Sin permisos:', {
+          reqUserId: req.user.id,
+          paramsUserId: userId,
+          userRole: req.user.rol,
+          userIdString,
+          paramsUserIdString,
+          originalComparison: req.user.id !== userId,
+          stringComparison: userIdString !== paramsUserIdString
+        });
+        return res.status(403).json({ 
+          error: 'No tienes permisos para acceder a estas estadísticas' 
+        });
+      }
+      
+      console.log('✅ Debug getUserStats - Permisos OK, continuando...');
 
       const stats = await userService.getUserStats(userId);
       

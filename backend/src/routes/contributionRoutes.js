@@ -9,10 +9,39 @@ router.get('/stats/:userId', authenticateToken, async (req, res) => {
   try {
     const { userId } = req.params;
     
+    // Debug logs detallados
+    console.log('🔍 Debug contributions/stats - req.user:', req.user);
+    console.log('🔍 Debug contributions/stats - userId from params:', userId);
+    console.log('🔍 Debug contributions/stats - req.user.id:', req.user?.id);
+    console.log('🔍 Debug contributions/stats - req.user.rol:', req.user?.rol);
+    console.log('🔍 Debug contributions/stats - tipos:', {
+      userIdType: typeof req.user?.id,
+      paramsUserIdType: typeof userId,
+      userIdValue: req.user?.id,
+      paramsUserIdValue: userId,
+      areEqual: req.user?.id === userId,
+      areEqualStrict: String(req.user?.id) === String(userId)
+    });
+    
+    // Comparación más robusta usando strings
+    const userIdString = String(req.user.id);
+    const paramsUserIdString = String(userId);
+    
     // Verificar que el usuario esté accediendo a sus propias estadísticas o sea admin
-    if (req.user.id !== userId && req.user.rol !== 'admin') {
+    if (userIdString !== paramsUserIdString && req.user.rol !== 'admin') {
+      console.log('❌ Debug contributions/stats - Sin permisos:', {
+        reqUserId: req.user.id,
+        paramsUserId: userId,
+        userRole: req.user.rol,
+        userIdString,
+        paramsUserIdString,
+        originalComparison: req.user.id !== userId,
+        stringComparison: userIdString !== paramsUserIdString
+      });
       return res.status(403).json({ error: 'No tienes permisos para acceder a estas estadísticas' });
     }
+    
+    console.log('✅ Debug contributions/stats - Permisos OK, continuando...');
 
     // Obtener estadísticas de contribuciones
     const { data: contribuciones, error: contribucionesError } = await supabase
@@ -63,8 +92,12 @@ router.get('/historial/:userId', authenticateToken, async (req, res) => {
   try {
     const { userId } = req.params;
     
+    // Comparación más robusta usando strings
+    const userIdString = String(req.user.id);
+    const paramsUserIdString = String(userId);
+    
     // Verificar que el usuario esté accediendo a su propio historial o sea admin
-    if (req.user.id !== userId && req.user.rol !== 'admin') {
+    if (userIdString !== paramsUserIdString && req.user.rol !== 'admin') {
       return res.status(403).json({ error: 'No tienes permisos para acceder a este historial' });
     }
 
