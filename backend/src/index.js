@@ -127,7 +127,9 @@ app.get('/health', (req, res) => {
     status: 'OK',
     timestamp: new Date().toISOString(),
     environment: config.NODE_ENV,
-    version: '2.2.0'
+    version: '2.2.1', // ✨ INCREMENTADO PARA FORZAR REDESPLIEGUE
+    cors_enabled: true,
+    credentials_support: true
   });
 });
 
@@ -137,15 +139,18 @@ app.get('/api/health', (req, res) => {
     status: 'OK',
     timestamp: new Date().toISOString(),
     environment: config.NODE_ENV,
-    version: '2.2.0'
+    version: '2.2.1', // ✨ INCREMENTADO PARA FORZAR REDESPLIEGUE
+    cors_enabled: true,
+    credentials_support: true
   });
 });
 
 // Ruta raíz
 app.get('/', (req, res) => {
   res.json({
-    message: '🌸 Nawatlajtol API v2.2.0',
+    message: '🌸 Nawatlajtol API v2.2.1', // ✨ ACTUALIZADO
     description: 'API para la plataforma de aprendizaje de náhuatl',
+    cors_support: 'enabled with credentials',
     endpoints: {
       health: '/health',
       auth: '/api/auth/*',
