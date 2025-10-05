@@ -50,17 +50,23 @@ let GLOBAL_AUTH_INSTANCE: AuthContextType | null = null;
  * 🔒 AUTH CONTEXT PROVIDER - SIMPLE SINGLETON
  */
 export function AuthProvider({ children }: AuthProviderProps) {
-  console.log(`🔥 AuthProvider ejecutándose...`);
+  console.log(`🔥 AuthProvider ejecutándose...`, new Date().toISOString());
   
   // SIEMPRE crear la instancia local (respeta reglas de hooks)
   const localAuth = useAuthBackend();
   
-  // Si no hay instancia global, usar la local
+  // ✅ CORRECCIÓN SIMPLE: Siempre usar la instancia local más reciente
+  // Si no existe global O si el local no está loading, usar el local
   if (!GLOBAL_AUTH_INSTANCE) {
     console.log(`✅ Estableciendo instancia global por PRIMERA VEZ`);
     GLOBAL_AUTH_INSTANCE = localAuth;
+  } else if (!localAuth.loading && GLOBAL_AUTH_INSTANCE.loading) {
+    // Si la instancia local terminó loading pero la global no, actualizar
+    console.log(`🔄 Instancia local terminó loading, actualizando global`);
+    GLOBAL_AUTH_INSTANCE = localAuth;
   } else {
     console.log(`♻️ Instancia global YA EXISTE - ignorando nueva instancia`);
+    console.log(`🔍 Loading states: global=${GLOBAL_AUTH_INSTANCE.loading}, local=${localAuth.loading}`);
   }
 
   return (

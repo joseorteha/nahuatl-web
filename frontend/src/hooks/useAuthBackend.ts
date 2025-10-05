@@ -365,20 +365,31 @@ export function useAuthBackend() {
               } catch (error) {
                 console.error('⚠️ Error verificando token (no crítico):', error);
                 // No limpiar datos en caso de error de red
+              } finally {
+                // ✅ CORRECCIÓN: setLoading(false) DESPUÉS de verificar el token
+                console.log('🏁 useAuthBackend: Verificación completa, setLoading(false)');
+                setLoading(false);
               }
             }, 2000); // Esperar 2 segundos antes de verificar
+          } else {
+            // Si no hay token, terminar loading inmediatamente
+            console.log('🏁 useAuthBackend: Sin token, setLoading(false) inmediato');
+            setLoading(false);
           }
         } else {
           console.log('❌ No hay datos de autenticación almacenados');
+          // Si no hay datos, terminar loading inmediatamente
+          setLoading(false);
         }
       } catch (error) {
         console.error('💥 Error cargando datos de autenticación:', error);
         setUser(null);
         setTokens(null);
         authPersistence.clearAuthData();
-      } finally {
+        // En caso de error, también terminar loading
         setLoading(false);
       }
+      // ✅ REMOVIDO: finally con setLoading(false) que causaba el problema
     };
 
     loadAuthData();

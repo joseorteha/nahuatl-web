@@ -71,7 +71,8 @@ export default function LogrosTab({ userId }: LogrosTabProps) {
 
   const loadLogrosObtenidos = async () => {
     try {
-      const token = localStorage.getItem('auth_tokens');
+      // Buscar token en sessionStorage primero, luego en localStorage
+      let token = sessionStorage.getItem('auth_tokens') || localStorage.getItem('auth_tokens');
       const parsedTokens = token ? JSON.parse(token) : null;
       const authToken = parsedTokens?.accessToken;
       
@@ -100,7 +101,8 @@ export default function LogrosTab({ userId }: LogrosTabProps) {
 
   const loadLogrosDisponibles = async () => {
     try {
-      const token = localStorage.getItem('auth_tokens');
+      // Buscar token en sessionStorage primero, luego en localStorage
+      let token = sessionStorage.getItem('auth_tokens') || localStorage.getItem('auth_tokens');
       const parsedTokens = token ? JSON.parse(token) : null;
       const authToken = parsedTokens?.accessToken;
       

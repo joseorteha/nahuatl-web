@@ -46,21 +46,30 @@ interface FeaturedContent {
 
 export default function Dashboard() {
   const { user, loading } = useAuth();
+  console.log(`🏠 Dashboard render: user=${user?.username}, loading=${loading}, timestamp=${Date.now()}`);
+  
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [featuredContent, setFeaturedContent] = useState<FeaturedContent | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Protección: redirigir si no hay usuario (después de cargar)
+  // SIMPLIFICADO: Timeout de seguridad para evitar loading infinito
   useEffect(() => {
-    if (!loading && !user) {
-      window.location.href = '/login';
-    }
-  }, [user, loading]);
+    const timeout = setTimeout(() => {
+      if (loading) {
+        console.log('⏰ Dashboard: Timeout de loading alcanzado, forzando carga');
+        setIsLoading(false);
+      }
+    }, 8000); // 8 segundos máximo
+
+    return () => clearTimeout(timeout);
+  }, [loading]);
 
   // Fetch dashboard data with REAL algorithms - MOVER ANTES DE useEffect
   const fetchDashboardData = async () => {
+    console.log('📊 Dashboard: Iniciando fetch de datos...');
     try {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      console.log('📊 Dashboard: API_URL =', API_URL);
       
       // Fetch real data from multiple endpoints
       const [activityResponse, featuredWordResponse, featuredUserResponse] = await Promise.allSettled([
@@ -148,8 +157,10 @@ export default function Dashboard() {
         featuredUser 
       });
 
+      console.log('✅ Dashboard: Datos cargados exitosamente');
+
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
+      console.error('❌ Dashboard: Error fetching data:', error);
       
       // Set fallback data
       setRecentActivity([]);
@@ -168,15 +179,33 @@ export default function Dashboard() {
         }
       });
     } finally {
+      console.log('🏁 Dashboard: Finalizando carga, setIsLoading(false)');
       setIsLoading(false);
     }
   };
 
+  // PRINCIPAL: Manejo unificado de estado de autenticación y carga de datos
   useEffect(() => {
-    if (user?.id) {
-      fetchDashboardData();
+    console.log(`🏠 Dashboard useEffect principal: loading=${loading}, user=${user?.username || 'null'}`);
+    
+    // Si todavía está cargando, no hacer nada
+    if (loading) {
+      console.log('🏠 Dashboard: Todavía en loading, esperando...');
+      return;
     }
-  }, [user?.id]);
+    
+    // Si no hay usuario después de cargar, redirigir
+    if (!user) {
+      console.log('🚨 Dashboard: Sin usuario después de loading, redirigiendo a login');
+      window.location.href = '/login';
+      return;
+    }
+    
+    // Si hay usuario y no está en loading, cargar datos del dashboard
+    console.log('✅ Dashboard: Usuario confirmado, cargando datos del dashboard...');
+    fetchDashboardData();
+    
+  }, [user, loading]); // Dependencias simplificadas
 
   // Función para obtener el saludo apropiado
   const getGreeting = () => {

@@ -66,7 +66,23 @@ export default function ExperienciaSocialPage() {
     
     try {
       setIsLoading(true);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/experiencia-social/${user.id}`);
+      
+      // Buscar token en sessionStorage primero, luego en localStorage
+      let token = sessionStorage.getItem('auth_tokens') || localStorage.getItem('auth_tokens');
+      const parsedTokens = token ? JSON.parse(token) : null;
+      
+      if (!parsedTokens?.accessToken) {
+        console.error('No hay token de autenticación');
+        return;
+      }
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      
+      const response = await fetch(`${API_URL}/api/experiencia-social/${user.id}`, {
+        headers: {
+          'Authorization': `Bearer ${parsedTokens.accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
       if (response.ok) {
         const result = await response.json();
         if (result.success) {

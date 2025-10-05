@@ -5,7 +5,7 @@
   "scripts": {
     "check-env": "node scripts/check-env.js",
     "predev": "npm run check-env",
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

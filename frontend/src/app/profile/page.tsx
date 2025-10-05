@@ -125,7 +125,8 @@ export default function ProfilePage() {
   const loadUserStats = useCallback(async (userId: string) => {
     try {
       setIsLoadingStats(true);
-      const token = localStorage.getItem('auth_tokens');
+      // Buscar token en sessionStorage primero, luego en localStorage
+      let token = sessionStorage.getItem('auth_tokens') || localStorage.getItem('auth_tokens');
       const parsedTokens = token ? JSON.parse(token) : null;
       
       const response = await fetch(`${API_URL}/api/auth/stats/${userId}`, {
@@ -153,7 +154,8 @@ export default function ProfilePage() {
   const loadContributionsStats = useCallback(async (userId: string) => {
     try {
       setIsLoadingContributions(true);
-      const token = localStorage.getItem('auth_tokens');
+      // Buscar token en sessionStorage primero, luego en localStorage
+      let token = sessionStorage.getItem('auth_tokens') || localStorage.getItem('auth_tokens');
       const parsedTokens = token ? JSON.parse(token) : null;
       
       // Cargar estadísticas de contribuciones
@@ -316,8 +318,8 @@ export default function ProfilePage() {
     setMessage(null);
 
     try {
-      // Obtener token del localStorage
-      const storedTokens = localStorage.getItem('auth_tokens');
+      // Buscar token en sessionStorage primero, luego en localStorage
+      let storedTokens = sessionStorage.getItem('auth_tokens') || localStorage.getItem('auth_tokens');
       const tokens = storedTokens ? JSON.parse(storedTokens) : null;
       
       if (!tokens?.accessToken) {

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Limpiar Service Worker</title>
+</head>
+<body>
+    <h1>Limpiando Service Worker...</h1>
+    <div id="status">Procesando...</div>
+    
+    <script>
+        async function clearServiceWorker() {
+            const statusDiv = document.getElementById('status');
+            
+            if ('serviceWorker' in navigator) {
+                try {
+                    // Obtener todas las registraciones
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    
+                    if (registrations.length === 0) {
+                        statusDiv.innerHTML = '✅ No hay Service Workers registrados';
+                        return;
+                    }
+                    
+                    // Desregistrar todos los Service Workers
+                    for (let registration of registrations) {
+                        await registration.unregister();
+                        console.log('SW desregistrado:', registration);
+                    }
+                    
+                    statusDiv.innerHTML = `✅ ${registrations.length} Service Worker(s) desregistrados correctamente`;
+                    
+                    // Limpiar caché
+                    if ('caches' in window) {
+                        const cacheNames = await caches.keys();
+                        await Promise.all(
+                            cacheNames.map(cacheName => caches.delete(cacheName))
+                        );
+                        statusDiv.innerHTML += '<br>✅ Caché limpiado';
+                    }
+                    
+                    statusDiv.innerHTML += '<br><br><strong>🔄 Recarga la página principal ahora</strong>';
+                    
+                } catch (error) {
+                    statusDiv.innerHTML = '❌ Error: ' + error.message;
+                    console.error('Error limpiando SW:', error);
+                }
+            } else {
+                statusDiv.innerHTML = '❌ Service Workers no soportados';
+            }
+        }
+        
+        // Ejecutar automáticamente
+        clearServiceWorker();
+    </script>
+</body>
+</html>

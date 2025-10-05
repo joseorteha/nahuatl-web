@@ -102,7 +102,8 @@ export default function ComunidadTab({ userId }: ComunidadTabProps) {
       setIsLoading(true);
       setError(null);
 
-      const token = localStorage.getItem('auth_tokens');
+      // Buscar token en sessionStorage primero, luego en localStorage
+      let token = sessionStorage.getItem('auth_tokens') || localStorage.getItem('auth_tokens');
       const parsedTokens = token ? JSON.parse(token) : null;
 
       const response = await fetch(`${API_URL}/api/profile/comunidad/${userId}`, {
