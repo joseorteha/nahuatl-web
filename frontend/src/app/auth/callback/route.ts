@@ -157,12 +157,32 @@ export async function GET(request: Request) {
             
             const userData = JSON.parse(decodeURIComponent(userParam));
             
-            // Guardar en ambos lugares para máxima compatibilidad usando las claves correctas
-            sessionStorage.setItem('auth_tokens', JSON.stringify(authTokens));
-            sessionStorage.setItem('user_data', JSON.stringify(userData));
-            localStorage.setItem('auth_tokens', JSON.stringify(authTokens));
-            localStorage.setItem('user_data', JSON.stringify(userData));
-            localStorage.setItem('remember_me', 'true'); // Marcar como sesión persistente por OAuth
+            // Detectar si el usuario tenia preferencia de "recordarme" antes del OAuth
+            const hadRememberMePreference = localStorage.getItem('remember_me') === 'true';
+            const shouldPersist = hadRememberMePreference; // Respetar la preferencia previa
+            
+            console.log('OAuth: Respetando preferencia de recordarme:', shouldPersist);
+            
+            if (shouldPersist) {
+              // Guardar en localStorage para sesion persistente
+              localStorage.setItem('auth_tokens', JSON.stringify(authTokens));
+              localStorage.setItem('user_data', JSON.stringify(userData));
+              localStorage.setItem('remember_me', 'true');
+              localStorage.setItem('last_login', new Date().toISOString());
+              localStorage.setItem('last_activity', new Date().toISOString());
+              // Limpiar sessionStorage
+              sessionStorage.removeItem('auth_tokens');
+              sessionStorage.removeItem('user_data');
+            } else {
+              // Guardar en sessionStorage para sesion temporal
+              sessionStorage.setItem('auth_tokens', JSON.stringify(authTokens));
+              sessionStorage.setItem('user_data', JSON.stringify(userData));
+              sessionStorage.setItem('last_activity', new Date().toISOString());
+              // Limpiar localStorage
+              localStorage.removeItem('auth_tokens');
+              localStorage.removeItem('user_data');
+              localStorage.removeItem('remember_me');
+            }
             
             console.log('✅ Datos guardados en sessionStorage y localStorage con claves correctas');
             

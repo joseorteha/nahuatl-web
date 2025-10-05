@@ -331,8 +331,12 @@ export function useAuthBackend() {
           setUser(storedUser);
           setTokens(storedTokens);
           
-          // Actualizar timestamp de actividad
-          authPersistence.updateLastActivity();
+          // Actualizar timestamp de actividad solo si hay sesión persistente
+          if (authPersistence.shouldPersistSession()) {
+            authPersistence.updateLastActivity();
+          }
+
+          console.log(`✅ Sesión cargada desde ${authPersistence.persistenceType}${authPersistence.isPWA ? ' (PWA)' : ''}`);
 
           // 🔥 VERIFICACIÓN DE TOKEN CON REQUEST POOLING
           // Evita múltiples verificaciones simultáneas
@@ -358,6 +362,8 @@ export function useAuthBackend() {
                     authPersistence.clearAuthData();
                   } else {
                     console.log('✅ Token válido, usuario confirmado');
+                    // Actualizar actividad después de verificación exitosa
+                    authPersistence.updateLastActivity();
                   }
                   
                   return response;

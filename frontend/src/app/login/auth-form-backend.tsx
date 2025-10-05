@@ -207,6 +207,15 @@ export default function AuthFormBackend() {
     setError(null);
     
     try {
+      // 🔥 IMPORTANTE: Guardar la preferencia de "recordarme" antes del OAuth
+      if (rememberMe) {
+        localStorage.setItem('remember_me', 'true');
+        console.log('✅ Preferencia de recordarme establecida para OAuth');
+      } else {
+        localStorage.removeItem('remember_me');
+        console.log('🔄 Sesión temporal seleccionada para OAuth');
+      }
+      
       // Redirigir al backend para OAuth
       const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
       window.location.href = `${backendUrl}/api/auth/google`;

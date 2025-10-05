@@ -1,4 +1,4 @@
-// hooks/useAuthPersistence.ts - Sistema de persistencia de autenticación mejorado
+// hooks/useAuthPersistence.ts - Sistema de persistencia de autenticación mejorado para PWA
 import { useState, useEffect } from 'react';
 import { setAuthCookie, removeAuthCookie } from '@/lib/utils/cookies';
 
@@ -35,11 +35,18 @@ const STORAGE_KEYS = {
   AUTH_TOKENS: 'auth_tokens',
   USER_DATA: 'user_data',
   REMEMBER_ME: 'remember_me',
-  LAST_LOGIN: 'last_login'
+  LAST_LOGIN: 'last_login',
+  LAST_ACTIVITY: 'last_activity'
 };
 
 export function useAuthPersistence() {
   const [persistenceType, setPersistenceType] = useState<'localStorage' | 'sessionStorage'>('sessionStorage');
+
+  // Detectar si está en PWA para ajustar estrategias
+  const isPWA = typeof window !== 'undefined' && 
+               (window.matchMedia('(display-mode: standalone)').matches ||
+                (window.navigator as any).standalone ||
+                document.referrer.includes('android-app://'));
 
   // Detectar tipo de almacenamiento preferido
   useEffect(() => {
@@ -47,7 +54,13 @@ export function useAuthPersistence() {
     if (rememberMe === 'true') {
       setPersistenceType('localStorage');
     }
-  }, []);
+    
+    // En PWA, tendemos a preferir localStorage para mejor experiencia
+    if (isPWA && rememberMe !== 'false') {
+      console.log('📱 PWA detectada - usando persistencia mejorada');
+      setPersistenceType('localStorage');
+    }
+  }, [isPWA]);
 
   // Obtener el storage apropiado
   const getStorage = () => {
@@ -61,9 +74,17 @@ export function useAuthPersistence() {
       const storage = rememberMe ? localStorage : sessionStorage;
       const otherStorage = rememberMe ? sessionStorage : localStorage;
       
+      console.log(`💾 Guardando sesión ${rememberMe ? 'PERSISTENTE' : 'TEMPORAL'} en ${rememberMe ? 'localStorage' : 'sessionStorage'}`);
+      
       // Limpiar el otro storage para evitar conflictos
       otherStorage.removeItem(STORAGE_KEYS.AUTH_TOKENS);
       otherStorage.removeItem(STORAGE_KEYS.USER_DATA);
+      
+      // Si cambiamos de persistente a temporal, también limpiar la preferencia
+      if (!rememberMe) {
+        localStorage.removeItem(STORAGE_KEYS.REMEMBER_ME);
+        localStorage.removeItem(STORAGE_KEYS.LAST_LOGIN);
+      }
       
       // Guardar en el storage apropiado
       storage.setItem(STORAGE_KEYS.AUTH_TOKENS, JSON.stringify({
@@ -100,16 +121,37 @@ export function useAuthPersistence() {
   // Cargar datos de autenticación
   const loadAuthData = (): { user: User | null; tokens: AuthTokens | null } => {
     try {
-      // Intentar cargar desde localStorage primero (sesión persistente)
-      let storage = localStorage;
-      let tokens = localStorage.getItem(STORAGE_KEYS.AUTH_TOKENS);
-      let userData = localStorage.getItem(STORAGE_KEYS.USER_DATA);
+      // Verificar si el usuario eligió "recordarme"
+      const rememberMePreference = localStorage.getItem(STORAGE_KEYS.REMEMBER_ME) === 'true';
       
-      // Si no hay en localStorage, intentar sessionStorage
-      if (!tokens || !userData) {
+      let storage: Storage;
+      let tokens: string | null = null;
+      let userData: string | null = null;
+      
+      // Si tiene preferencia de recordarme, usar localStorage
+      if (rememberMePreference) {
+        storage = localStorage;
+        tokens = localStorage.getItem(STORAGE_KEYS.AUTH_TOKENS);
+        userData = localStorage.getItem(STORAGE_KEYS.USER_DATA);
+        console.log('📱 Cargando desde localStorage (sesión persistente)');
+      } else {
+        // Si no, usar sessionStorage
         storage = sessionStorage;
         tokens = sessionStorage.getItem(STORAGE_KEYS.AUTH_TOKENS);
         userData = sessionStorage.getItem(STORAGE_KEYS.USER_DATA);
+        console.log('🔄 Cargando desde sessionStorage (sesión temporal)');
+      }
+      
+      // Si no encuentra datos en el storage preferido, intentar el otro como fallback
+      if (!tokens || !userData) {
+        const fallbackStorage = rememberMePreference ? sessionStorage : localStorage;
+        tokens = fallbackStorage.getItem(STORAGE_KEYS.AUTH_TOKENS);
+        userData = fallbackStorage.getItem(STORAGE_KEYS.USER_DATA);
+        
+        if (tokens && userData) {
+          console.log(`🔄 Datos encontrados en fallback (${fallbackStorage === localStorage ? 'localStorage' : 'sessionStorage'})`);
+          storage = fallbackStorage;
+        }
       }
       
       if (tokens && userData) {
@@ -119,11 +161,28 @@ export function useAuthPersistence() {
         // Verificar si la sesión no ha expirado (para localStorage)
         if (storage === localStorage) {
           const lastLogin = storage.getItem(STORAGE_KEYS.LAST_LOGIN);
+          const lastActivity = storage.getItem(STORAGE_KEYS.LAST_ACTIVITY);
+          
           if (lastLogin) {
             const daysSinceLogin = (Date.now() - new Date(lastLogin).getTime()) / (1000 * 60 * 60 * 24);
-            // Si han pasado más de 30 días, limpiar sesión
-            if (daysSinceLogin > 30) {
-              console.log('🔄 Sesión expirada (más de 30 días), limpiando datos');
+            
+            // Para PWA, usar timeouts más largos (90 días vs 30 días)
+            const maxDays = isPWA ? 90 : 30;
+            
+            if (daysSinceLogin > maxDays) {
+              console.log(`🔄 Sesión expirada (más de ${maxDays} días), limpiando datos`);
+              clearAuthData();
+              return { user: null, tokens: null };
+            }
+          }
+          
+          // Verificar actividad reciente (solo para sesiones muy largas)
+          if (lastActivity) {
+            const daysSinceActivity = (Date.now() - new Date(lastActivity).getTime()) / (1000 * 60 * 60 * 24);
+            
+            // Si no hay actividad en más de 180 días, limpiar (solo para PWA)
+            if (isPWA && daysSinceActivity > 180) {
+              console.log('🔄 Inactividad prolongada en PWA, limpiando datos');
               clearAuthData();
               return { user: null, tokens: null };
             }
@@ -154,11 +213,13 @@ export function useAuthPersistence() {
       localStorage.removeItem(STORAGE_KEYS.AUTH_TOKENS);
       localStorage.removeItem(STORAGE_KEYS.USER_DATA);
       localStorage.removeItem(STORAGE_KEYS.LAST_LOGIN);
+      localStorage.removeItem(STORAGE_KEYS.LAST_ACTIVITY);
       localStorage.removeItem(STORAGE_KEYS.REMEMBER_ME);
       
       sessionStorage.removeItem(STORAGE_KEYS.AUTH_TOKENS);
       sessionStorage.removeItem(STORAGE_KEYS.USER_DATA);
       sessionStorage.removeItem(STORAGE_KEYS.LAST_LOGIN);
+      sessionStorage.removeItem(STORAGE_KEYS.LAST_ACTIVITY);
       
       // 🍪 IMPORTANTE: Eliminar cookie de autenticación
       removeAuthCookie();
@@ -173,9 +234,16 @@ export function useAuthPersistence() {
   // Actualizar timestamp de última actividad
   const updateLastActivity = () => {
     try {
-      const storage = getStorage();
-      if (storage && storage.getItem(STORAGE_KEYS.AUTH_TOKENS)) {
-        storage.setItem(STORAGE_KEYS.LAST_LOGIN, new Date().toISOString());
+      // Solo actualizar si hay una sesión activa
+      const currentStorage = persistenceType === 'localStorage' ? localStorage : sessionStorage;
+      
+      if (currentStorage.getItem(STORAGE_KEYS.AUTH_TOKENS)) {
+        currentStorage.setItem(STORAGE_KEYS.LAST_ACTIVITY, new Date().toISOString());
+        
+        // Para localStorage también actualizar LAST_LOGIN para mantener la sesión fresca
+        if (persistenceType === 'localStorage') {
+          localStorage.setItem(STORAGE_KEYS.LAST_LOGIN, new Date().toISOString());
+        }
       }
     } catch (error) {
       console.error('Error actualizando última actividad:', error);
@@ -219,7 +287,8 @@ export function useAuthPersistence() {
     updateLastActivity,
     shouldPersistSession,
     persistCurrentSession,
-    persistenceType
+    persistenceType,
+    isPWA
   };
 }
 
