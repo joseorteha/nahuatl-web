@@ -62,8 +62,8 @@ export function usePWA() {
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
-    // Register service worker
-    if ('serviceWorker' in navigator) {
+    // Register service worker - SOLO en producción
+    if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
       navigator.serviceWorker
         .register('/sw.js')
         .then((registration) => {

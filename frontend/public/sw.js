@@ -66,6 +66,15 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // SKIP Next.js internal chunks and HMR in development
+  if (url.pathname.includes('/_next/') || 
+      url.pathname.includes('webpack-hmr') || 
+      url.pathname.includes('__nextjs_original-stack-frame') ||
+      url.pathname.includes('node_modules_')) {
+    // Let Next.js handle these directly - no service worker interference
+    return;
+  }
+
   // Handle API requests - network first, cache fallback
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(
