@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const { supabase } = require('../config/database');
 const { authenticateToken } = require('../middleware/auth');
+const { NotificationService } = require('../services/notificationService');
+
+const notificationService = new NotificationService();
 
 // GET /api/experiencia-social/:userId - Obtener estadísticas de experiencia social
 router.get('/:userId', async (req, res) => {
@@ -332,37 +335,17 @@ router.post('/crear-notificacion', authenticateToken, async (req, res) => {
 
     console.log('🔔 Creando notificación:', { usuarioDestino, tipo, titulo });
 
-    const { data: notificacion, error: notificacionError } = await supabase
-      .from('notificaciones')
-      .insert({
-        usuario_id: usuarioDestino,
-        tipo_notificacion: tipo,
-        titulo,
-        mensaje,
-        relacionado_id: datosAdicionales?.tema_id || datosAdicionales?.respuesta_id || null,
-        relacionado_tipo: datosAdicionales?.tema_id ? 'feedback' : datosAdicionales?.respuesta_id ? 'respuesta' : 'usuario',
-        leida: false,
-        fecha_creacion: new Date().toISOString()
-      })
-      .select()
-      .single();
-
-    if (notificacionError) {
-      console.error('❌ Error creando notificación:', notificacionError);
-      throw notificacionError;
-    }
+    // Usar el nuevo NotificationService
+    const notificacion = await notificationService.crearNotificacion({
+      usuario_id: usuarioDestino,
+      tipo: tipo,
+      titulo: titulo,
+      mensaje: mensaje,
+      relacionado_id: datosAdicionales?.tema_id || datosAdicionales?.respuesta_id || null,
+      relacionado_tipo: datosAdicionales?.tema_id ? 'tema' : datosAdicionales?.respuesta_id ? 'respuesta' : 'usuario'
+    });
 
     console.log('✅ Notificación creada:', notificacion.id);
-
-    // Enviar push notification si está disponible
-    try {
-      const pushNotificationService = require('../services/pushNotificationService');
-      await pushNotificationService.sendNotificationByType(usuarioDestino, tipo, datosAdicionales);
-      console.log('✅ Push notification enviada');
-    } catch (pushError) {
-      console.warn('⚠️ Error enviando push notification (no crítico):', pushError.message);
-      // No fallar la operación principal si la push notification falla
-    }
 
     res.status(201).json({
       success: true,

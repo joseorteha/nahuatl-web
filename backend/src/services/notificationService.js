@@ -356,10 +356,9 @@ class NotificationService {
   async enviarPushNotification(usuarioId, payload) {
     try {
       // Importar dinámicamente para evitar dependencias circulares
-      const { PushNotificationService } = require('./pushNotificationService');
-      const pushService = new PushNotificationService();
+      const pushNotificationService = require('./pushNotificationService');
       
-      await pushService.sendToUser(usuarioId, payload);
+      await pushNotificationService.sendToUser(usuarioId, payload);
     } catch (error) {
       console.log('📱 Push notification no disponible o falló:', error.message);
       // No lanzar error, las push notifications son opcionales
