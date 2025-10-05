@@ -91,6 +91,15 @@ class AuthController {
       const accessToken = generateToken(user.id, user.email);
       const refreshToken = generateRefreshToken(user.id);
 
+      // 🍪 GUARDAR EN SESIÓN DE COOKIES TAMBIÉN
+      req.session.userId = user.id;
+      req.session.userEmail = user.email;
+      
+      console.log('🍪 Sesión guardada en cookies:', { 
+        userId: req.session.userId, 
+        sessionID: req.sessionID 
+      });
+
       res.json({
         message: 'Login exitoso',
         user,
@@ -366,8 +375,19 @@ class AuthController {
    */
   async logout(req, res) {
     try {
-      // En un sistema más avanzado, aquí podrías invalidar el token
-      // agregándolo a una lista negra en Redis o BD
+      // 🍪 LIMPIAR SESIÓN DE COOKIES
+      if (req.session) {
+        req.session.destroy((err) => {
+          if (err) {
+            console.error('Error destruyendo sesión:', err);
+          } else {
+            console.log('🍪 Sesión de cookies destruida exitosamente');
+          }
+        });
+      }
+      
+      // Limpiar cookie de sesión
+      res.clearCookie('connect.sid');
       
       res.json({
         message: 'Sesión cerrada exitosamente'
@@ -395,6 +415,73 @@ class AuthController {
       res.status(500).json({ 
         error: 'Error iniciando autenticación con Google',
         message: error.message 
+      });
+    }
+  }
+
+  /**
+   * Verificar sesión actual (usando cookies de sesión)
+   * @param {Request} req - Objeto de request
+   * @param {Response} res - Objeto de response
+   */
+  async checkSession(req, res) {
+    try {
+      console.log('🔍 Verificando sesión de cookies...');
+      console.log('Session:', req.session);
+      console.log('User en session:', req.user);
+      
+      // Si hay un usuario en la sesión (OAuth)
+      if (req.user) {
+        console.log('✅ Usuario encontrado en sesión:', req.user.email);
+        
+        // Generar tokens JWT para el usuario de la sesión
+        const accessToken = generateToken(req.user.id, req.user.email);
+        const refreshToken = generateRefreshToken(req.user.id);
+        
+        return res.json({
+          success: true,
+          user: req.user,
+          accessToken,
+          refreshToken,
+          expiresIn: process.env.JWT_EXPIRY || '7d',
+          sessionType: 'oauth'
+        });
+      }
+      
+      // Si hay session.userId (login manual)
+      if (req.session?.userId) {
+        console.log('🔍 Buscando usuario por session.userId:', req.session.userId);
+        
+        const userProfile = await userService.getUserProfile(req.session.userId);
+        if (userProfile) {
+          console.log('✅ Usuario encontrado por sessionId:', userProfile.email);
+          
+          // Generar tokens JWT
+          const accessToken = generateToken(userProfile.id, userProfile.email);
+          const refreshToken = generateRefreshToken(userProfile.id);
+          
+          return res.json({
+            success: true,
+            user: userProfile,
+            accessToken,
+            refreshToken,
+            expiresIn: process.env.JWT_EXPIRY || '7d',
+            sessionType: 'manual'
+          });
+        }
+      }
+      
+      console.log('❌ No hay sesión activa');
+      res.status(401).json({
+        success: false,
+        error: 'No hay sesión activa'
+      });
+    } catch (error) {
+      console.error('Error verificando sesión:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Error interno del servidor',
+        message: error.message
       });
     }
   }

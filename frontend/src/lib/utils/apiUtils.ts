@@ -83,6 +83,7 @@ export async function robustApiCall<T = any>(
           ...headers,
         },
         body,
+        credentials: 'include',
         signal: controller.signal,
       });
 

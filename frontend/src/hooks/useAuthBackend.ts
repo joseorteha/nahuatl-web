@@ -97,6 +97,7 @@ export function useAuthBackend() {
         body: JSON.stringify({
           refreshToken: tokens.refreshToken,
         }),
+        credentials: 'include',
       });
 
       if (response.ok) {
@@ -353,6 +354,7 @@ export function useAuthBackend() {
                       'Content-Type': 'application/json',
                       'Authorization': `Bearer ${storedTokens.accessToken}`,
                     },
+                    credentials: 'include',
                   });
                   
                   if (!response.ok) {

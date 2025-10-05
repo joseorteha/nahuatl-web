@@ -16,6 +16,9 @@ router.post('/login', validateLogin, authController.login);
 // POST /api/auth/refresh - Renovar token
 router.post('/refresh', authController.refreshToken);
 
+// GET /api/auth/check-session - Verificar sesión de cookies
+router.get('/check-session', authController.checkSession);
+
 // GET /api/auth/profile/:userId - Obtener perfil público (sin autenticación)
 router.get('/profile/:userId', validateUUID('userId'), authController.getPublicProfile);
 

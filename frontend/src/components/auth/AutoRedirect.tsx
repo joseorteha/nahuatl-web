@@ -26,33 +26,68 @@ export default function AutoRedirect({ redirectTo = '/dashboard' }: AutoRedirect
         // Pequeño delay para evitar flickering
         await new Promise(resolve => setTimeout(resolve, 300));
 
-        // Verificar si hay datos de autenticación almacenados
+        console.log('🔍 AutoRedirect: Verificando autenticación...');
+
+        // 1. Primero verificar datos locales (más rápido)
         const authData = authPersistence.loadAuthData();
         
         if (authData?.user && authData?.tokens) {
-          // Verificar que la sesión no haya expirado usando el timestamp interno
           const tokensData = authData.tokens as any;
           if (tokensData.expiresIn) {
             const expiresAt = parseInt(tokensData.expiresIn);
             const now = Date.now();
             
             if (expiresAt > now) {
-              console.log('🔄 Usuario autenticado detectado en landing, redirigiendo a:', redirectTo);
+              console.log('🔄 JWT válido encontrado, redirigiendo a:', redirectTo);
               router.push(redirectTo);
               return;
-            } else {
-              console.log('⚠️ Token expirado, limpiando datos');
-              authPersistence.clearAuthData();
             }
-          } else {
-            // Si no hay expiresIn, verificar por fecha de último login
-            console.log('🔄 Usuario autenticado sin timestamp, redirigiendo a:', redirectTo);
-            router.push(redirectTo);
-            return;
           }
         }
+
+        // 2. Si no hay JWT válido, verificar sesión de cookies en el servidor
+        console.log('🍪 Verificando sesión de cookies en el servidor...');
         
-        console.log('ℹ️ No hay sesión activa, mostrando landing');
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+        
+        try {
+          const response = await fetch(`${API_URL}/api/auth/check-session`, {
+            method: 'GET',
+            credentials: 'include', // ✨ INCLUIR COOKIES
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (response.ok) {
+            const sessionData = await response.json();
+            
+            if (sessionData.success && sessionData.user) {
+              console.log('🍪 Sesión de cookies válida encontrada, guardando datos y redirigiendo');
+              
+              // Guardar datos de sesión localmente para futuras verificaciones
+              const authTokens = {
+                accessToken: sessionData.accessToken,
+                refreshToken: sessionData.refreshToken,
+                expiresIn: sessionData.expiresIn,
+              };
+              
+              // Determinar si guardar persistente basado en tipo de sesión
+              const shouldPersist = sessionData.sessionType === 'oauth' || 
+                                  localStorage.getItem('remember_me') === 'true';
+              
+              authPersistence.saveAuthData(sessionData.user, authTokens, shouldPersist);
+              
+              console.log('🔄 Datos de sesión guardados, redirigiendo a:', redirectTo);
+              router.push(redirectTo);
+              return;
+            }
+          }
+        } catch (error) {
+          console.log('⚠️ Error verificando sesión de cookies (normal si no hay sesión):', error);
+        }
+        
+        console.log('ℹ️ No hay sesión activa (ni JWT ni cookies), mostrando landing');
       } catch (error) {
         console.error('❌ Error verificando autenticación para auto-redirect:', error);
       } finally {
