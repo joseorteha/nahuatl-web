@@ -4,6 +4,7 @@ import './globals.css';
 import Footer from '@/components/navigation/Footer';
 import { ThemeProvider } from '@/components/shared/theme-provider';
 import ErrorBoundary from '@/components/shared/ErrorBoundary';
+import ServerStatusProvider from '@/components/providers/ServerStatusProvider';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
@@ -37,10 +38,12 @@ export default function RootLayout({
       <body className="bg-neutral-50 dark:bg-gray-900 text-neutral-800 dark:text-gray-100 min-h-screen font-sans transition-colors duration-300">
         <ErrorBoundary>
           <ThemeProvider>
-            <div className="flex-1 flex flex-col">
-              {children}
-            </div>
-            <Footer />
+            <ServerStatusProvider>
+              <div className="flex-1 flex flex-col">
+                {children}
+              </div>
+              <Footer />
+            </ServerStatusProvider>
           </ThemeProvider>
         </ErrorBoundary>
       </body>

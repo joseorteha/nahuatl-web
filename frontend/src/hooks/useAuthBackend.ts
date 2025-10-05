@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthPersistence } from './useAuthPersistence';
+import { robustApiCall, warmUpServer } from '@/lib/utils/apiUtils';
 
 interface User {
   id: string;
@@ -132,36 +133,43 @@ export function useAuthBackend() {
     try {
       setLoading(true);
       
-      const response = await fetch(`${API_URL}/api/auth/login`, {
+      // Intentar calentar el servidor primero
+      console.log('🔥 Preparando conexión con el servidor...');
+      await warmUpServer(API_URL);
+      
+      const response = await robustApiCall(`${API_URL}/api/auth/login`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({ email, password }),
+        timeout: 30000, // 30 segundos para cold starts
+        retries: 3
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
+      if (response.success && response.data) {
         const authTokens: AuthTokens = {
-          accessToken: data.accessToken,
-          refreshToken: data.refreshToken,
-          expiresIn: data.expiresIn,
+          accessToken: response.data.accessToken,
+          refreshToken: response.data.refreshToken,
+          expiresIn: response.data.expiresIn,
         };
 
-        setUser(data.user);
+        setUser(response.data.user);
         setTokens(authTokens);
         
         // Usar el nuevo sistema de persistencia
-        authPersistence.saveAuthData(data.user, authTokens, rememberMe);
+        authPersistence.saveAuthData(response.data.user, authTokens, rememberMe);
         
-        return { success: true, user: data.user };
+        return { success: true, user: response.data.user };
       } else {
-        return { success: false, error: data.error || 'Error de autenticación' };
+        return { 
+          success: false, 
+          error: response.error || 'Error de autenticación'
+        };
       }
     } catch (error) {
       console.error('Error en login:', error);
-      return { success: false, error: 'Error de conexión' };
+      return { 
+        success: false, 
+        error: 'Error de conexión. El servidor puede estar iniciando, intenta de nuevo en unos segundos.'
+      };
     } finally {
       setLoading(false);
     }
@@ -177,40 +185,47 @@ export function useAuthBackend() {
     try {
       setLoading(true);
       
-      const response = await fetch(`${API_URL}/api/auth/register`, {
+      // Intentar calentar el servidor primero
+      console.log('🔥 Preparando conexión con el servidor para registro...');
+      await warmUpServer(API_URL);
+      
+      const response = await robustApiCall(`${API_URL}/api/auth/register`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(userData),
+        timeout: 30000, // 30 segundos para cold starts
+        retries: 3
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
+      if (response.success && response.data) {
         const authTokens: AuthTokens = {
-          accessToken: data.accessToken,
-          refreshToken: data.refreshToken,
-          expiresIn: data.expiresIn,
+          accessToken: response.data.accessToken,
+          refreshToken: response.data.refreshToken,
+          expiresIn: response.data.expiresIn,
         };
 
-        setUser(data.user);
+        setUser(response.data.user);
         setTokens(authTokens);
         
-        // Usar el nuevo sistema de persistencia (por defecto no recordar en registro)
-        authPersistence.saveAuthData(data.user, authTokens, false);
+        // Usar el nuevo sistema de persistencia (auto-recordar en registro)
+        authPersistence.saveAuthData(response.data.user, authTokens, true);
         
-        return { success: true, user: data.user };
+        return { success: true, user: response.data.user };
       } else {
-        return { success: false, error: data.error || 'Error de registro' };
+        return { 
+          success: false, 
+          error: response.error || 'Error en el registro'
+        };
       }
     } catch (error) {
       console.error('Error en registro:', error);
-      return { success: false, error: 'Error de conexión' };
+      return { 
+        success: false, 
+        error: 'Error de conexión. El servidor puede estar iniciando, intenta de nuevo en unos segundos.'
+      };
     } finally {
       setLoading(false);
     }
-  }, [API_URL]);
+  }, [API_URL, authPersistence]);
 
   // Función de logout
   const signOut = useCallback(async () => {
@@ -235,31 +250,40 @@ export function useAuthBackend() {
     if (!user) return { success: false, error: 'No hay usuario autenticado' };
 
     try {
-      const response = await apiCall(`/api/auth/profile/${user.id}`, {
+      const response = await robustApiCall(`${API_URL}/api/auth/profile/${user.id}`, {
         method: 'PUT',
         body: JSON.stringify(updateData),
+        headers: tokens?.accessToken ? { 
+          'Authorization': `Bearer ${tokens.accessToken}` 
+        } : {},
+        timeout: 15000, // 15 segundos suficiente para actualizaciones
+        retries: 2
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        setUser(data.user);
+      if (response.success && response.data) {
+        setUser(response.data.user);
         
         // Actualizar los datos del usuario manteniendo la persistencia actual
         if (tokens) {
           const rememberMe = authPersistence.shouldPersistSession();
-          authPersistence.saveAuthData(data.user, tokens, rememberMe);
+          authPersistence.saveAuthData(response.data.user, tokens, rememberMe);
         }
         
-        return { success: true, user: data.user };
+        return { success: true, user: response.data.user };
       } else {
-        return { success: false, error: data.error || 'Error actualizando perfil' };
+        return { 
+          success: false, 
+          error: response.error || 'Error actualizando perfil' 
+        };
       }
     } catch (error) {
       console.error('Error actualizando perfil:', error);
-      return { success: false, error: 'Error de conexión' };
+      return { 
+        success: false, 
+        error: 'Error de conexión al actualizar perfil' 
+      };
     }
-  }, [user]);
+  }, [user, tokens, API_URL, authPersistence]);
 
   // Cargar datos de autenticación al inicializar
   useEffect(() => {
