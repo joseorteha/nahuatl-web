@@ -39,10 +39,10 @@ const app = express();
 // Seguridad
 app.use(helmet());
 
-// Rate limiting - Configuración MÁS ESTRICTA para producción
+// Rate limiting - Configuración MÁS PERMISIVA para producción inicial
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
-  max: process.env.NODE_ENV === 'production' ? 100 : 1000, // 100 en prod, 1000 en dev
+  max: process.env.NODE_ENV === 'production' ? 500 : 1000, // 500 en prod, 1000 en dev
   message: {
     error: 'Demasiadas peticiones',
     message: 'Has excedido el límite de peticiones. Intenta de nuevo en 15 minutos.'
@@ -52,13 +52,16 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// CORS
+// CORS - Configuración mejorada
 app.use(cors({
   origin: function (origin, callback) {
     // Permitir requests sin origin (como mobile apps o Postman)
     if (!origin) return callback(null, true);
     
     const allowedOrigins = config.CORS_ORIGIN;
+    console.log('CORS: Checking origin:', origin);
+    console.log('CORS: Allowed origins:', allowedOrigins);
+    
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
@@ -67,9 +70,19 @@ app.use(cors({
     }
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  optionsSuccessStatus: 200
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: [
+    'Content-Type', 
+    'Authorization', 
+    'X-Requested-With',
+    'Accept',
+    'Origin',
+    'Access-Control-Request-Method',
+    'Access-Control-Request-Headers'
+  ],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  optionsSuccessStatus: 200,
+  preflightContinue: false
 }));
 
 // Configuración de codificación UTF-8
