@@ -30,6 +30,6 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: VAPID_PUBLIC_KEY
-        value: ""
+        value: "BPjD0kTgU02W_3ySXv-ZUbuOeLco96ymIJYU13XM0IMyJAwQ8encdTH5PE_zdq-AwyjEKVSHUUTGEc_pgG3dRvI"
       - key: VAPID_PRIVATE_KEY
-        value: ""
+        value: "M0iS6Ey1paPUN8CwrRYtFD_W7Oqu-A0JoC4JJHBXCoY"

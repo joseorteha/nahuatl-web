@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { ThemeToggle } from '../shared/ThemeToggle';
 import { useAuth } from '@/contexts/AuthContext';
+import NotificationCenter from '../features/notifications/NotificationCenter';
 
 export default function Header() {
   const { user, loading, signOut } = useAuth();
@@ -227,6 +228,10 @@ export default function Header() {
           {/* User menu / Auth - Responsive */}
           <div className="flex items-center gap-2 sm:gap-3">
             <ThemeToggle />
+            
+            {/* Notification Center - Solo para usuarios logueados */}
+            {user && <NotificationCenter />}
+            
             {loading ? (
               <div className="w-8 h-8 sm:w-10 sm:h-10 bg-slate-200 dark:bg-slate-700 rounded-xl animate-pulse"></div>
             ) : user ? (
@@ -320,9 +325,13 @@ export default function Header() {
               {/* User info - Responsive */}
               <div className="flex items-center gap-3 sm:gap-4 px-3 sm:px-4 py-3 sm:py-4 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-2xl mb-4 sm:mb-6">
                 {renderAvatar(user.url_avatar, 40)}
-                <div className="flex flex-col">
+                <div className="flex flex-col flex-1">
                   <span className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100">{user.nombre_completo || user.email || 'Usuario'}</span>
                   <span className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">{user.email}</span>
+                </div>
+                {/* Notification Center Mobile */}
+                <div className="flex-shrink-0">
+                  <NotificationCenter />
                 </div>
               </div>
 
