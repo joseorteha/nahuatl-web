@@ -17,4 +17,4 @@ cd ..
 
 echo "✅ Despliegue completado!"
 echo "🌐 Frontend: https://nahuatl-web.vercel.app"
-echo "🔧 Backend: https://nahuatl-web.onrender.com"
+echo "🔧 Backend: https://nahuatl-web-xmeo.onrender.com"

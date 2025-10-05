@@ -48,7 +48,7 @@ export default function ContributeWordForm({ userId, userEmail, onSuccess }: Con
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web.onrender.com';
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web-xmeo.onrender.com';
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;

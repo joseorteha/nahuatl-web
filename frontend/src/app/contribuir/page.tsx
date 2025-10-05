@@ -37,7 +37,7 @@ export default function ContributePage() {
   const [selectedContribution, setSelectedContribution] = useState<UserContribution | null>(null);
   const [showDetails, setShowDetails] = useState(false);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web.onrender.com';
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://nahuatl-web-xmeo.onrender.com';
 
   const loadUserContributions = useCallback(async (userId: string) => {
     try {
