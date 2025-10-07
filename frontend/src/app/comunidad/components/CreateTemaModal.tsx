@@ -12,7 +12,7 @@ interface CreateTemaModalProps {
 }
 
 export default function CreateTemaModal({ isOpen, onClose, onSuccess }: CreateTemaModalProps) {
-  const { user } = useAuth();
+  const { user, apiCall } = useAuth();
   const [formData, setFormData] = useState({
     titulo: '',
     descripcion: '',
@@ -20,8 +20,6 @@ export default function CreateTemaModal({ isOpen, onClose, onSuccess }: CreateTe
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
-
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
   // Reset form when modal opens/closes
   useEffect(() => {
@@ -56,15 +54,8 @@ export default function CreateTemaModal({ isOpen, onClose, onSuccess }: CreateTe
     setIsSubmitting(true);
 
     try {
-      const token = localStorage.getItem('auth_tokens');
-      const parsedTokens = token ? JSON.parse(token) : null;
-
-      const response = await fetch(`${API_URL}/api/temas`, {
+      const response = await apiCall('/api/temas', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${parsedTokens?.access_token}`,
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(formData),
       });
 

@@ -347,8 +347,23 @@ router.post('/:id/respuestas', authenticateToken, async (req, res) => {
 // POST /api/temas/:id/like - Like/Unlike tema
 router.post('/:id/like', authenticateToken, async (req, res) => {
   try {
+    console.log('🔥 DEBUG LIKE - Endpoint alcanzado');
+    console.log('🔥 DEBUG LIKE - req.userId:', req.userId);
+    console.log('🔥 DEBUG LIKE - req.user:', req.user);
+    console.log('🔥 DEBUG LIKE - params:', req.params);
+    
     const { id } = req.params;
     const userId = req.userId; // Usuario autenticado
+
+    if (!userId) {
+      console.log('❌ DEBUG LIKE - No userId found');
+      return res.status(401).json({ 
+        success: false, 
+        error: 'Usuario no autenticado' 
+      });
+    }
+
+    console.log('✅ DEBUG LIKE - Usuario autenticado:', userId);
 
     // Obtener el tema primero para tener el contador actual
     const { data: tema, error: temaError } = await supabase

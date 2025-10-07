@@ -78,6 +78,7 @@ function AuthContextComponent({ children }: AuthProviderProps) {
     console.log(`🔗 API Call: ${endpoint}`);
     console.log(`🎫 Token: ${token ? `${token.substring(0, 20)}...` : 'AUSENTE'}`);
     console.log(`👤 User: ${user ? user.id : 'NO USER'}`);
+    console.log(`🔍 Full tokens object:`, tokens);
     
     return await fetch(`${API_URL}${endpoint}`, {
       ...options,

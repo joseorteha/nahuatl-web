@@ -8,6 +8,8 @@ const { supabase } = require('../config/database');
 const authenticateToken = async (req, res, next) => {
   try {
     console.log('🔍 Debug Auth - Headers:', req.headers);
+    console.log('🔍 Debug Auth - URL:', req.url);
+    console.log('🔍 Debug Auth - Method:', req.method);
     const authHeader = req.headers['authorization'];
     console.log('🔍 Debug Auth - Auth Header:', authHeader);
     const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN

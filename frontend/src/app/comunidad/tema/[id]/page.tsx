@@ -56,7 +56,7 @@ interface Respuesta {
 }
 
 export default function TemaPage() {
-  const { user, loading } = useAuth();
+  const { user, loading, apiCall } = useAuth();
   const router = useRouter();
   const params = useParams();
   const temaId = params.id as string;
@@ -77,12 +77,7 @@ export default function TemaPage() {
   // Fetch tema
   const fetchTema = useCallback(async () => {
     try {
-      const response = await fetch(`${API_URL}/api/temas/${temaId}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_tokens') ? JSON.parse(localStorage.getItem('auth_tokens')!).access_token : ''}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await apiCall(`/api/temas/${temaId}`);
 
       if (response.ok) {
         const result = await response.json();
@@ -94,7 +89,7 @@ export default function TemaPage() {
       console.error('Error fetching tema:', error);
       showNotification('error', 'Error de conexión');
     }
-  }, [temaId, API_URL]);
+  }, [temaId, apiCall]);
 
   // Initial load
   useEffect(() => {
@@ -117,15 +112,8 @@ export default function TemaPage() {
     }
 
     try {
-      const token = localStorage.getItem('auth_tokens');
-      const parsedTokens = token ? JSON.parse(token) : null;
-
-      const response = await fetch(`${API_URL}/api/temas/${temaId}/like`, {
+      const response = await apiCall(`/api/temas/${temaId}/like`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${parsedTokens?.access_token}`,
-          'Content-Type': 'application/json',
-        },
       });
 
       if (response.ok) {
@@ -161,9 +149,6 @@ export default function TemaPage() {
     if (!tema) return;
 
     try {
-      const token = localStorage.getItem('auth_tokens');
-      const parsedTokens = token ? JSON.parse(token) : null;
-
       // Compartir usando Web Share API si está disponible
       if (navigator.share) {
         await navigator.share({
@@ -179,12 +164,8 @@ export default function TemaPage() {
 
       // Actualizar contador en backend
       if (user) {
-        await fetch(`${API_URL}/api/temas/${temaId}/share`, {
+        await apiCall(`/api/temas/${temaId}/share`, {
           method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${parsedTokens?.access_token}`,
-            'Content-Type': 'application/json',
-          },
         });
 
         setTema(prev => prev ? {
@@ -209,15 +190,8 @@ export default function TemaPage() {
     setIsSubmittingRespuesta(true);
 
     try {
-      const token = localStorage.getItem('auth_tokens');
-      const parsedTokens = token ? JSON.parse(token) : null;
-
-      const response = await fetch(`${API_URL}/api/temas/${temaId}/respuestas`, {
+      const response = await apiCall(`/api/temas/${temaId}/respuestas`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${parsedTokens?.access_token}`,
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({ contenido }),
       });
 
