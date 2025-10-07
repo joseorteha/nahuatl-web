@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { robustApiCall } from '@/lib/utils/apiUtils';
 
 export interface Notificacion {
-  id: number;
+  id: string;
   usuario_id: string;
   tipo_notificacion: 'like_recibido' | 'respuesta_recibida' | 'mencion' | 'nuevo_seguidor' | 'logro_obtenido' | 'feedback_aprobado' | 'feedback_rechazado' | 'puntos_ganados';
   titulo: string;
@@ -31,7 +31,7 @@ interface UseNotificationsReturn {
   hasMore: boolean;
   // Actions
   fetchNotifications: (reset?: boolean) => Promise<void>;
-  markAsRead: (notificationId: number) => Promise<void>;
+  markAsRead: (notificationId: string) => Promise<void>;
   markAllAsRead: () => Promise<void>;
   createTestNotification: () => Promise<void>;
   // Real-time
@@ -136,7 +136,7 @@ export function useNotifications(): UseNotificationsReturn {
   /**
    * Marcar notificación como leída
    */
-  const markAsRead = useCallback(async (notificationId: number) => {
+  const markAsRead = useCallback(async (notificationId: string) => {
     if (!isUserReady) return;
 
     try {

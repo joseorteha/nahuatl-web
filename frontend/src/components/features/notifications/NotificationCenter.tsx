@@ -6,6 +6,7 @@ import { Bell, BellOff, Check, CheckCheck, Loader2, RefreshCw, X } from 'lucide-
 import { useNotifications } from '@/hooks/useNotifications';
 import NotificationItem from './NotificationItem';
 import { useAuth } from '@/contexts/AuthContext';
+import { Notification } from '@/types';
 
 interface NotificationCenterProps {
   className?: string;
@@ -58,7 +59,7 @@ export default function NotificationCenter({ className = '' }: NotificationCente
     }
   };
 
-  const handleNotificationClick = async (notification: any) => {
+  const handleNotificationClick = async (notification: Notification) => {
     if (!notification.leida) {
       await markAsRead(notification.id);
     }

@@ -18,7 +18,7 @@ import { Notification } from '@/types';
 
 interface NotificationItemProps {
   notification: Notification;
-  onMarkAsRead?: (id: number) => void;
+  onMarkAsRead?: (id: string) => void;
   onNotificationClick?: (notification: Notification) => void;
   className?: string;
 }
