@@ -25,7 +25,10 @@ const authenticateToken = async (req, res, next) => {
 
     // Verificar el token JWT
     console.log('🔍 Debug Auth - Verificando token...');
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'tu_jwt_secret_muy_seguro');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'tu_jwt_secret_muy_seguro', {
+      issuer: 'nahuatl-web',
+      audience: 'nahuatl-users'
+    });
     console.log('🔍 Debug Auth - Token decodificado:', decoded);
     
     // Verificar que el usuario aún existe en la base de datos
@@ -97,7 +100,10 @@ const optionalAuth = async (req, res, next) => {
       return next();
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'tu_jwt_secret_muy_seguro');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'tu_jwt_secret_muy_seguro', {
+      issuer: 'nahuatl-web',
+      audience: 'nahuatl-users'
+    });
     
     const { data: user } = await supabase
       .from('perfiles')
