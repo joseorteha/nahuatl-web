@@ -113,7 +113,7 @@ export default function Header() {
     },
     {
       name: 'Comunidad',
-      href: '/feedback',
+      href: '/comunidad',
       icon: MessageCircle,
       color: 'text-cyan-600 dark:text-cyan-400',
       hoverColor: 'hover:text-cyan-600 dark:hover:text-cyan-400',

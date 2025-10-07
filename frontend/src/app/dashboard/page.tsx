@@ -458,7 +458,7 @@ export default function Dashboard() {
               {/* Accesos rápidos */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <Link
-                  href="/feedback"
+                  href="/comunidad"
                   className="group block bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl p-6 border border-purple-200 dark:border-purple-800 hover:border-purple-400 dark:hover:border-purple-600 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
                 >
                   <div className="flex items-start justify-between mb-4">

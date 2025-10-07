@@ -222,17 +222,17 @@ class NotificationService {
         case 'aprobada':
           titulo = '✅ ¡Contribución aprobada!';
           mensaje = `Tu contribución "${contribucion.word}" ha sido aprobada y está disponible en el diccionario`;
-          tipo = 'feedback_aprobado';
+          tipo = 'contribucion_aprobada';
           break;
         case 'rechazada':
           titulo = '❌ Contribución rechazada';
           mensaje = `Tu contribución "${contribucion.word}" fue rechazada. ${contribucion.comentarios_admin || ''}`;
-          tipo = 'feedback_rechazado';
+          tipo = 'contribucion_rechazada';
           break;
         case 'publicada':
           titulo = '🎉 ¡Contribución publicada!';
           mensaje = `Tu contribución "${contribucion.word}" ya está disponible públicamente`;
-          tipo = 'feedback_aprobado';
+          tipo = 'contribucion_publicada';
           break;
         default:
           return;

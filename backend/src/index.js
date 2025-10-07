@@ -15,7 +15,6 @@ const { passport } = require('./config/googleOAuth');
 // Rutas
 const authRoutes = require('./routes/authRoutes');
 const dictionaryRoutes = require('./routes/dictionaryRoutes');
-const feedbackRoutes = require('./routes/feedbackRoutes');
 const temasRoutes = require('./routes/temas');
 const adminRoutes = require('./routes/adminRoutes');
 const contributionRoutes = require('./routes/contributionRoutes');

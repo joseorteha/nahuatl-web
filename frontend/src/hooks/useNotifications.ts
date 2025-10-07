@@ -6,11 +6,11 @@ import { robustApiCall } from '@/lib/utils/apiUtils';
 export interface Notificacion {
   id: string;
   usuario_id: string;
-  tipo_notificacion: 'like_recibido' | 'respuesta_recibida' | 'mencion' | 'nuevo_seguidor' | 'logro_obtenido' | 'feedback_aprobado' | 'feedback_rechazado' | 'puntos_ganados';
+  tipo_notificacion: 'like_recibido' | 'respuesta_recibida' | 'mencion' | 'nuevo_seguidor' | 'logro_obtenido' | 'contribucion_aprobada' | 'contribucion_rechazada' | 'contribucion_publicada' | 'puntos_ganados';
   titulo: string;
   mensaje: string;
   relacionado_id?: string;
-  relacionado_tipo?: 'feedback' | 'respuesta' | 'usuario' | 'logro' | 'tema';
+  relacionado_tipo?: 'tema' | 'respuesta' | 'usuario' | 'logro' | 'contribucion';
   fecha_creacion: string;
   leida: boolean;
   fecha_leida?: string;

@@ -10,7 +10,7 @@ export interface UserProfile {
   fecha_creacion: string;
   fecha_actualizacion: string;
   es_beta_tester: boolean;
-  contador_feedback: number;
+  contador_temas: number;
   rol: 'usuario' | 'moderador' | 'admin';
   biografia?: string;
   ubicacion?: string;
@@ -31,13 +31,13 @@ export interface UserStats {
   nivel: string;
   contribuciones_aprobadas: number;
   likes_recibidos: number;
-  feedbacks_creados: number;
+  temas_creados: number;
   seguidores: number;
   siguiendo: number;
   posicion_ranking?: number;
 }
 
-export interface Feedback {
+export interface TemaConversacion {
   id: string;
   titulo: string;
   contenido: string;
@@ -48,30 +48,30 @@ export interface Feedback {
   fecha_creacion: string;
   usuario_id: string;
   usuario?: UserProfile;
-  retroalimentacion_likes?: unknown[];
+  temas_likes?: unknown[];
   total_likes: number;
   total_respuestas: number;
-  retroalimentacion_respuestas?: unknown[];
+  temas_respuestas?: unknown[];
 }
 
-export interface FeedbackCompartido {
+export interface TemaCompartido {
   id: string;
   comentario_compartir?: string;
   fecha_compartido: string;
-  retroalimentacion: Feedback;
+  temas_conversacion: TemaConversacion;
 }
 
-export interface FeedbackGuardado {
+export interface TemaGuardado {
   id: string;
   notas_personales?: string;
   fecha_guardado: string;
-  retroalimentacion: Feedback;
+  temas_conversacion: TemaConversacion;
 }
 
 export interface LikeDado {
   id: string;
   fecha_creacion: string;
-  retroalimentacion: Feedback;
+  temas_conversacion: TemaConversacion;
 }
 
 export type TabType = 'temas' | 'respuestas' | 'compartidos' | 'guardados' | 'likes' | 'seguidores' | 'siguiendo';
@@ -91,11 +91,11 @@ export interface Siguiendo {
 export interface Notification {
   id: string;
   usuario_id: string;
-  tipo_notificacion: 'like_recibido' | 'respuesta_recibida' | 'mencion' | 'nuevo_seguidor' | 'logro_obtenido' | 'feedback_aprobado' | 'feedback_rechazado' | 'puntos_ganados';
+  tipo_notificacion: 'like_recibido' | 'respuesta_recibida' | 'mencion' | 'nuevo_seguidor' | 'logro_obtenido' | 'contribucion_aprobada' | 'contribucion_rechazada' | 'contribucion_publicada' | 'puntos_ganados';
   titulo: string;
   mensaje: string;
   relacionado_id?: string;
-  relacionado_tipo?: 'feedback' | 'respuesta' | 'usuario' | 'logro' | 'tema';
+  relacionado_tipo?: 'tema' | 'respuesta' | 'usuario' | 'logro' | 'contribucion';
   fecha_creacion: string;
   leida: boolean;
   fecha_leida?: string;

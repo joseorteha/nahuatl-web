@@ -244,9 +244,9 @@ class RecompensasService {
         .select('id')
         .eq('usuario_id', userId);
 
-      // Obtener feedback
-      const { data: feedback } = await supabase
-        .from('retroalimentacion')
+      // Obtener temas de conversación
+      const { data: temas } = await supabase
+        .from('temas_conversacion')
         .select('id')
         .eq('usuario_id', userId);
 
@@ -256,15 +256,15 @@ class RecompensasService {
         .select('id')
         .eq('usuario_id', userId);
 
-      // Obtener likes recibidos (esto requiere una consulta más compleja)
+      // Obtener likes recibidos en temas
       const { data: likesRecibidos } = await supabase
-        .from('retroalimentacion_likes')
-        .select('id, retroalimentacion(usuario_id)')
-        .eq('retroalimentacion.usuario_id', userId);
+        .from('temas_likes')
+        .select('id, temas_conversacion(usuario_id)')
+        .eq('temas_conversacion.usuario_id', userId);
 
       return {
         contribuciones_cantidad: contribuciones?.length || 0,
-        feedback_cantidad: feedback?.length || 0,
+        temas_cantidad: temas?.length || 0,
         palabras_guardadas: palabrasGuardadas?.length || 0,
         likes_recibidos: likesRecibidos?.length || 0,
         dias_consecutivos: 0 // Por implementar
@@ -273,7 +273,7 @@ class RecompensasService {
       console.error('Error obteniendo estadísticas para logros:', error);
       return {
         contribuciones_cantidad: 0,
-        feedback_cantidad: 0,
+        temas_cantidad: 0,
         palabras_guardadas: 0,
         likes_recibidos: 0,
         dias_consecutivos: 0

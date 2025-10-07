@@ -12,7 +12,7 @@ interface User {
   fecha_actualizacion: string;
   url_avatar?: string;
   es_beta_tester: boolean;
-  contador_feedback: number;
+  contador_temas: number;
   biografia?: string;
   ubicacion?: string;
   sitio_web?: string;

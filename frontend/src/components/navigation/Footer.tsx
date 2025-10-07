@@ -77,10 +77,10 @@ const Footer = () => {
           <div className="col-span-1 md:col-span-1 lg:col-span-1">
             <h3 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-slate-100 mb-3 sm:mb-4 uppercase tracking-wider">Comunidad</h3>
             <nav className="flex flex-col space-y-2 sm:space-y-3">
-              <span className="text-xs sm:text-sm text-slate-400 dark:text-slate-500 flex items-center gap-1.5 sm:gap-2 cursor-not-allowed">
+              <Link href="/comunidad" className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors duration-200 flex items-center gap-1.5 sm:gap-2">
                 <Users size={14} className="sm:w-4 sm:h-4" />
-                Comunidad (Próximamente)
-              </span>
+                Comunidad
+              </Link>
               <Link href="/login" className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors duration-200 flex items-center gap-1.5 sm:gap-2">
                 <svg className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />

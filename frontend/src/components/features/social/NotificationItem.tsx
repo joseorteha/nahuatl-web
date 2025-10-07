@@ -7,7 +7,7 @@ import { Bell, Heart, MessageCircle, UserPlus, Award, CheckCircle, XCircle, Star
 export interface Notificacion {
   id: string;
   usuario_id: string;
-  tipo_notificacion: 'like_recibido' | 'respuesta_recibida' | 'mencion' | 'nuevo_seguidor' | 'logro_obtenido' | 'feedback_aprobado' | 'feedback_rechazado' | 'puntos_ganados';
+  tipo_notificacion: 'like_recibido' | 'respuesta_recibida' | 'mencion' | 'nuevo_seguidor' | 'logro_obtenido' | 'contribucion_aprobada' | 'contribucion_rechazada' | 'contribucion_publicada' | 'puntos_ganados';
   titulo: string;
   mensaje: string;
   relacionado_id?: string;
@@ -36,10 +36,12 @@ const getNotificationIcon = (tipo: string) => {
       return <UserPlus className="w-5 h-5 text-green-500" />;
     case 'logro_obtenido':
       return <Award className="w-5 h-5 text-purple-500" />;
-    case 'feedback_aprobado':
+    case 'contribucion_aprobada':
       return <CheckCircle className="w-5 h-5 text-green-500" />;
-    case 'feedback_rechazado':
+    case 'contribucion_rechazada':
       return <XCircle className="w-5 h-5 text-red-500" />;
+    case 'contribucion_publicada':
+      return <CheckCircle className="w-5 h-5 text-emerald-500" />;
     case 'puntos_ganados':
       return <Star className="w-5 h-5 text-yellow-500" />;
     default:
@@ -59,10 +61,12 @@ const getNotificationColor = (tipo: string) => {
       return 'border-l-green-500 bg-green-50';
     case 'logro_obtenido':
       return 'border-l-purple-500 bg-purple-50';
-    case 'feedback_aprobado':
+    case 'contribucion_aprobada':
       return 'border-l-green-500 bg-green-50';
-    case 'feedback_rechazado':
+    case 'contribucion_rechazada':
       return 'border-l-red-500 bg-red-50';
+    case 'contribucion_publicada':
+      return 'border-l-emerald-500 bg-emerald-50';
     case 'puntos_ganados':
       return 'border-l-yellow-500 bg-yellow-50';
     default:

@@ -185,7 +185,7 @@ export default function ExperienciaSocialPage() {
           {/* Back to Community Button - Responsive */}
           <div className="mt-4 sm:mt-6">
             <Link
-              href="/feedback"
+              href="/comunidad"
               className="inline-flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-xl font-medium hover:from-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl text-sm sm:text-base"
             >
               <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />

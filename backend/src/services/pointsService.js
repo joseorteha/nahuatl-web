@@ -255,13 +255,13 @@ class PointsService {
           case 'likes_recibidos':
             cumpleCondicion = likesRecibidos >= logro.condicion_valor;
             break;
-          case 'feedback_cantidad':
-            // Verificar cantidad de feedbacks
-            const { data: feedbacks } = await supabase
-              .from('retroalimentacion')
+          case 'temas_cantidad':
+            // Verificar cantidad de temas de conversación
+            const { data: temas } = await supabase
+              .from('temas_conversacion')
               .select('id')
               .eq('usuario_id', userId);
-            cumpleCondicion = (feedbacks?.length || 0) >= logro.condicion_valor;
+            cumpleCondicion = (temas?.length || 0) >= logro.condicion_valor;
             break;
         }
 
@@ -353,26 +353,26 @@ class PointsService {
       if (palabrasError) throw palabrasError;
 
       // Obtener estadísticas de comunidad
-      const { data: feedbacks, error: feedbacksError } = await supabase
-        .from('retroalimentacion')
+      const { data: temas, error: temasError } = await supabase
+        .from('temas_conversacion')
         .select('id, contador_likes')
         .eq('usuario_id', userId);
 
-      if (feedbacksError) throw feedbacksError;
+      if (temasError) throw temasError;
 
       const { data: likesDados, error: likesError } = await supabase
-        .from('retroalimentacion_likes')
+        .from('temas_likes')
         .select('id')
         .eq('usuario_id', userId);
 
       if (likesError) throw likesError;
 
-      const { data: respuestas, error: respuestasError } = await supabase
-        .from('retroalimentacion_respuestas')
+      const { data: compartidos, error: compartidosError } = await supabase
+        .from('temas_shares')
         .select('id')
         .eq('usuario_id', userId);
 
-      if (respuestasError) throw respuestasError;
+      if (compartidosError) throw compartidosError;
 
       return {
         conocimiento: {
@@ -385,10 +385,10 @@ class PointsService {
         comunidad: {
           puntos: recompensas?.experiencia_social || 0,
           nivel: this.calcularNivelComunidad(recompensas?.experiencia_social || 0),
-          total_feedbacks: feedbacks?.length || 0,
+          total_temas: temas?.length || 0,
           likes_dados: likesDados?.length || 0,
           likes_recibidos: recompensas?.likes_recibidos || 0,
-          respuestas_creadas: respuestas?.length || 0,
+          temas_compartidos: compartidos?.length || 0,
           ranking_semanal: recompensas?.ranking_semanal || 0,
           ranking_mensual: recompensas?.ranking_mensual || 0
         }

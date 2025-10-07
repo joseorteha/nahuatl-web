@@ -43,43 +43,30 @@ interface TemaCardProps {
 }
 
 export default function TemaCard({ tema, onLike, onShare, onTemaUpdate }: TemaCardProps) {
-  const [isLiked, setIsLiked] = useState(false);
-  const [isShared, setIsShared] = useState(false);
   const router = useRouter();
-
-
-  const handleLike = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const newLikedState = !isLiked;
-    setIsLiked(newLikedState);
-    
-    // Actualizar contador local
-    const likeChange = newLikedState ? 1 : -1;
-    onTemaUpdate?.(tema.id, {
-      contador_likes: tema.contador_likes + likeChange,
-      participantes_count: newLikedState ? tema.participantes_count + 1 : tema.participantes_count
-    });
-    
-    onLike?.(tema.id);
-  };
-
-  const handleShare = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const newSharedState = !isShared;
-    setIsShared(newSharedState);
-    
-    // Actualizar contador local
-    const shareChange = newSharedState ? 1 : -1;
-    onTemaUpdate?.(tema.id, {
-      compartido_contador: tema.compartido_contador + shareChange,
-      participantes_count: newSharedState ? tema.participantes_count + 1 : tema.participantes_count
-    });
-    
-    onShare?.(tema.id);
-  };
+  const [isLiking, setIsLiking] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
 
   const handleCardClick = () => {
-    router.push(`/feedback/tema/${tema.id}`);
+    router.push(`/comunidad/tema/${tema.id}`);
+  };
+
+  const handleLike = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isLiking || !onLike) return;
+    
+    setIsLiking(true);
+    await onLike(tema.id);
+    setIsLiking(false);
+  };
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isSharing || !onShare) return;
+    
+    setIsSharing(true);
+    await onShare(tema.id);
+    setIsSharing(false);
   };
 
   const getEstadoColor = (estado: string) => {
@@ -87,9 +74,9 @@ export default function TemaCard({ tema, onLike, onShare, onTemaUpdate }: TemaCa
       case 'activo':
         return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
       case 'cerrado':
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
       case 'archivado':
-        return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400';
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
       default:
         return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
     }
@@ -97,31 +84,12 @@ export default function TemaCard({ tema, onLike, onShare, onTemaUpdate }: TemaCa
 
   const getEstadoIcon = (estado: string) => {
     switch (estado) {
-      case 'activo':
-        return <MessageCircle className="w-4 h-4" />;
       case 'cerrado':
-        return <Lock className="w-4 h-4" />;
+        return <Lock className="w-3 h-3" />;
       case 'archivado':
-        return <Archive className="w-4 h-4" />;
+        return <Archive className="w-3 h-3" />;
       default:
-        return <MessageCircle className="w-4 h-4" />;
-    }
-  };
-
-  const getCategoriaColor = (categoria: string) => {
-    switch (categoria) {
-      case 'suggestion':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
-      case 'question':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
-      case 'issue':
-        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
-      case 'bug_report':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400';
-      case 'feature_request':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+        return null;
     }
   };
 
@@ -140,6 +108,23 @@ export default function TemaCard({ tema, onLike, onShare, onTemaUpdate }: TemaCa
       default:
         return 'General';
     }
+  };
+
+  const formatTimeAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+    
+    if (diffInMinutes < 1) return 'Ahora';
+    if (diffInMinutes < 60) return `${diffInMinutes}m`;
+    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h`;
+    if (diffInMinutes < 43200) return `${Math.floor(diffInMinutes / 1440)}d`;
+    
+    return date.toLocaleDateString('es-ES', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    });
   };
 
   return (
@@ -163,31 +148,40 @@ export default function TemaCard({ tema, onLike, onShare, onTemaUpdate }: TemaCa
                 </h3>
                 <div className={`px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 w-fit ${getEstadoColor(tema.estado)}`}>
                   {getEstadoIcon(tema.estado)}
-                  <span className="hidden xs:inline">{tema.estado}</span>
-                  <span className="xs:hidden">{tema.estado.charAt(0).toUpperCase()}</span>
+                  {tema.estado.charAt(0).toUpperCase() + tema.estado.slice(1)}
                 </div>
               </div>
               
-              {tema.descripcion && (
-                <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed line-clamp-2 mb-3">
-                  {tema.descripcion}
-                </p>
-              )}
+              <div className="flex flex-col xs:flex-row xs:items-center gap-1 xs:gap-2 text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-2">
+                <div className="px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium flex items-center gap-1 w-fit">
+                  <Tag className="w-3 h-3" />
+                  {getCategoriaLabel(tema.categoria)}
+                </div>
+              </div>
             </div>
-            
-            <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400 group-hover:text-cyan-500 transition-colors flex-shrink-0 lg:ml-2" />
+
+            <div className="flex items-center gap-2 lg:flex-col lg:items-end lg:gap-1">
+              <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                <Clock className="w-3 h-3" />
+                {formatTimeAgo(tema.ultima_actividad)}
+              </div>
+              <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-cyan-500 transition-colors lg:hidden" />
+            </div>
           </div>
 
-          {/* Categoría y creador - Responsive */}
-          <div className="flex flex-col xs:flex-row xs:items-center gap-2 xs:gap-3 mb-3 sm:mb-4">
-            <div className={`px-2.5 sm:px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 w-fit ${getCategoriaColor(tema.categoria)}`}>
-              <Tag className="w-3 h-3" />
-              <span className="hidden xs:inline">{getCategoriaLabel(tema.categoria)}</span>
-              <span className="xs:hidden">{getCategoriaLabel(tema.categoria).split(' ')[0]}</span>
+          {/* Descripción */}
+          {tema.descripcion && (
+            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 line-clamp-2 mb-3 sm:mb-4 leading-relaxed">
+              {tema.descripcion}
+            </p>
+          )}
+
+          {/* Usuario */}
+          <div className="flex items-center gap-2 mb-3 sm:mb-4">
+            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-xs sm:text-sm">
+              {tema.creador.nombre_completo.charAt(0).toUpperCase()}
             </div>
-            
-            <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-              <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+            <div className="flex flex-col xs:flex-row xs:items-center gap-0 xs:gap-2 min-w-0 flex-1">
               <Link 
                 href={`/profile/${tema.creador.id}`} 
                 className="font-medium hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors truncate min-w-0"
@@ -223,44 +217,33 @@ export default function TemaCard({ tema, onLike, onShare, onTemaUpdate }: TemaCa
                 <span className="hidden xs:inline">participantes</span>
                 <span className="xs:hidden">part</span>
               </div>
-              
-              <div className="flex items-center gap-1 col-span-2 xs:col-span-1">
-                <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
-                <span className="hidden sm:inline">{new Date(tema.ultima_actividad).toLocaleDateString()}</span>
-                <span className="sm:hidden">{new Date(tema.ultima_actividad).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' })}</span>
-              </div>
+
+              {tema.trending_score > 0 && (
+                <div className="flex items-center gap-1 col-span-2 xs:col-span-1">
+                  <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0 text-orange-500" />
+                  <span className="text-sm font-semibold text-orange-600 dark:text-orange-400">Trending</span>
+                </div>
+              )}
             </div>
 
             {/* Acciones - Responsive */}
-            <div className="flex items-center justify-center lg:justify-end gap-1.5 sm:gap-2">
+            <div className="flex items-center gap-2 sm:gap-3">
               <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleLike(e);
-                }}
-                className={`flex items-center gap-1 p-1.5 sm:p-2 rounded-lg transition-all duration-200 ${
-                  isLiked 
-                    ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' 
-                    : 'hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400'
-                }`}
+                onClick={handleLike}
+                disabled={isLiking}
+                className="flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1.5 bg-pink-50 dark:bg-pink-900/20 text-pink-600 dark:text-pink-400 rounded-lg hover:bg-pink-100 dark:hover:bg-pink-900/30 transition-all duration-200 disabled:opacity-50 text-xs sm:text-sm"
               >
-                <Heart className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isLiked ? 'fill-current' : ''}`} />
-                <span className="text-sm font-semibold text-slate-600 dark:text-slate-300">{tema.contador_likes}</span>
+                <Heart className={`w-3 h-3 sm:w-4 sm:h-4 ${isLiking ? 'animate-pulse' : ''}`} />
+                <span className="font-semibold">{tema.contador_likes}</span>
               </button>
-              
+
               <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleShare(e);
-                }}
-                className={`flex items-center gap-1 p-1.5 sm:p-2 rounded-lg transition-all duration-200 ${
-                  isShared 
-                    ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' 
-                    : 'hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400'
-                }`}
+                onClick={handleShare}
+                disabled={isSharing}
+                className="flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1.5 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition-all duration-200 disabled:opacity-50 text-xs sm:text-sm"
               >
-                <Share2 className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isShared ? 'fill-current' : ''}`} />
-                <span className="text-sm font-semibold text-slate-600 dark:text-slate-300">{tema.compartido_contador}</span>
+                <Share2 className={`w-3 h-3 sm:w-4 sm:h-4 ${isSharing ? 'animate-pulse' : ''}`} />
+                <span className="font-semibold">{tema.compartido_contador}</span>
               </button>
             </div>
           </div>

@@ -1,5 +1,5 @@
 // services/apiService.ts
-import { UserProfile, UserStats, FeedbackCompartido, FeedbackGuardado, LikeDado } from '../types';
+import { UserProfile, UserStats, TemaCompartido, TemaGuardado, LikeDado } from '../../types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -9,7 +9,7 @@ interface ApiResponse<T> {
   success: boolean;
 }
 
-interface FeedbackItem {
+interface TemaItem {
   id: string;
   titulo: string;
   contenido: string;
@@ -25,7 +25,7 @@ interface FeedbackItem {
     username?: string;
     url_avatar?: string;
   };
-  retroalimentacion_respuestas?: Array<{
+  temas_respuestas?: Array<{
     id: string;
     contenido: string;
     fecha_creacion: string;
@@ -35,7 +35,7 @@ interface FeedbackItem {
       url_avatar?: string;
     };
   }>;
-  retroalimentacion_likes?: Array<{
+  temas_likes?: Array<{
     usuario_id: string;
   }>;
 }
@@ -86,7 +86,7 @@ export class ApiService {
           nivel: rewardsResponse.data.nivel,
           contribuciones_aprobadas: 0, // Temporal
           likes_recibidos: 0, // Temporal
-          feedbacks_creados: 0, // Temporal
+          temas_creados: 0, // Temporal
           seguidores: 0, // Temporal
           siguiendo: 0 // Temporal
         }

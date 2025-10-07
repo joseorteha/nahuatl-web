@@ -17,13 +17,13 @@ class StatsService {
 
       if (contributionsError) throw contributionsError;
 
-      // Obtener feedback/mensajes enviados
-      const { data: feedback, error: feedbackError } = await supabase
-        .from('retroalimentacion')
+      // Obtener temas de conversación enviados
+      const { data: temas, error: temasError } = await supabase
+        .from('temas_conversacion')
         .select('id')
         .eq('usuario_id', userId);
 
-      if (feedbackError) throw feedbackError;
+      if (temasError) throw temasError;
 
       // Obtener palabras guardadas (favorites) - asumiendo que existe esta tabla
       // Por ahora pondremos 0 hasta que se implemente
@@ -31,7 +31,7 @@ class StatsService {
 
       return {
         contributions: contributions ? contributions.length : 0,
-        feedback: feedback ? feedback.length : 0,
+        temas: temas ? temas.length : 0,
         savedWords: savedWords
       };
     } catch (error) {

@@ -30,7 +30,7 @@ interface ComunidadData {
   siguiente_nivel: string | null;
   puntos_para_siguiente: number;
   progreso_porcentaje: number;
-  total_feedbacks: number;
+  total_temas: number;
   likes_dados: number;
   likes_recibidos: number;
   respuestas_creadas: number;
@@ -53,7 +53,7 @@ interface ComunidadData {
     descripcion: string;
     fecha_creacion: string;
   }>;
-  feedbacks_recientes: Array<{
+  temas_recientes: Array<{
     id: string;
     titulo: string;
     likes: number;
@@ -229,7 +229,7 @@ export default function ComunidadTab({ userId }: ComunidadTabProps) {
             </div>
           </div>
           <Link
-            href="/feedback"
+            href="/comunidad"
             className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-3 py-2 sm:px-4 rounded-lg font-semibold hover:shadow-lg transition-all duration-300 flex items-center gap-2 text-sm sm:text-base w-full sm:w-auto justify-center"
           >
             <Plus className="w-4 h-4" />
@@ -264,7 +264,7 @@ export default function ComunidadTab({ userId }: ComunidadTabProps) {
 
       {/* Estadísticas principales */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
-        <Link href="/feedback">
+        <Link href="/comunidad">
           <motion.div
             whileHover={{ scale: 1.02 }}
             className="bg-gradient-to-br from-blue-50 to-blue-100/80 dark:from-blue-900/30 dark:to-blue-800/30 rounded-xl p-3 sm:p-4 border border-blue-200/60 dark:border-blue-700/60 text-center cursor-pointer hover:shadow-lg transition-all duration-300 group"
@@ -273,7 +273,7 @@ export default function ComunidadTab({ userId }: ComunidadTabProps) {
               <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
             <p className="text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400">
-              {data.total_feedbacks}
+              {data.total_temas}
             </p>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
               Temas Creados
@@ -285,7 +285,7 @@ export default function ComunidadTab({ userId }: ComunidadTabProps) {
           </motion.div>
         </Link>
 
-        <Link href="/feedback">
+        <Link href="/comunidad">
           <motion.div
             whileHover={{ scale: 1.02 }}
             className="bg-gradient-to-br from-red-50 to-red-100/80 dark:from-red-900/30 dark:to-red-800/30 rounded-xl p-3 sm:p-4 border border-red-200/60 dark:border-red-700/60 text-center cursor-pointer hover:shadow-lg transition-all duration-300 group"
@@ -306,7 +306,7 @@ export default function ComunidadTab({ userId }: ComunidadTabProps) {
           </motion.div>
         </Link>
 
-        <Link href="/feedback">
+        <Link href="/comunidad">
           <motion.div
             whileHover={{ scale: 1.02 }}
             className="bg-gradient-to-br from-green-50 to-green-100/80 dark:from-green-900/30 dark:to-green-800/30 rounded-xl p-3 sm:p-4 border border-green-200/60 dark:border-green-700/60 text-center cursor-pointer hover:shadow-lg transition-all duration-300 group"
@@ -327,7 +327,7 @@ export default function ComunidadTab({ userId }: ComunidadTabProps) {
           </motion.div>
         </Link>
 
-        <Link href="/feedback">
+        <Link href="/comunidad">
           <motion.div
             whileHover={{ scale: 1.02 }}
             className="bg-gradient-to-br from-purple-50 to-purple-100/80 dark:from-purple-900/30 dark:to-purple-800/30 rounded-xl p-3 sm:p-4 border border-purple-200/60 dark:border-purple-700/60 text-center cursor-pointer hover:shadow-lg transition-all duration-300 group"
@@ -487,8 +487,8 @@ export default function ComunidadTab({ userId }: ComunidadTabProps) {
         </motion.div>
       )}
 
-      {/* Feedbacks recientes */}
-      {data.feedbacks_recientes.length > 0 && (
+      {/* Temas recientes */}
+      {data.temas_recientes.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -500,9 +500,9 @@ export default function ComunidadTab({ userId }: ComunidadTabProps) {
             Temas Recientes
           </h3>
           <div className="space-y-3">
-            {data.feedbacks_recientes.map((feedback, index) => (
+            {data.temas_recientes.map((tema, index) => (
               <motion.div
-                key={feedback.id}
+                key={tema.id}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.1 }}
@@ -510,21 +510,21 @@ export default function ComunidadTab({ userId }: ComunidadTabProps) {
               >
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="font-semibold text-slate-900 dark:text-white">
-                    {feedback.titulo}
+                    {tema.titulo}
                   </h4>
                   <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
                     <span className="flex items-center gap-1">
                       <Heart className="w-3 h-3" />
-                      {feedback.likes}
+                      {tema.likes}
                     </span>
                     <span className="flex items-center gap-1">
                       <Share2 className="w-3 h-3" />
-                      {feedback.compartidos}
+                      {tema.compartidos}
                     </span>
                   </div>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  {new Date(feedback.fecha_creacion).toLocaleDateString()}
+                  {new Date(tema.fecha_creacion).toLocaleDateString()}
                 </p>
               </motion.div>
             ))}
@@ -539,7 +539,7 @@ export default function ComunidadTab({ userId }: ComunidadTabProps) {
         transition={{ delay: 0.4 }}
         className="grid grid-cols-1 md:grid-cols-2 gap-4"
       >
-        <Link href="/feedback" className="block">
+        <Link href="/comunidad" className="block">
           <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/20 rounded-xl p-6 border border-blue-200/60 dark:border-blue-700/60 hover:shadow-lg transition-all duration-300 group">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">

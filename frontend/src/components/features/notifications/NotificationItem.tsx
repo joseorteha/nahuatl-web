@@ -29,8 +29,9 @@ const NOTIFICATION_ICONS = {
   'mencion': Share2,
   'nuevo_seguidor': UserPlus,
   'logro_obtenido': Trophy,
-  'feedback_aprobado': Star,
-  'feedback_rechazado': Gift,
+  'contribucion_aprobada': Star,
+  'contribucion_rechazada': Gift,
+  'contribucion_publicada': Star,
   'puntos_ganados': Plus
 };
 
@@ -40,8 +41,9 @@ const NOTIFICATION_COLORS = {
   'mencion': 'text-green-500 bg-green-50 dark:bg-green-900/20',
   'nuevo_seguidor': 'text-pink-500 bg-pink-50 dark:bg-pink-900/20',
   'logro_obtenido': 'text-yellow-500 bg-yellow-50 dark:bg-yellow-900/20',
-  'feedback_aprobado': 'text-purple-500 bg-purple-50 dark:bg-purple-900/20',
-  'feedback_rechazado': 'text-indigo-500 bg-indigo-50 dark:bg-indigo-900/20',
+  'contribucion_aprobada': 'text-purple-500 bg-purple-50 dark:bg-purple-900/20',
+  'contribucion_rechazada': 'text-indigo-500 bg-indigo-50 dark:bg-indigo-900/20',
+  'contribucion_publicada': 'text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20',
   'puntos_ganados': 'text-cyan-500 bg-cyan-50 dark:bg-cyan-900/20'
 };
 

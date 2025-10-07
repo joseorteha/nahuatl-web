@@ -8,7 +8,7 @@ export function middleware(request: NextRequest) {
   const protectedPaths = [
     '/dashboard',
     '/profile', 
-    '/feedback',
+    '/comunidad',
     '/contribuir',
     '/admin',
     '/experiencia-social'
@@ -30,7 +30,7 @@ export const config = {
   matcher: [
     '/dashboard/:path*',
     '/profile/:path*',
-    '/feedback/:path*',
+    '/comunidad/:path*',
     '/contribuir/:path*',
     '/admin/:path*',
     '/experiencia-social/:path*'

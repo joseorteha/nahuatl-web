@@ -190,7 +190,7 @@ export default function PerfilUsuarioPage() {
               El perfil que buscas no existe o ha sido eliminado.
             </p>
             <button
-              onClick={() => router.push('/feedback')}
+              onClick={() => router.push('/comunidad')}
               className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
             >
               Volver a la Comunidad
