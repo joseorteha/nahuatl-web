@@ -39,6 +39,7 @@ export interface Seguimiento {
 
 export interface Notificacion {
   id: string;
+  usuario_id: string;
   tipo_notificacion: string;
   titulo: string;
   mensaje: string;

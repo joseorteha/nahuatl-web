@@ -122,7 +122,7 @@ export default function Recompensas({ userId }: { userId: string }) {
       const parsedTokens = token ? JSON.parse(token) : null;
       
       // Obtener datos de contribuciones (mismo endpoint que el perfil)
-      const contribucionesResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/contribuciones/stats/${userId}`, {
+      const contribucionesResponse = await fetch(`http://localhost:3001/api/contribuciones/stats/${userId}`, {
         headers: {
           'Authorization': `Bearer ${parsedTokens?.accessToken}`,
           'Content-Type': 'application/json'
@@ -146,7 +146,7 @@ export default function Recompensas({ userId }: { userId: string }) {
       }
 
       // Obtener historial de contribuciones (usar el mismo sistema)
-      const historialResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/contributions/historial/${userId}`, {
+      const historialResponse = await fetch(`http://localhost:3001/api/contributions/historial/${userId}`, {
         headers: {
           'Authorization': `Bearer ${parsedTokens?.accessToken}`,
           'Content-Type': 'application/json'
