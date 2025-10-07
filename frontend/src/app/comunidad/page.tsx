@@ -67,7 +67,7 @@ type ViewType = 'grid' | 'list';
 type FilterType = 'all' | 'suggestion' | 'question' | 'issue' | 'bug_report' | 'feature_request';
 
 export default function ComunidadPage() {
-  const { user, loading, apiCall } = useAuth();
+  const { user, loading, apiCall, refreshTokenFix } = useAuth();
   const router = useRouter();
 
   const [temas, setTemas] = useState<Tema[]>([]);
@@ -492,10 +492,26 @@ export default function ComunidadPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.8 }}
-              className="flex items-center gap-2 text-slate-500 dark:text-slate-400"
+              className="flex items-center gap-4"
             >
-              <Users className="w-5 h-5" />
-              <span className="text-sm">+{filteredTemas.reduce((sum, tema) => sum + tema.participantes_count, 0)} participantes activos</span>
+              <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+                <Users className="w-5 h-5" />
+                <span className="text-sm">+{filteredTemas.reduce((sum, tema) => sum + tema.participantes_count, 0)} participantes activos</span>
+              </div>
+              
+              {/* Botón temporal de debug */}
+              {process.env.NODE_ENV === 'development' && (
+                <motion.button
+                  onClick={async () => {
+                    console.log('🔄 Probando refresh token...');
+                    const result = await refreshTokenFix();
+                    showNotification(result ? 'success' : 'error', result ? 'Token refrescado' : 'Error al refrescar');
+                  }}
+                  className="px-4 py-2 bg-yellow-500 text-white rounded-lg text-sm font-medium"
+                >
+                  🔄 Refresh Token
+                </motion.button>
+              )}
             </motion.div>
           </motion.div>
         </motion.div>
