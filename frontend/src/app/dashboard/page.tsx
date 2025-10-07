@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import ConditionalHeader from '@/components/navigation/ConditionalHeader';
 import { useAuth } from '@/contexts/AuthContext';
+import OAuthDebug from '@/components/debug/OAuthDebug';
 
 interface RecentActivity {
   id: string;
@@ -251,6 +252,9 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-cyan-50/30 to-blue-50/40 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
       <ConditionalHeader />
+      
+      {/* Debug Component - Solo visible en desarrollo */}
+      {process.env.NODE_ENV === 'development' && <OAuthDebug />}
 
       {/* Hero section con personalidad */}
       <div className="relative overflow-hidden bg-gradient-to-r from-cyan-600 via-blue-600 to-sky-600 dark:from-cyan-800 dark:via-blue-800 dark:to-sky-800">

@@ -111,9 +111,9 @@ function AuthContextComponent({ children }: AuthProviderProps) {
           expiresIn: data.expiresIn,
         });
         
-        // Guardar en localStorage para persistencia
+        // Guardar en localStorage para persistencia (usar claves consistentes con OAuth)
         if (typeof window !== 'undefined') {
-          localStorage.setItem('auth_user', JSON.stringify(data.user));
+          localStorage.setItem('user_data', JSON.stringify(data.user));
           localStorage.setItem('auth_tokens', JSON.stringify({
             accessToken: data.accessToken,
             refreshToken: data.refreshToken,
@@ -169,8 +169,10 @@ function AuthContextComponent({ children }: AuthProviderProps) {
     
     // Limpiar localStorage
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('auth_user');
+      localStorage.removeItem('user_data');
       localStorage.removeItem('auth_tokens');
+      sessionStorage.removeItem('user_data');
+      sessionStorage.removeItem('auth_tokens');
     }
   }, [API_URL]);
 
@@ -201,15 +203,32 @@ function AuthContextComponent({ children }: AuthProviderProps) {
       console.log('🔑 AuthProvider: Inicializando autenticación...');
       
       try {
-        // Intentar cargar desde localStorage
+        // Intentar cargar desde sessionStorage (OAuth) o localStorage (login normal)
         if (typeof window !== 'undefined') {
-          const savedUser = localStorage.getItem('auth_user');
-          const savedTokens = localStorage.getItem('auth_tokens');
+          let savedUser = null;
+          let savedTokens = null;
+          
+          // Priorizar sessionStorage (OAuth reciente)
+          savedUser = sessionStorage.getItem('user_data') || localStorage.getItem('user_data');
+          savedTokens = sessionStorage.getItem('auth_tokens') || localStorage.getItem('auth_tokens');
+          
+          console.log('🔍 Buscando sesión guardada...', {
+            hasUser: !!savedUser,
+            hasTokens: !!savedTokens,
+            source: savedUser ? (sessionStorage.getItem('user_data') ? 'sessionStorage' : 'localStorage') : 'none'
+          });
           
           if (savedUser && savedTokens) {
-            console.log('📱 Restaurando sesión desde localStorage...');
+            console.log('📱 Restaurando sesión desde storage...');
             const userData = JSON.parse(savedUser);
             const tokensData = JSON.parse(savedTokens);
+            
+            console.log('✅ Datos restaurados:', {
+              user: userData.username || userData.nombre_completo,
+              userId: userData.id,
+              hasAccessToken: !!tokensData.accessToken,
+              tokenPreview: tokensData.accessToken?.substring(0, 20) + '...'
+            });
             
             setUser(userData);
             setTokens(tokensData);
@@ -230,8 +249,8 @@ function AuthContextComponent({ children }: AuthProviderProps) {
             console.log('✅ Sesión restaurada desde cookies del servidor');
             setUser(data.user);
             
-            // Guardar en localStorage también
-            localStorage.setItem('auth_user', JSON.stringify(data.user));
+            // Guardar en localStorage también (usar claves consistentes)
+            localStorage.setItem('user_data', JSON.stringify(data.user));
           }
         }
       } catch (error) {

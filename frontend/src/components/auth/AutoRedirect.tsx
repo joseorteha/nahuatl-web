@@ -50,13 +50,20 @@ export default function AutoRedirect({ redirectTo = '/dashboard' }: AutoRedirect
           }
         }
 
-        // 2. También verificar localStorage básico
+        // 2. También verificar localStorage/sessionStorage básico (usar claves consistentes)
         if (typeof window !== 'undefined') {
-          const savedUser = localStorage.getItem('auth_user');
-          const savedTokens = localStorage.getItem('auth_tokens');
+          // Buscar en sessionStorage y localStorage (OAuth y login normal)
+          const savedUser = sessionStorage.getItem('user_data') || localStorage.getItem('user_data') || localStorage.getItem('auth_user');
+          const savedTokens = sessionStorage.getItem('auth_tokens') || localStorage.getItem('auth_tokens');
+          
+          console.log('🔍 AutoRedirect: Verificando storage...', {
+            hasUser: !!savedUser,
+            hasTokens: !!savedTokens,
+            source: savedUser ? (sessionStorage.getItem('user_data') ? 'sessionStorage' : 'localStorage') : 'none'
+          });
           
           if (savedUser && savedTokens) {
-            console.log('📱 Usuario encontrado en localStorage, redirigiendo a:', redirectTo);
+            console.log('📱 Usuario encontrado en storage, redirigiendo a:', redirectTo);
             router.push(redirectTo);
             return;
           }
