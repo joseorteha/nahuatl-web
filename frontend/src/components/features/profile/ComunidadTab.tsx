@@ -95,7 +95,7 @@ export default function ComunidadTab({ userId }: ComunidadTabProps) {
   const [showSeguidoresModal, setShowSeguidoresModal] = useState(false);
   const [showSeguidosModal, setShowSeguidosModal] = useState(false);
 
-  const API_URL = 'http://localhost:3001';
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
   const loadComunidadData = useCallback(async () => {
     try {

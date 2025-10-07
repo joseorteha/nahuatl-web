@@ -771,7 +771,18 @@ export default function FeedbackPage() {
             >
               <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-slate-200/60 dark:border-slate-700/60 shadow-lg">
                 <NotificationList
-                  notifications={notifications}
+                  notifications={notifications.map(n => ({
+                    ...n,
+                    tipo_notificacion: n.tipo_notificacion as
+                      | "like_recibido"
+                      | "respuesta_recibida"
+                      | "mencion"
+                      | "nuevo_seguidor"
+                      | "logro_obtenido"
+                      | "feedback_aprobado"
+                      | "feedback_rechazado"
+                      | "puntos_ganados"
+                  }))}
                   onMarkAsRead={handleMarkNotificationAsRead}
                   onMarkAllAsRead={handleMarkAllNotificationsAsRead}
                   showMarkAllButton={true}

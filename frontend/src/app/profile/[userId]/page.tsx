@@ -95,7 +95,7 @@ export default function PerfilUsuarioPage() {
     
     try {
       setIsLoading(true);
-      const response = await fetch(`http://localhost:3001/api/profile/${userId}`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/profile/${userId}`);
       
       if (!response.ok) {
         if (response.status === 404) {
