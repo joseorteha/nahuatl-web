@@ -164,24 +164,9 @@ export default function ComunidadPage() {
     }
 
     try {
-      console.log('🔥 DEBUG LIKE - Starting like process');
-      console.log('🔥 DEBUG LIKE - temaId:', temaId);
-      console.log('🔥 DEBUG LIKE - user:', user);
-      
-      // Verificar tokens directamente
-      const storedTokens = localStorage.getItem('auth_tokens');
-      console.log('🔥 DEBUG LIKE - localStorage tokens:', storedTokens);
-      
-      if (storedTokens) {
-        const parsedTokens = JSON.parse(storedTokens);
-        console.log('🔥 DEBUG LIKE - Parsed tokens:', parsedTokens);
-      }
-      
       const response = await apiCall(`/api/temas/${temaId}/like`, {
         method: 'POST',
       });
-      
-      console.log('🔥 DEBUG LIKE - Response:', response.status, response.statusText);
 
       if (response.ok) {
         const result = await response.json();
@@ -492,26 +477,10 @@ export default function ComunidadPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.8 }}
-              className="flex items-center gap-4"
+              className="flex items-center gap-2 text-slate-500 dark:text-slate-400"
             >
-              <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
-                <Users className="w-5 h-5" />
-                <span className="text-sm">+{filteredTemas.reduce((sum, tema) => sum + tema.participantes_count, 0)} participantes activos</span>
-              </div>
-              
-              {/* Botón temporal de debug */}
-              {process.env.NODE_ENV === 'development' && (
-                <motion.button
-                  onClick={async () => {
-                    console.log('🔄 Probando refresh token...');
-                    const result = await refreshTokenFix();
-                    showNotification(result ? 'success' : 'error', result ? 'Token refrescado' : 'Error al refrescar');
-                  }}
-                  className="px-4 py-2 bg-yellow-500 text-white rounded-lg text-sm font-medium"
-                >
-                  🔄 Refresh Token
-                </motion.button>
-              )}
+              <Users className="w-5 h-5" />
+              <span className="text-sm">+{filteredTemas.reduce((sum, tema) => sum + tema.participantes_count, 0)} participantes activos</span>
             </motion.div>
           </motion.div>
         </motion.div>
