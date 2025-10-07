@@ -26,6 +26,7 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/navigation/Header';
 import { useSocial } from '@/hooks/useSocial';
+import Avatar from '@/components/ui/Avatar';
 
 interface PerfilUsuario {
   id: string;
@@ -204,110 +205,115 @@ export default function PerfilUsuarioPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
       <Header />
       
-      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 lg:py-8 max-w-6xl">
+      <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8 max-w-6xl">
         {/* Header del perfil mejorado */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-6 sm:mb-8"
         >
-          <div className="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
-            <button
-              onClick={() => router.back()}
-              className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 flex-shrink-0"
-            >
-              <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
-            </button>
-            
-            <div className="flex-1">
+            <div className="flex items-start gap-2 sm:gap-3 mb-4 sm:mb-6">
+              <button
+                onClick={() => router.back()}
+                className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 flex-shrink-0"
+              >
+                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+              </button>            <div className="flex-1">
               {/* Información principal */}
-              <div className="bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-800 dark:via-slate-700 dark:to-slate-600 rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-200/60 dark:border-slate-700/60">
+              <div className="bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-800 dark:via-slate-700 dark:to-slate-600 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-xl border border-slate-200/60 dark:border-slate-700/60">
                 <div className="flex flex-col lg:flex-row lg:items-start gap-4 lg:gap-6">
                   {/* Avatar y info básica */}
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                    <div className="relative">
-                      <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 bg-gradient-to-br from-cyan-500 via-blue-600 to-purple-600 rounded-3xl flex items-center justify-center text-white font-bold text-2xl sm:text-3xl lg:text-4xl shadow-2xl">
-                        {perfilUsuario.nombre_completo.charAt(0)}
-                      </div>
+                  <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4">
+                    <div className="relative flex-shrink-0">
+                      <Avatar 
+                        src={perfilUsuario.url_avatar}
+                        name={perfilUsuario.nombre_completo}
+                        size="2xl"
+                        className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 shadow-2xl"
+                      />
                       {perfilUsuario.verificado && (
-                        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                          <Crown className="w-3 h-3 text-white" />
+                        <div className="absolute -bottom-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                          <Crown className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" />
                         </div>
                       )}
                     </div>
                     
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">
-                        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white">
+                        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white leading-tight">
                           {perfilUsuario.nombre_completo}
                         </h1>
                         {perfilUsuario.verificado && (
-                          <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                            <Crown className="w-3 h-3 text-white" />
+                          <div className="w-5 h-5 sm:w-6 sm:h-6 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                            <Crown className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" />
                           </div>
                         )}
                       </div>
-                      <p className="text-slate-600 dark:text-slate-300 text-lg mb-3">
+                      <p className="text-slate-600 dark:text-slate-300 text-base sm:text-lg mb-3">
                         @{perfilUsuario.username}
                       </p>
                       
                       {/* Biografía */}
                       {perfilUsuario.biografia && (
-                        <p className="text-slate-700 dark:text-slate-300 mb-3 max-w-2xl">
+                        <p className="text-slate-700 dark:text-slate-300 mb-3 max-w-2xl text-sm sm:text-base leading-relaxed">
                           {perfilUsuario.biografia}
                         </p>
                       )}
                       
                       {/* Info adicional */}
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
+                      <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
                         {perfilUsuario.ubicacion && (
                           <div className="flex items-center gap-1">
-                            <MapPin className="w-4 h-4" />
-                            <span>{perfilUsuario.ubicacion}</span>
+                            <MapPin className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                            <span className="truncate">{perfilUsuario.ubicacion}</span>
                           </div>
                         )}
                         {perfilUsuario.sitio_web && (
                           <div className="flex items-center gap-1">
-                            <ExternalLink className="w-4 h-4" />
-                            <a href={perfilUsuario.sitio_web} target="_blank" rel="noopener noreferrer" className="hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors">
+                            <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                            <a href={perfilUsuario.sitio_web} target="_blank" rel="noopener noreferrer" className="hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors truncate">
                               Sitio web
                             </a>
                           </div>
                         )}
                         <div className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
-                          <span>Miembro desde {new Date(perfilUsuario.fecha_registro).toLocaleDateString()}</span>
+                          <Calendar className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                          <span className="truncate">Miembro desde {new Date(perfilUsuario.fecha_registro).toLocaleDateString()}</span>
                         </div>
                       </div>
                     </div>
                   </div>
                   
                   {/* Niveles y puntos */}
-                  <div className="flex flex-col sm:flex-row lg:flex-col gap-3 lg:gap-4">
+                  <div className="flex flex-col sm:flex-row lg:flex-col gap-3 lg:gap-4 lg:min-w-fit">
                     {(perfilUsuario.configuraciones?.mostrar_nivel ?? true) && (
-                      <div className="flex gap-2">
-                        <div className={`px-4 py-2 rounded-2xl text-sm font-semibold bg-gradient-to-r ${getNivelColor(perfilUsuario.nivel_social)} text-white shadow-lg`}>
+                      <div className="flex flex-wrap gap-2">
+                        <div className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-semibold bg-gradient-to-r ${getNivelColor(perfilUsuario.nivel_social)} text-white shadow-lg`}>
                           {getNivelIcon(perfilUsuario.nivel_social)} {perfilUsuario.nivel_social}
                         </div>
-                        <div className={`px-4 py-2 rounded-2xl text-sm font-semibold bg-gradient-to-r ${getNivelColor(perfilUsuario.nivel_conocimiento)} text-white shadow-lg`}>
+                        <div className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-semibold bg-gradient-to-r ${getNivelColor(perfilUsuario.nivel_conocimiento)} text-white shadow-lg`}>
                           {getNivelIcon(perfilUsuario.nivel_conocimiento)} {perfilUsuario.nivel_conocimiento}
                         </div>
                       </div>
                     )}
                     
                     {(perfilUsuario.configuraciones?.mostrar_puntos ?? true) && (
-                      <div className="flex gap-4">
+                      <div className="flex gap-3 sm:gap-4">
                         <div className="text-center">
-                          <div className="text-2xl font-bold text-cyan-600 dark:text-cyan-400">
-                            {perfilUsuario.experiencia_social}
-                          </div>
-                          <div className="text-xs text-slate-500 dark:text-slate-400">Social</div>
+                          <p className="text-lg sm:text-xl lg:text-2xl font-bold text-cyan-600 dark:text-cyan-400">
+                            {perfilUsuario.puntos_conocimiento?.toLocaleString() || 0}
+                          </p>
+                          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                            Puntos
+                          </p>
                         </div>
                         <div className="text-center">
-                          <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                            {perfilUsuario.puntos_conocimiento}
-                          </div>
-                          <div className="text-xs text-slate-500 dark:text-slate-400">Conocimiento</div>
+                          <p className="text-lg sm:text-xl lg:text-2xl font-bold text-purple-600 dark:text-purple-400">
+                            {perfilUsuario.experiencia_social?.toLocaleString() || 0}
+                          </p>
+                          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                            Experiencia
+                          </p>
                         </div>
                       </div>
                     )}

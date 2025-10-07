@@ -63,31 +63,31 @@ export default function NotificationItem({ notification, onMarkAsRead, onNotific
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 20 }}
       transition={{ duration: 0.2 }}
-      className={`group relative p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all duration-200 cursor-pointer border-l-4 ${
+      className={`group relative p-3 sm:p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all duration-200 cursor-pointer border-l-4 ${
         !notification.leida 
           ? 'border-l-cyan-500 bg-cyan-50/30 dark:bg-cyan-900/10' 
           : 'border-l-transparent'
       } ${className}`}
       onClick={handleClick}
     >
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-2 sm:gap-3">
         {/* Icono de la notificación */}
-        <div className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center ${colorClasses}`}>
-          <IconComponent size={18} />
+        <div className={`flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center ${colorClasses}`}>
+          <IconComponent size={16} className="sm:w-[18px] sm:h-[18px]" />
         </div>
 
         {/* Contenido de la notificación */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
-              <p className={`text-sm font-medium ${
+              <p className={`text-xs sm:text-sm font-medium leading-snug ${
                 !notification.leida 
                   ? 'text-slate-900 dark:text-slate-100' 
                   : 'text-slate-700 dark:text-slate-300'
               }`}>
                 {notification.titulo}
               </p>
-              <p className={`text-sm mt-1 ${
+              <p className={`text-xs sm:text-sm mt-1 leading-relaxed ${
                 !notification.leida 
                   ? 'text-slate-600 dark:text-slate-400' 
                   : 'text-slate-500 dark:text-slate-500'
@@ -98,12 +98,12 @@ export default function NotificationItem({ notification, onMarkAsRead, onNotific
             
             {/* Indicador de no leído */}
             {!notification.leida && (
-              <div className="flex-shrink-0 w-2 h-2 bg-cyan-500 rounded-full mt-2"></div>
+              <div className="flex-shrink-0 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-cyan-500 rounded-full mt-1 sm:mt-2"></div>
             )}
           </div>
 
           {/* Timestamp */}
-          <div className="flex items-center justify-between mt-2">
+          <div className="flex items-center justify-between mt-1 sm:mt-2">
             <p className="text-xs text-slate-500 dark:text-slate-500">
               {formatDistanceToNow(new Date(notification.fecha_creacion), {
                 addSuffix: true,
@@ -113,8 +113,8 @@ export default function NotificationItem({ notification, onMarkAsRead, onNotific
             
             {/* Flecha para indicar que es clickeable */}
             <ChevronRight 
-              size={14} 
-              className="text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors duration-200 opacity-0 group-hover:opacity-100"
+              size={12} 
+              className="sm:w-[14px] sm:h-[14px] text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors duration-200 opacity-0 group-hover:opacity-100"
             />
           </div>
         </div>

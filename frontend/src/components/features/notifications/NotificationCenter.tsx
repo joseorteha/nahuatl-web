@@ -131,47 +131,47 @@ export default function NotificationCenter({ className = '' }: NotificationCente
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -10 }}
             transition={{ duration: 0.15 }}
-            className="absolute right-0 top-full mt-2 w-96 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg z-50"
+            className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg z-50 max-w-[calc(100vw-2rem)] sm:max-w-none"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
-              <h3 className="font-semibold text-slate-900 dark:text-slate-100">
+            <div className="flex items-center justify-between p-3 sm:p-4 border-b border-slate-200 dark:border-slate-700">
+              <h3 className="font-semibold text-slate-900 dark:text-slate-100 text-sm sm:text-base">
                 Notificaciones
                 {unreadCount > 0 && (
-                  <span className="ml-2 text-sm font-normal text-slate-500 dark:text-slate-400">
+                  <span className="ml-1 sm:ml-2 text-xs sm:text-sm font-normal text-slate-500 dark:text-slate-400">
                     ({unreadCount} sin leer)
                   </span>
                 )}
               </h3>
               
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 sm:gap-2">
                 {/* Botón de refrescar */}
                 <button
                   onClick={handleRefresh}
                   disabled={loading}
-                  className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                  className="p-1 sm:p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                   title="Refrescar"
                 >
-                  <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                  <RefreshCw className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${loading ? 'animate-spin' : ''}`} />
                 </button>
 
                 {/* Marcar todas como leídas */}
                 {unreadCount > 0 && (
                   <button
                     onClick={handleMarkAllAsRead}
-                    className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-green-600 dark:hover:text-green-400 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                    className="p-1 sm:p-1.5 text-slate-500 dark:text-slate-400 hover:text-green-600 dark:hover:text-green-400 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                     title="Marcar todas como leídas"
                   >
-                    <CheckCheck className="w-4 h-4" />
+                    <CheckCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </button>
                 )}
 
                 {/* Cerrar */}
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                  className="p-1 sm:p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </button>
               </div>
             </div>
@@ -186,7 +186,7 @@ export default function NotificationCenter({ className = '' }: NotificationCente
             )}
 
             {/* Lista de notificaciones */}
-            <div className="max-h-96 overflow-y-auto">
+            <div className="max-h-80 sm:max-h-96 overflow-y-auto">
               {loading && notifications.length === 0 ? (
                 <div className="flex items-center justify-center p-8">
                   <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
