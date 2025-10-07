@@ -33,6 +33,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   updateProfile: (updateData: Partial<User>) => Promise<any>;
   apiCall: (endpoint: string, options?: RequestInit) => Promise<Response>;
+  refreshTokenFix: () => Promise<boolean>;
 }
 
 // Exportar el contexto para uso avanzado (como en ConditionalHeader)
@@ -71,7 +72,50 @@ function AuthContextComponent({ children }: AuthProviderProps) {
   
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-  // 🔥 FUNCIÓN PARA HACER LLAMADAS AUTENTICADAS
+  // � FUNCIÓN PARA REFRESCAR TOKEN EN CASO DE ERROR
+  const refreshTokenFix = useCallback(async () => {
+    try {
+      console.log('🔄 Intentando refrescar token...');
+      const response = await fetch(`${API_URL}/api/auth/refresh-token-fix`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(tokens?.accessToken && { Authorization: `Bearer ${tokens.accessToken}` }),
+        },
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('✅ Token refrescado exitosamente');
+        
+        setUser(data.user);
+        setTokens({
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken,
+          expiresIn: data.expiresIn,
+        });
+        
+        // Guardar en localStorage
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('user_data', JSON.stringify(data.user));
+          localStorage.setItem('auth_tokens', JSON.stringify({
+            accessToken: data.accessToken,
+            refreshToken: data.refreshToken,
+            expiresIn: data.expiresIn,
+          }));
+        }
+        
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error refrescando token:', error);
+      return false;
+    }
+  }, [API_URL, tokens?.accessToken]);
+
+  // �🔥 FUNCIÓN PARA HACER LLAMADAS AUTENTICADAS CON AUTO-REFRESH
   const apiCall = useCallback(async (endpoint: string, options: RequestInit = {}): Promise<Response> => {
     const token = tokens?.accessToken;
     
@@ -80,7 +124,7 @@ function AuthContextComponent({ children }: AuthProviderProps) {
     console.log(`👤 User: ${user ? user.id : 'NO USER'}`);
     console.log(`🔍 Full tokens object:`, tokens);
     
-    return await fetch(`${API_URL}${endpoint}`, {
+    const response = await fetch(`${API_URL}${endpoint}`, {
       ...options,
       headers: {
         'Content-Type': 'application/json',
@@ -89,7 +133,30 @@ function AuthContextComponent({ children }: AuthProviderProps) {
       },
       credentials: 'include',
     });
-  }, [tokens?.accessToken, API_URL, user]);
+    
+    // Si hay error 403/401, intentar refrescar el token
+    if ((response.status === 403 || response.status === 401) && token) {
+      console.log('🔄 Error de auth, intentando refrescar token...');
+      const refreshed = await refreshTokenFix();
+      
+      if (refreshed) {
+        console.log('🔄 Token refrescado, reintentando llamada...');
+        // Reintentar la llamada con el nuevo token
+        const newToken = tokens?.accessToken;
+        return await fetch(`${API_URL}${endpoint}`, {
+          ...options,
+          headers: {
+            'Content-Type': 'application/json',
+            ...(newToken && { Authorization: `Bearer ${newToken}` }),
+            ...options.headers,
+          },
+          credentials: 'include',
+        });
+      }
+    }
+    
+    return response;
+  }, [tokens?.accessToken, API_URL, user, refreshTokenFix]);
 
   // 🔑 FUNCIÓN DE LOGIN
   const login = useCallback(async (email: string, password: string, rememberMe?: boolean) => {
@@ -280,6 +347,7 @@ function AuthContextComponent({ children }: AuthProviderProps) {
     signOut,
     updateProfile,
     apiCall,
+    refreshTokenFix,
   };
 
   return (
