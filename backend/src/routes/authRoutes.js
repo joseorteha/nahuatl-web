@@ -92,18 +92,15 @@ router.post('/refresh-token', authController.refreshToken);
 // GET /api/auth/check-session - Verificar sesión de cookies
 router.get('/check-session', authController.checkSession);
 
-// GET /api/auth/profile/:userId - Obtener perfil público (sin autenticación)
-router.get('/profile/:userId', validateUUID('userId'), authController.getPublicProfile);
-
 // Rutas protegidas (requieren autenticación)
 // GET /api/auth/profile/:userId - Obtener perfil
-router.get('/profile/:userId', validateUUID('userId'), authenticateToken, authController.getProfile);
+router.get('/profile/:userId', validateUUID('userId'), authenticateTokenLegacy, authController.getProfile);
 
 // PUT /api/auth/profile/:userId - Actualizar perfil
 router.put('/profile/:userId', validateUUID('userId'), authenticateToken, authController.updateProfile);
 
 // GET /api/auth/stats/:userId - Obtener estadísticas del usuario
-router.get('/stats/:userId', validateUUID('userId'), authenticateToken, authController.getUserStats);
+router.get('/stats/:userId', validateUUID('userId'), authenticateTokenLegacy, authController.getUserStats);
 
 // GET /api/auth/saved-words/:userId - Obtener palabras guardadas del usuario
 router.get('/saved-words/:userId', validateUUID('userId'), authenticateToken, authController.getSavedWords);

@@ -244,38 +244,78 @@ class UserService {
    */
   async getUserStats(userId) {
     try {
-      // Obtener contribuciones
-      const { data: contributions, error: contributionsError } = await supabase
-        .from('contribuciones_diccionario')
-        .select('id')
-        .eq('usuario_id', userId);
+      console.log('🔍 getUserStats - Starting stats collection for user:', userId);
+      
+      let contributions = 0;
+      let temas = 0;
+      let savedWords = 0;
 
-      if (contributionsError) throw contributionsError;
+      // Intentar obtener contribuciones (si la tabla existe)
+      try {
+        const { data: contributionsData, error: contributionsError } = await supabase
+          .from('contribuciones_diccionario')
+          .select('id')
+          .eq('usuario_id', userId);
 
-      // Obtener temas de conversación enviados
-      const { data: temas, error: temasError } = await supabase
-        .from('temas_conversacion')
-        .select('id')
-        .eq('usuario_id', userId);
+        if (!contributionsError && contributionsData) {
+          contributions = contributionsData.length;
+          console.log('✅ getUserStats - Contributions found:', contributions);
+        }
+      } catch (error) {
+        console.log('⚠️ getUserStats - Contributions table not accessible, using default');
+        contributions = 0;
+      }
 
-      if (temasError) throw temasError;
+      // Intentar obtener temas (usar tabla disponible o 0)
+      try {
+        // Usar temas_conversacion con creador_id según el esquema de BD
+        const { data: temasData, error: temasError } = await supabase
+          .from('temas_conversacion')
+          .select('id')
+          .eq('creador_id', userId);
 
-      // Obtener palabras guardadas
-      const { data: savedWords, error: savedWordsError } = await supabase
-        .from('palabras_guardadas')
-        .select('id')
-        .eq('usuario_id', userId);
+        if (!temasError && temasData) {
+          temas = temasData.length;
+          console.log('✅ getUserStats - Temas found:', temas);
+        }
+      } catch (error) {
+        console.log('⚠️ getUserStats - Temas table not accessible, using default');
+        temas = 0;
+      }
 
-      if (savedWordsError) throw savedWordsError;
+      // Intentar obtener palabras guardadas
+      try {
+        const { data: savedWordsData, error: savedWordsError } = await supabase
+          .from('palabras_guardadas')
+          .select('id')
+          .eq('usuario_id', userId);
 
-      return {
-        contributions: contributions ? contributions.length : 0,
-        temas: temas ? temas.length : 0,
-        savedWords: savedWords ? savedWords.length : 0
+        if (!savedWordsError && savedWordsData) {
+          savedWords = savedWordsData.length;
+          console.log('✅ getUserStats - Saved words found:', savedWords);
+        }
+      } catch (error) {
+        console.log('⚠️ getUserStats - Saved words table not accessible, using default');
+        savedWords = 0;
+      }
+
+      const stats = {
+        contributions,
+        temas,
+        savedWords
       };
+
+      console.log('✅ getUserStats - Final stats:', stats);
+      return stats;
+
     } catch (error) {
-      console.error('Error obteniendo estadísticas del usuario:', error);
-      throw error;
+      console.error('❌ getUserStats - Error general:', error);
+      // Retornar estadísticas por defecto en caso de error
+      return {
+        contributions: 0,
+        temas: 0,
+        savedWords: 0
+      };
     }
   }
 
