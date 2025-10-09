@@ -39,7 +39,7 @@ interface UseNotificationsReturn {
   stopPolling: () => void;
 }
 
-const POLLING_INTERVAL = 30000; // 30 segundos
+const POLLING_INTERVAL = 60000; // 60 segundos (reducido de 30)
 const NOTIFICATIONS_PER_PAGE = 20;
 
 export function useNotifications(): UseNotificationsReturn {
@@ -300,12 +300,9 @@ export function useNotifications(): UseNotificationsReturn {
     }
   }, []);
 
-  // ✅ Efecto para manejar polling basado en autenticación
+  // ✅ Efecto para manejar polling basado en autenticación (SIN auto-inicio)
   useEffect(() => {
-    if (isUserReady) {
-      console.log('🔔 Usuario listo, iniciando polling de notificaciones');
-      startPolling();
-    } else {
+    if (!isUserReady) {
       console.log('🔔 Usuario no listo, deteniendo polling');
       stopPolling();
       // Limpiar estado cuando no hay usuario
@@ -315,11 +312,13 @@ export function useNotifications(): UseNotificationsReturn {
       setOffset(0);
       setHasMore(true);
     }
+    // ❌ NO iniciar polling automáticamente
+    // Dejamos que lo haga manualmente el NotificationCenter cuando se abra
 
     return () => {
       stopPolling();
     };
-  }, [isUserReady, startPolling, stopPolling]);
+  }, [isUserReady, stopPolling]); // ❌ Removido startPolling de dependencias
 
   return {
     notifications,
