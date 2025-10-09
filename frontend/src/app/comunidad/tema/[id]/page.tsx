@@ -298,7 +298,7 @@ export default function TemaPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
+    <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: 'var(--color-background)' }}>
       <Header />
       
       {/* Notification */}
@@ -310,11 +310,21 @@ export default function TemaPage() {
             exit={{ opacity: 0, y: -50 }}
             className="fixed top-20 right-4 z-50"
           >
-            <div className={`rounded-lg p-4 shadow-lg ${
+            <div className={`card p-4 shadow-xl ${
               notification.type === 'success' 
-                ? 'bg-green-500 text-white' 
-                : 'bg-red-500 text-white'
-            }`}>
+                ? 'bg-green-50 border-green-200 text-green-800'
+                : 'bg-red-50 border-red-200 text-red-800'
+            }`} style={{
+              backgroundColor: notification.type === 'success' 
+                ? 'var(--color-success)' + '20'
+                : 'var(--color-error)' + '20',
+              borderColor: notification.type === 'success' 
+                ? 'var(--color-success)'
+                : 'var(--color-error)',
+              color: notification.type === 'success' 
+                ? 'var(--color-success)'
+                : 'var(--color-error)'
+            }}>
               {notification.message}
             </div>
           </motion.div>
@@ -330,11 +340,11 @@ export default function TemaPage() {
         >
           <button
             onClick={() => router.back()}
-            className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 flex-shrink-0"
+            className="button-secondary p-3 rounded-lg flex items-center justify-center"
           >
             <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white leading-tight">
+          <h1 className="title-lg leading-tight" style={{ color: 'var(--color-text)' }}>
             {tema.titulo}
           </h1>
         </motion.div>

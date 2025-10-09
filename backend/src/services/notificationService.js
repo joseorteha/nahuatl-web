@@ -120,7 +120,7 @@ class NotificationService {
       
       await this.crearNotificacion({
         usuario_id: autorTema,
-        tipo: 'contenido_compartido',
+        tipo: 'tema_compartido',
         titulo: '🔗 ¡Compartieron tu tema!',
         mensaje: `${nombreUsuario} compartió tu tema: "${tema.titulo}"`,
         relacionado_id: temaId,
@@ -136,6 +136,7 @@ class NotificationService {
    * Notificación cuando alguien responde a un tema
    */
   async notificarRespuestaTema(temaId, usuarioQueResponde, autorTema, contenidoRespuesta) {
+    
     if (usuarioQueResponde === autorTema) {
       return;
     }
@@ -170,6 +171,8 @@ class NotificationService {
         relacionado_id: temaId,
         relacionado_tipo: 'tema'
       });
+
+      console.log('✅ Notificación de respuesta enviada correctamente');
 
     } catch (error) {
       console.error('❌ Error en notificarRespuestaTema:', error);

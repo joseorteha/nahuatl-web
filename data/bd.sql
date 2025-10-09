@@ -127,7 +127,7 @@ CREATE TABLE public.mensajes_contacto (
 CREATE TABLE public.notificaciones (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   usuario_id uuid NOT NULL,
-  tipo_notificacion text NOT NULL CHECK (tipo_notificacion = ANY (ARRAY['like_recibido'::text, 'respuesta_recibida'::text, 'mencion'::text, 'nuevo_seguidor'::text, 'logro_obtenido'::text, 'puntos_ganados'::text, 'contribucion_aprobada'::text, 'contribucion_rechazada'::text, 'tema_nuevo_categoria'::text, 'mensaje_contacto'::text, 'solicitud_union'::text])),
+  tipo_notificacion text NOT NULL CHECK (tipo_notificacion = ANY (ARRAY['like_recibido'::text, 'respuesta_recibida'::text, 'tema_compartido'::text, 'ranking_actualizado'::text, 'mencion'::text, 'nuevo_seguidor'::text, 'logro_obtenido'::text, 'puntos_ganados'::text, 'contribucion_aprobada'::text, 'contribucion_rechazada'::text, 'contribucion_publicada'::text, 'tema_nuevo_categoria'::text, 'mensaje_contacto'::text, 'solicitud_union'::text])),
   titulo text NOT NULL,
   mensaje text NOT NULL,
   relacionado_id uuid,

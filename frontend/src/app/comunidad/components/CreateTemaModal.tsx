@@ -100,16 +100,20 @@ export default function CreateTemaModal({ isOpen, onClose, onSuccess }: CreateTe
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
           className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+          style={{ 
+            backgroundColor: 'var(--color-surface)',
+            borderColor: 'var(--color-border)'
+          }}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+          <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: 'var(--color-border)' }}>
+            <h2 className="title-sm" style={{ color: 'var(--color-text)' }}>
               Crear Nuevo Tema
             </h2>
             <button
               onClick={onClose}
-              className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200"
+              className="button-text p-2 rounded-lg"
             >
               <X className="w-5 h-5" />
             </button>
@@ -150,7 +154,7 @@ export default function CreateTemaModal({ isOpen, onClose, onSuccess }: CreateTe
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             {/* Título */}
             <div>
-              <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+              <label className="label-modern">
                 Título del Tema *
               </label>
               <input
@@ -158,19 +162,19 @@ export default function CreateTemaModal({ isOpen, onClose, onSuccess }: CreateTe
                 value={formData.titulo}
                 onChange={(e) => setFormData(prev => ({ ...prev, titulo: e.target.value }))}
                 placeholder="Escribe un título claro y descriptivo..."
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                className="input-modern"
                 maxLength={200}
                 disabled={isSubmitting}
                 required
               />
-              <div className="mt-1 text-xs text-gray-500 dark:text-gray-400 text-right">
+              <div className="mt-1 text-xs text-right" style={{ color: 'var(--color-text-muted)' }}>
                 {formData.titulo.length}/200
               </div>
             </div>
 
             {/* Descripción */}
             <div>
-              <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+              <label className="label-modern">
                 Descripción (Opcional)
               </label>
               <textarea
@@ -178,18 +182,18 @@ export default function CreateTemaModal({ isOpen, onClose, onSuccess }: CreateTe
                 onChange={(e) => setFormData(prev => ({ ...prev, descripcion: e.target.value }))}
                 placeholder="Proporciona más detalles sobre tu tema..."
                 rows={4}
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 resize-none"
+                className="input-modern resize-none"
                 maxLength={1000}
                 disabled={isSubmitting}
               />
-              <div className="mt-1 text-xs text-gray-500 dark:text-gray-400 text-right">
+              <div className="mt-1 text-xs text-right" style={{ color: 'var(--color-text-muted)' }}>
                 {formData.descripcion.length}/1000
               </div>
             </div>
 
             {/* Categoría */}
             <div>
-              <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-3">
+              <label className="label-modern">
                 Categoría *
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -248,17 +252,17 @@ export default function CreateTemaModal({ isOpen, onClose, onSuccess }: CreateTe
                 type="button"
                 onClick={onClose}
                 disabled={isSubmitting}
-                className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200 disabled:opacity-50"
+                className="button-secondary flex-1 py-3 disabled:opacity-50"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting || !formData.titulo.trim()}
-                className={`flex-1 px-4 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 ${
+                className={`flex-1 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center gap-2 ${
                   isSubmitting || !formData.titulo.trim()
-                    ? 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-cyan-500 via-blue-500 to-slate-500 text-white shadow-lg hover:shadow-xl'
+                    ? 'opacity-50 cursor-not-allowed'
+                    : 'button-primary shadow-lg hover:shadow-xl'
                 }`}
               >
                 {isSubmitting ? (

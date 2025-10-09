@@ -334,12 +334,26 @@ export default function ComunidadPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950 relative overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-100/20 via-transparent to-purple-100/20 dark:from-blue-900/10 dark:to-purple-900/10"></div>
-      <div className="absolute top-0 -right-4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 dark:opacity-10 animate-pulse" style={{animationDuration: '4s'}}></div>
-      <div className="absolute top-0 -left-4 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 dark:opacity-10 animate-pulse" style={{animationDuration: '6s', animationDelay: '2s'}}></div>
-      <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 dark:opacity-10 animate-pulse" style={{animationDuration: '8s', animationDelay: '4s'}}></div>
+    <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: 'var(--color-background)' }}>
+      {/* Background Effects Modernos */}
+      <div className="absolute inset-0 bg-gradient-to-br from-cyan-50/30 via-transparent to-blue-50/30"></div>
+      <div className="absolute top-0 -right-4 w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse" 
+           style={{ 
+             backgroundColor: 'var(--color-primary)',
+             animationDuration: '8s'
+           }}></div>
+      <div className="absolute top-0 -left-4 w-80 h-80 rounded-full mix-blend-multiply filter blur-3xl opacity-15 animate-pulse" 
+           style={{ 
+             backgroundColor: 'var(--color-secondary)',
+             animationDuration: '12s', 
+             animationDelay: '2s'
+           }}></div>
+      <div className="absolute -bottom-8 left-1/3 w-72 h-72 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse" 
+           style={{ 
+             backgroundColor: 'var(--color-accent)',
+             animationDuration: '10s', 
+             animationDelay: '4s'
+           }}></div>
       
       <Header />
       
@@ -352,11 +366,21 @@ export default function ComunidadPage() {
             exit={{ opacity: 0, y: -50, scale: 0.9 }}
             className="fixed top-20 right-4 z-50"
           >
-            <div className={`relative rounded-2xl p-4 shadow-2xl backdrop-blur-xl border border-white/20 ${
+            <div className={`card relative p-4 shadow-xl backdrop-blur-xl ${
               notification.type === 'success' 
-                ? 'bg-gradient-to-r from-green-500/90 to-emerald-500/90 text-white border-green-300/30' 
-                : 'bg-gradient-to-r from-red-500/90 to-rose-500/90 text-white border-red-300/30'
-            }`}>
+                ? 'bg-green-50 border-green-200 text-green-800'
+                : 'bg-red-50 border-red-200 text-red-800'
+            }`} style={{
+              backgroundColor: notification.type === 'success' 
+                ? 'var(--color-success)' + '20'
+                : 'var(--color-error)' + '20',
+              borderColor: notification.type === 'success' 
+                ? 'var(--color-success)'
+                : 'var(--color-error)',
+              color: notification.type === 'success' 
+                ? 'var(--color-success)'
+                : 'var(--color-error)'
+            }}>
               <div className="flex items-center gap-3">
                 {notification.type === 'success' ? (
                   <Sparkles className="w-5 h-5 animate-spin" />
@@ -365,7 +389,7 @@ export default function ComunidadPage() {
                 )}
                 <span className="font-medium">{notification.message}</span>
               </div>
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/20 to-transparent opacity-50 pointer-events-none"></div>
+              <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-white/10 to-transparent opacity-50 pointer-events-none"></div>
             </div>
           </motion.div>
         )}
@@ -376,7 +400,7 @@ export default function ComunidadPage() {
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center py-16 mb-12"
+          className="text-center py-20 mb-16"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -384,51 +408,61 @@ export default function ComunidadPage() {
             transition={{ delay: 0.2 }}
             className="relative"
           >
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-600 dark:from-indigo-400 dark:via-purple-400 dark:to-cyan-400 bg-clip-text text-transparent mb-6 leading-tight">
-              Temas de Conversación
+            {/* Badge moderno */}
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.1 }}
+              className="inline-flex items-center px-4 py-2 rounded-full mb-8"
+              style={{ 
+                backgroundColor: 'var(--color-primary-light)',
+                color: 'var(--color-primary-dark)',
+                border: `1px solid var(--color-primary)`
+              }}
+            >
+              <MessageCircle className="w-5 h-5 mr-2" />
+              <span className="text-sm font-semibold">Comunidad Activa • {temas.length} Temas</span>
+            </motion.div>
+
+            <h1 className="title-xl mb-6 leading-tight">
+              <span style={{ color: 'var(--color-text)' }}>Conecta y Comparte en la </span>
+              <span 
+                className="bg-gradient-to-r bg-clip-text text-transparent font-bold"
+                style={{ 
+                  backgroundImage: `linear-gradient(135deg, var(--color-primary), var(--color-secondary), var(--color-accent))`
+                }}
+              >
+                Comunidad Náhuatl
+              </span>
             </h1>
-            <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-20 h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent rounded-full"></div>
+            
+            <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-24 h-1 rounded-full"
+                 style={{ backgroundColor: 'var(--color-accent)' }}></div>
           </motion.div>
           
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="text-xl text-slate-600 dark:text-slate-300 mb-8 max-w-3xl mx-auto leading-relaxed"
+            className="subtitle mb-10 max-w-3xl mx-auto leading-relaxed"
           >
-            Únete a la conversación más vibrante sobre náhuatl. Comparte ideas, resuelve dudas y construye conocimiento en comunidad.
+            Un espacio para hacer preguntas, compartir ideas y colaborar en la preservación 
+            del náhuatl. Únete a la conversación y ayuda a que nuestra lengua florezca.
           </motion.p>
           
-          <motion.div
+          <motion.button
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.95 }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+            onClick={() => setShowCreateModal(true)}
+            className="button-primary text-lg px-10 py-4 rounded-xl shadow-xl relative overflow-hidden group"
           >
-            <motion.button
-              onClick={() => setShowCreateModal(true)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="group relative bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500 text-white px-8 py-4 rounded-2xl font-semibold shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 flex items-center gap-3 text-lg overflow-hidden"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <div className="relative z-10 flex items-center gap-3">
-                <Plus className="w-6 h-6 group-hover:rotate-90 transition-transform duration-300" />
-                <span>Crear Nuevo Tema</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
-              </div>
-            </motion.button>
-            
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.8 }}
-              className="flex items-center gap-2 text-slate-500 dark:text-slate-400"
-            >
-              <Users className="w-5 h-5" />
-              <span className="text-sm">+{filteredTemas.reduce((sum, tema) => sum + tema.participantes_count, 0)} participantes activos</span>
-            </motion.div>
-          </motion.div>
+            <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <Plus className="w-5 h-5 mr-2 inline relative z-10" />
+            <span className="relative z-10">Crear Nuevo Tema</span>
+          </motion.button>
         </motion.div>
 
         {/* Advanced Search and Controls */}
@@ -438,26 +472,29 @@ export default function ComunidadPage() {
           transition={{ delay: 0.3 }}
           className="mb-8"
         >
-          <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-slate-700/20 p-6 sm:p-8">
+          <div className="card p-6 sm:p-8 backdrop-blur-xl">
             <div className="flex flex-col lg:flex-row gap-6">
               {/* Enhanced Search */}
               <div className="flex-1 relative group">
-                <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 rounded-lg blur opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                     style={{ backgroundColor: 'var(--color-primary-light)' }}></div>
                 <div className="relative">
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5 group-hover:text-indigo-500 transition-colors duration-300" />
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 transition-colors duration-300" 
+                          style={{ color: 'var(--color-text-secondary)' }} />
                   <input
                     type="text"
                     placeholder="Buscar temas, palabras clave, categorías..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-12 pr-4 py-4 bg-slate-50/80 dark:bg-slate-700/80 border border-slate-200/60 dark:border-slate-600/60 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300 text-base backdrop-blur-sm group-hover:bg-white dark:group-hover:bg-slate-700"
+                    className="input-modern w-full pl-12 pr-12 py-4 text-base"
                   />
                   {searchTerm && (
                     <motion.button
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       onClick={() => setSearchTerm('')}
-                      className="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-red-500 transition-colors duration-200"
+                      className="absolute right-4 top-1/2 transform -translate-y-1/2 transition-colors duration-200"
+                      style={{ color: 'var(--color-text-muted)' }}
                     >
                       <X className="w-5 h-5" />
                     </motion.button>
@@ -472,7 +509,7 @@ export default function ComunidadPage() {
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as SortType)}
-                    className="appearance-none px-4 py-4 bg-slate-50/80 dark:bg-slate-700/80 border border-slate-200/60 dark:border-slate-600/60 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300 text-base backdrop-blur-sm min-w-[200px] cursor-pointer group-hover:bg-white dark:group-hover:bg-slate-700"
+                    className="input-modern appearance-none pr-10 min-w-[200px] cursor-pointer text-base"
                   >
                     <option value="trending">🔥 Tendencias</option>
                     <option value="newest">⏰ Más Recientes</option>
@@ -480,7 +517,8 @@ export default function ComunidadPage() {
                     <option value="most_liked">❤️ Más Valorados</option>
                     <option value="most_responses">💬 Más Discutidos</option>
                   </select>
-                  <TrendingUp className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none group-hover:text-indigo-500 transition-colors duration-300" />
+                  <TrendingUp className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 pointer-events-none transition-colors duration-300" 
+                             style={{ color: 'var(--color-text-secondary)' }} />
                 </div>
 
                 {/* Advanced Filter Button */}
@@ -488,27 +526,23 @@ export default function ComunidadPage() {
                   onClick={() => setShowFilters(!showFilters)}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className={`px-6 py-4 rounded-2xl font-medium transition-all duration-300 flex items-center gap-3 backdrop-blur-sm border ${
-                    showFilters
-                      ? 'bg-indigo-500 text-white border-indigo-300 shadow-lg shadow-indigo-500/25'
-                      : 'bg-slate-50/80 dark:bg-slate-700/80 border-slate-200/60 dark:border-slate-600/60 text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700'
+                  className={`px-6 py-3 rounded-lg font-medium transition-all duration-300 flex items-center gap-3 ${
+                    showFilters ? 'button-primary' : 'button-secondary'
                   }`}
                 >
                   <Filter className="w-5 h-5" />
-                  <span className="hidden sm:inline">Filtros</span>
+                  <span>Filtros</span>
                   <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${showFilters ? 'rotate-180' : ''}`} />
                 </motion.button>
 
                 {/* View Toggle with Icons */}
-                <div className="flex rounded-2xl border border-slate-200/60 dark:border-slate-600/60 overflow-hidden backdrop-blur-sm">
+                <div className="flex rounded-lg overflow-hidden border" style={{ borderColor: 'var(--color-border)' }}>
                   <motion.button
                     onClick={() => setViewType('grid')}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className={`px-4 py-4 transition-all duration-300 flex items-center gap-2 ${
-                      viewType === 'grid'
-                        ? 'bg-indigo-500 text-white shadow-lg'
-                        : 'bg-slate-50/80 dark:bg-slate-700/80 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700'
+                    className={`px-4 py-3 transition-all duration-300 flex items-center gap-2 border-0 ${
+                      viewType === 'grid' ? 'button-primary' : 'button-secondary'
                     }`}
                   >
                     <Grid className="w-5 h-5" />
@@ -518,10 +552,8 @@ export default function ComunidadPage() {
                     onClick={() => setViewType('list')}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className={`px-4 py-4 transition-all duration-300 flex items-center gap-2 ${
-                      viewType === 'list'
-                        ? 'bg-indigo-500 text-white shadow-lg'
-                        : 'bg-slate-50/80 dark:bg-slate-700/80 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700'
+                    className={`px-4 py-3 transition-all duration-300 flex items-center gap-2 border-0 ${
+                      viewType === 'list' ? 'button-primary' : 'button-secondary'
                     }`}
                   >
                     <List className="w-5 h-5" />
@@ -535,9 +567,11 @@ export default function ComunidadPage() {
                   disabled={isLoading}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-4 py-4 bg-slate-50/80 dark:bg-slate-700/80 border border-slate-200/60 dark:border-slate-600/60 rounded-2xl hover:bg-white dark:hover:bg-slate-700 transition-all duration-300 disabled:opacity-50 backdrop-blur-sm group"
+                  className="button-secondary px-4 py-3 disabled:opacity-50 group"
                 >
-                  <RefreshCw className={`w-5 h-5 text-slate-600 dark:text-slate-400 group-hover:text-indigo-500 transition-colors duration-300 ${isLoading ? 'animate-spin' : 'group-hover:rotate-180'}`} />
+                  <RefreshCw className={`w-5 h-5 transition-all duration-300 ${
+                    isLoading ? 'animate-spin' : 'group-hover:rotate-180'
+                  }`} style={{ color: 'var(--color-text-secondary)' }} />
                 </motion.button>
               </div>
             </div>
@@ -550,21 +584,22 @@ export default function ComunidadPage() {
                   animate={{ opacity: 1, height: 'auto', y: 0 }}
                   exit={{ opacity: 0, height: 0, y: -10 }}
                   transition={{ duration: 0.3 }}
-                  className="mt-6 pt-6 border-t border-slate-200/60 dark:border-slate-600/60"
+                  className="mt-6 pt-6 border-t"
+                  style={{ borderColor: 'var(--color-border)' }}
                 >
                   <div className="space-y-4">
                     <div className="flex items-center gap-3 mb-4">
-                      <Layers className="w-5 h-5 text-indigo-500" />
-                      <h3 className="font-semibold text-slate-700 dark:text-slate-300">Categorías</h3>
+                      <Layers className="w-5 h-5" style={{ color: 'var(--color-primary)' }} />
+                      <h3 className="font-semibold" style={{ color: 'var(--color-text)' }}>Categorías</h3>
                     </div>
                     <div className="flex flex-wrap gap-3">
                       {[
-                        { value: 'all', label: 'Todos', icon: Globe, color: 'slate' },
-                        { value: 'suggestion', label: 'Sugerencias', icon: Lightbulb, color: 'yellow' },
-                        { value: 'question', label: 'Preguntas', icon: BookOpen, color: 'blue' },
-                        { value: 'issue', label: 'Problemas', icon: AlertCircle, color: 'orange' },
-                        { value: 'bug_report', label: 'Errores', icon: Bug, color: 'red' },
-                        { value: 'feature_request', label: 'Funcionalidades', icon: Settings, color: 'purple' },
+                        { value: 'all', label: 'Todos', icon: Globe },
+                        { value: 'suggestion', label: 'Sugerencias', icon: Lightbulb },
+                        { value: 'question', label: 'Preguntas', icon: BookOpen },
+                        { value: 'issue', label: 'Problemas', icon: AlertCircle },
+                        { value: 'bug_report', label: 'Errores', icon: Bug },
+                        { value: 'feature_request', label: 'Funcionalidades', icon: Settings },
                       ].map((filter) => {
                         const IconComponent = filter.icon;
                         const isActive = filterBy === filter.value;
@@ -574,10 +609,8 @@ export default function ComunidadPage() {
                             onClick={() => setFilterBy(filter.value as FilterType)}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className={`px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 flex items-center gap-2 backdrop-blur-sm border ${
-                              isActive
-                                ? 'bg-indigo-500 text-white border-indigo-300 shadow-lg shadow-indigo-500/25'
-                                : 'bg-slate-100/80 dark:bg-slate-600/80 text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-600 border-slate-200/60 dark:border-slate-500/60'
+                            className={`px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
+                              isActive ? 'button-primary' : 'tag hover:opacity-80'
                             }`}
                           >
                             <IconComponent className="w-4 h-4" />
