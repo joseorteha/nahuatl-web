@@ -82,49 +82,6 @@ export default function ComunidadPage() {
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-  // 🔥 DEBUGGING TEMPORAL - FUNCIÓN DE DIAGNÓSTICO
-  const debugAuth = async () => {
-    console.log('🔥 DEBUG AUTH STATUS:');
-    console.log('User:', user);
-    console.log('Loading:', loading);
-    console.log('localStorage auth_tokens:', localStorage.getItem('auth_tokens'));
-    console.log('sessionStorage auth_tokens:', sessionStorage.getItem('auth_tokens'));
-    
-    // Intentar parsear los tokens
-    try {
-      const localTokens = localStorage.getItem('auth_tokens');
-      if (localTokens) {
-        const parsed = JSON.parse(localTokens);
-        console.log('Parsed localStorage tokens:', parsed);
-      }
-      
-      const sessionTokens = sessionStorage.getItem('auth_tokens');
-      if (sessionTokens) {
-        const parsed = JSON.parse(sessionTokens);
-        console.log('Parsed sessionStorage tokens:', parsed);
-      }
-    } catch (e) {
-      console.log('Error parsing tokens:', e);
-    }
-    
-    // Test directo de API call
-    console.log('🧪 Testing API call...');
-    try {
-      const response = await apiCall('/api/temas');
-      console.log('✅ API call successful:', response.status);
-      if (response.ok) {
-        const data = await response.json();
-        console.log('API response data:', data);
-      } else {
-        console.log('❌ API call failed:', response.status, response.statusText);
-        const errorText = await response.text();
-        console.log('Error response:', errorText);
-      }
-    } catch (error) {
-      console.log('💥 API call error:', error);
-    }
-  };
-
   // Mostrar notificación
   const showNotification = (type: 'success' | 'error', message: string) => {
     setNotification({ type, message });
@@ -460,17 +417,6 @@ export default function ComunidadPage() {
                 <span>Crear Nuevo Tema</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
               </div>
-            </motion.button>
-            
-            {/* 🔥 BOTÓN TEMPORAL DE DEBUG */}
-            <motion.button
-              onClick={debugAuth}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="bg-red-500 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
-            >
-              <Bug className="w-5 h-5" />
-              Debug Auth
             </motion.button>
             
             <motion.div

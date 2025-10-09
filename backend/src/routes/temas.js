@@ -329,7 +329,6 @@ router.post('/:id/respuestas', authenticateToken, async (req, res) => {
     await updateTemaCounters(id);
 
     // Crear notificación para el autor del tema original
-    console.log('🔔 DEBUG: Enviando notificación de respuesta:', { temaId: id, userId, autorTema: tema.creador_id, contenido });
     await notificationService.notificarRespuestaTema(id, userId, tema.creador_id, contenido);
 
     res.status(201).json({

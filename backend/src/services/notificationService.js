@@ -136,10 +136,7 @@ class NotificationService {
    * Notificación cuando alguien responde a un tema
    */
   async notificarRespuestaTema(temaId, usuarioQueResponde, autorTema, contenidoRespuesta) {
-    console.log('🔔 DEBUG notificarRespuestaTema:', { temaId, usuarioQueResponde, autorTema, contenidoRespuesta });
-    
     if (usuarioQueResponde === autorTema) {
-      console.log('🔔 DEBUG: Usuario responde a su propio tema, no enviando notificación');
       return;
     }
 
