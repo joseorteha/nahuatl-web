@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { 
   User, 
@@ -21,7 +22,8 @@ import {
   Mail,
   Users,
   Star,
-  TrendingUp
+  TrendingUp,
+  UserPlus
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/navigation/Header';
@@ -76,13 +78,33 @@ interface PerfilUsuario {
     titulo: string;
     categoria: string;
     fecha_creacion: string;
-    respuestas_count: number;
-    contador_likes: number;
+  respuestas_count: number;
+  contador_likes: number;
   }>;
 }
 
+interface SeguimientoUsuario {
+  id: string;
+  nombre_completo: string;
+  username: string;
+  email: string;
+  url_avatar?: string;
+  verificado?: boolean;
+  fecha_seguimiento: string;
+}
+
+interface SeguimientoData {
+  esta_siguiendo: boolean;
+  seguidores: SeguimientoUsuario[];
+  seguidos: SeguimientoUsuario[];
+  estadisticas: {
+    total_seguidores: number;
+    total_seguidos: number;
+  };
+}
+
 export default function PerfilUsuarioPage() {
-  const { user: currentUser, loading } = useAuth();
+  const { user: currentUser, loading, apiCall } = useAuth();
   const params = useParams();
   const router = useRouter();
   const userId = params.userId as string;
@@ -90,8 +112,8 @@ export default function PerfilUsuarioPage() {
   const [perfilUsuario, setPerfilUsuario] = useState<PerfilUsuario | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'general' | 'conocimiento' | 'comunidad' | 'logros'>('general');
-
-  const fetchPerfilUsuario = useCallback(async () => {
+  const [seguimientoData, setSeguimientoData] = useState<SeguimientoData | null>(null);
+  const [isFollowing, setIsFollowing] = useState(false);  const fetchPerfilUsuario = useCallback(async () => {
     if (!userId) return;
     
     try {
@@ -118,11 +140,65 @@ export default function PerfilUsuarioPage() {
     }
   }, [userId]);
 
+  const fetchSeguimientoData = useCallback(async () => {
+    if (!currentUser || !userId) return;
+
+    try {
+      const response = await apiCall(`/api/usuarios/${userId}/seguimiento`);
+      if (response.ok) {
+        const result = await response.json();
+        setSeguimientoData(result.data);
+      }
+    } catch (error) {
+      console.error('Error fetching seguimiento data:', error);
+    }
+  }, [userId, currentUser, apiCall]);
+
   useEffect(() => {
     if (!loading) {
       fetchPerfilUsuario();
+      if (currentUser) {
+        fetchSeguimientoData();
+      }
     }
-  }, [loading, fetchPerfilUsuario]);
+  }, [loading, fetchPerfilUsuario, fetchSeguimientoData, currentUser]);
+
+  const handleSeguir = async () => {
+    if (!currentUser || !userId || isFollowing) return;
+
+    setIsFollowing(true);
+    try {
+      const response = await apiCall(`/api/usuarios/${userId}/seguir`, {
+        method: 'POST'
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        
+        // Actualizar el estado local
+        if (seguimientoData) {
+          const isNowFollowing = result.data.action === 'followed';
+          setSeguimientoData({
+            ...seguimientoData,
+            esta_siguiendo: isNowFollowing,
+            estadisticas: {
+              ...seguimientoData.estadisticas,
+              total_seguidores: isNowFollowing 
+                ? seguimientoData.estadisticas.total_seguidores + 1
+                : seguimientoData.estadisticas.total_seguidores - 1
+            }
+          });
+        }
+        
+        // Refrescar los datos de seguimiento para actualizar las listas
+        await fetchSeguimientoData();
+      }
+    } catch (error) {
+      console.error('Error toggling follow:', error);
+    } finally {
+      setIsFollowing(false);
+    }
+  };
 
   const getNivelColor = (nivel: string) => {
     switch (nivel.toLowerCase()) {
@@ -284,8 +360,53 @@ export default function PerfilUsuarioPage() {
                     </div>
                   </div>
                   
-                  {/* Niveles y puntos */}
+                  {/* Niveles, puntos y botón de seguir */}
                   <div className="flex flex-col sm:flex-row lg:flex-col gap-3 lg:gap-4 lg:min-w-fit">
+                    {/* Botón de seguir */}
+                    {currentUser && currentUser.id !== userId && (
+                      <div className="flex justify-end lg:justify-start">
+                        <button
+                          onClick={handleSeguir}
+                          disabled={isFollowing}
+                          className={`px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 flex items-center gap-2 ${
+                            seguimientoData?.esta_siguiendo
+                              ? 'bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-300'
+                              : 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white shadow-lg'
+                          } disabled:opacity-50`}
+                        >
+                          <Users className="w-4 h-4" />
+                          {isFollowing 
+                            ? 'Procesando...' 
+                            : seguimientoData?.esta_siguiendo 
+                              ? 'Siguiendo' 
+                              : 'Seguir'
+                          }
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Estadísticas de seguimiento */}
+                    {seguimientoData && (
+                      <div className="flex gap-4 text-center">
+                        <div>
+                          <p className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">
+                            {seguimientoData.estadisticas.total_seguidores}
+                          </p>
+                          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                            Seguidores
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">
+                            {seguimientoData.estadisticas.total_seguidos}
+                          </p>
+                          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                            Siguiendo
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
                     {(perfilUsuario.configuraciones?.mostrar_nivel ?? true) && (
                       <div className="flex flex-wrap gap-2">
                         <div className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-semibold bg-gradient-to-r ${getNivelColor(perfilUsuario.nivel_social)} text-white shadow-lg`}>
@@ -511,7 +632,8 @@ export default function PerfilUsuarioPage() {
                   👥 Comunidad
                 </h3>
                 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Estadísticas de seguimiento */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                   <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl p-6 border border-green-200/60 dark:border-green-700/60 shadow-lg">
                     <div className="flex items-center gap-4 mb-4">
                       <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center">
@@ -534,34 +656,127 @@ export default function PerfilUsuarioPage() {
                     </div>
                   </div>
                   
-                  <div className="bg-gradient-to-br from-orange-50 to-yellow-50 dark:from-orange-900/20 dark:to-yellow-900/20 rounded-2xl p-6 border border-orange-200/60 dark:border-orange-700/60 shadow-lg">
+                  <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-2xl p-6 border border-blue-200/60 dark:border-blue-700/60 shadow-lg">
                     <div className="flex items-center gap-4 mb-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-2xl flex items-center justify-center">
-                        <Trophy className="w-6 h-6 text-white" />
+                      <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center">
+                        <Heart className="w-6 h-6 text-white" />
                       </div>
                       <div>
                         <h4 className="text-lg font-semibold text-slate-900 dark:text-white">
-                          Rankings
+                          Seguidores
                         </h4>
                         <p className="text-sm text-slate-600 dark:text-slate-400">
-                          Tu posición en la comunidad
+                          Personas que te siguen
                         </p>
                       </div>
                     </div>
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span>Semanal:</span>
-                        <span className="font-semibold">#{perfilUsuario.rankings.semanal}</span>
+                    <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">
+                      {seguimientoData?.estadisticas.total_seguidores || 0}
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 rounded-2xl p-6 border border-purple-200/60 dark:border-purple-700/60 shadow-lg">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-violet-500 rounded-2xl flex items-center justify-center">
+                        <UserPlus className="w-6 h-6 text-white" />
                       </div>
-                      <div className="flex justify-between text-sm">
-                        <span>Mensual:</span>
-                        <span className="font-semibold">#{perfilUsuario.rankings.mensual}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span>Anual:</span>
-                        <span className="font-semibold">#{perfilUsuario.rankings.anual}</span>
+                      <div>
+                        <h4 className="text-lg font-semibold text-slate-900 dark:text-white">
+                          Siguiendo
+                        </h4>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">
+                          Personas que sigues
+                        </p>
                       </div>
                     </div>
+                    <div className="text-3xl font-bold text-purple-600 dark:text-purple-400 mb-2">
+                      {seguimientoData?.estadisticas.total_seguidos || 0}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Listas de seguimiento */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  {/* Lista de Seguidores */}
+                  <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl p-6 border border-slate-200/60 dark:border-slate-700/60 shadow-lg">
+                    <h4 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                      <Heart className="w-5 h-5 text-blue-500" />
+                      Seguidores ({seguimientoData?.estadisticas.total_seguidores || 0})
+                    </h4>
+                    
+                    {seguimientoData?.seguidores && seguimientoData.seguidores.length > 0 ? (
+                      <div className="space-y-3 max-h-60 overflow-y-auto">
+                        {seguimientoData.seguidores.map((seguidor) => (
+                          <div key={seguidor.id} className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
+                              {seguidor.username.charAt(0).toUpperCase()}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-slate-900 dark:text-white truncate">
+                                {seguidor.username}
+                              </p>
+                              <p className="text-sm text-slate-500 dark:text-slate-400 truncate">
+                                {seguidor.nombre_completo}
+                              </p>
+                            </div>
+                            <Link 
+                              href={`/profile/${seguidor.id}`}
+                              className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-3 py-1 rounded-full hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
+                            >
+                              Ver perfil
+                            </Link>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <Users className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+                        <p className="text-slate-500 dark:text-slate-400 text-sm">
+                          Sin seguidores aún
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Lista de Siguiendo */}
+                  <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl p-6 border border-slate-200/60 dark:border-slate-700/60 shadow-lg">
+                    <h4 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                      <UserPlus className="w-5 h-5 text-purple-500" />
+                      Siguiendo ({seguimientoData?.estadisticas.total_seguidos || 0})
+                    </h4>
+                    
+                    {seguimientoData?.seguidos && seguimientoData.seguidos.length > 0 ? (
+                      <div className="space-y-3 max-h-60 overflow-y-auto">
+                        {seguimientoData.seguidos.map((seguido) => (
+                          <div key={seguido.id} className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                            <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold">
+                              {seguido.username.charAt(0).toUpperCase()}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-slate-900 dark:text-white truncate">
+                                {seguido.username}
+                              </p>
+                              <p className="text-sm text-slate-500 dark:text-slate-400 truncate">
+                                {seguido.nombre_completo}
+                              </p>
+                            </div>
+                            <Link 
+                              href={`/profile/${seguido.id}`}
+                              className="text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 px-3 py-1 rounded-full hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors"
+                            >
+                              Ver perfil
+                            </Link>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <UserPlus className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+                        <p className="text-slate-500 dark:text-slate-400 text-sm">
+                          No sigues a nadie aún
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

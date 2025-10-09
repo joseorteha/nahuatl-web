@@ -204,7 +204,7 @@ export default function ComunidadTab({ userId }: ComunidadTabProps) {
     );
   }
 
-  const NivelIcon = getNivelIcon(data.nivel_comunidad);
+  const NivelIcon = getNivelIcon(data?.nivel_comunidad || 'principiante');
 
   return (
     <div className="space-y-6">
@@ -216,15 +216,15 @@ export default function ComunidadTab({ userId }: ComunidadTabProps) {
       >
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
           <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br ${getNivelColor(data.nivel_comunidad)} rounded-xl flex items-center justify-center shadow-lg`}>
+            <div className={`w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br ${getNivelColor(data?.nivel_comunidad || 'principiante')} rounded-xl flex items-center justify-center shadow-lg`}>
               <NivelIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
             <div>
               <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white capitalize">
-                {data.nivel_comunidad}
+                {data?.nivel_comunidad || 'Principiante'}
               </h3>
               <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300">
-                {data.experiencia_social} puntos de experiencia social
+                {data?.experiencia_social || 0} puntos de experiencia social
               </p>
             </div>
           </div>
@@ -239,24 +239,24 @@ export default function ComunidadTab({ userId }: ComunidadTabProps) {
         </div>
 
         {/* Barra de progreso */}
-        {data.siguiente_nivel && (
+        {data?.siguiente_nivel && (
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-slate-600 dark:text-slate-300">
                 Progreso hacia {data.siguiente_nivel}
               </span>
               <span className="text-slate-600 dark:text-slate-300">
-                {data.progreso_porcentaje.toFixed(1)}%
+                {(data.progreso_porcentaje || 0).toFixed(1)}%
               </span>
             </div>
             <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3">
               <div
-                className={`bg-gradient-to-r ${getNivelColor(data.nivel_comunidad)} h-3 rounded-full transition-all duration-500`}
-                style={{ width: `${data.progreso_porcentaje}%` }}
+                className={`bg-gradient-to-r ${getNivelColor(data?.nivel_comunidad || 'principiante')} h-3 rounded-full transition-all duration-500`}
+                style={{ width: `${data.progreso_porcentaje || 0}%` }}
               ></div>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              {data.puntos_para_siguiente} puntos para el siguiente nivel
+              {data.puntos_para_siguiente || 0} puntos para el siguiente nivel
             </p>
           </div>
         )}
@@ -273,7 +273,7 @@ export default function ComunidadTab({ userId }: ComunidadTabProps) {
               <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
             <p className="text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400">
-              {data.total_temas}
+              {data?.total_temas || 0}
             </p>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
               Temas Creados
@@ -294,7 +294,7 @@ export default function ComunidadTab({ userId }: ComunidadTabProps) {
               <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
             <p className="text-xl sm:text-2xl font-bold text-red-600 dark:text-red-400">
-              {data.likes_dados}
+              {data?.likes_dados || 0}
             </p>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
               Likes Dados
@@ -315,7 +315,7 @@ export default function ComunidadTab({ userId }: ComunidadTabProps) {
               <Share2 className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
             <p className="text-xl sm:text-2xl font-bold text-green-600 dark:text-green-400">
-              {data.contenido_compartido}
+              {data?.contenido_compartido || 0}
             </p>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
               Temas Compartidos
@@ -336,7 +336,7 @@ export default function ComunidadTab({ userId }: ComunidadTabProps) {
               <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
             <p className="text-xl sm:text-2xl font-bold text-purple-600 dark:text-purple-400">
-              #{data.ranking_semanal || 'N/A'}
+              #{data?.ranking_semanal || 'N/A'}
             </p>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
               Ranking Semanal
@@ -408,7 +408,7 @@ export default function ComunidadTab({ userId }: ComunidadTabProps) {
               <TrendingUp className="w-4 h-4 text-white" />
             </div>
             <p className="text-xl font-bold text-blue-600 dark:text-blue-400">
-              #{data.ranking_semanal || 'N/A'}
+              #{data?.ranking_semanal || 'N/A'}
             </p>
             <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">
               Semanal
@@ -420,7 +420,7 @@ export default function ComunidadTab({ userId }: ComunidadTabProps) {
               <Award className="w-4 h-4 text-white" />
             </div>
             <p className="text-xl font-bold text-purple-600 dark:text-purple-400">
-              #{data.ranking_mensual || 'N/A'}
+              #{data?.ranking_mensual || 'N/A'}
             </p>
             <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">
               Mensual
@@ -432,7 +432,7 @@ export default function ComunidadTab({ userId }: ComunidadTabProps) {
               <Crown className="w-4 h-4 text-white" />
             </div>
             <p className="text-xl font-bold text-yellow-600 dark:text-yellow-400">
-              #{data.ranking_anual || 'N/A'}
+              #{data?.ranking_anual || 'N/A'}
             </p>
             <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">
               Anual
@@ -442,7 +442,7 @@ export default function ComunidadTab({ userId }: ComunidadTabProps) {
       </motion.div>
 
       {/* Logros de comunidad */}
-      {data.logros_comunidad.length > 0 && (
+      {data?.logros_comunidad && data.logros_comunidad.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -451,10 +451,10 @@ export default function ComunidadTab({ userId }: ComunidadTabProps) {
         >
           <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
             <Award className="w-5 h-5 text-purple-500" />
-            Logros de Comunidad ({data.logros_comunidad.length})
+            Logros de Comunidad ({data?.logros_comunidad?.length || 0})
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {data.logros_comunidad.map((logro, index) => (
+            {data?.logros_comunidad?.map((logro, index) => (
               <motion.div
                 key={logro.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -488,7 +488,7 @@ export default function ComunidadTab({ userId }: ComunidadTabProps) {
       )}
 
       {/* Temas recientes */}
-      {data.temas_recientes.length > 0 && (
+      {data?.temas_recientes && data.temas_recientes.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -500,7 +500,7 @@ export default function ComunidadTab({ userId }: ComunidadTabProps) {
             Temas Recientes
           </h3>
           <div className="space-y-3">
-            {data.temas_recientes.map((tema, index) => (
+            {data?.temas_recientes?.map((tema, index) => (
               <motion.div
                 key={tema.id}
                 initial={{ opacity: 0, x: -20 }}
