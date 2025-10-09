@@ -13,8 +13,13 @@ import {
   Tag,
   ChevronRight,
   Lock,
-  Archive
+  Archive,
+  MoreVertical,
+  Edit3,
+  Power,
+  PowerOff
 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface TemaCardProps {
   tema: {
@@ -44,8 +49,11 @@ interface TemaCardProps {
 
 export default function TemaCard({ tema, onLike, onShare, onTemaUpdate }: TemaCardProps) {
   const router = useRouter();
+  const { user, apiCall } = useAuth();
   const [isLiking, setIsLiking] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
+  const [showOptions, setShowOptions] = useState(false);
+  const [isChangingState, setIsChangingState] = useState(false);
 
   const handleCardClick = () => {
     router.push(`/comunidad/tema/${tema.id}`);
@@ -67,6 +75,33 @@ export default function TemaCard({ tema, onLike, onShare, onTemaUpdate }: TemaCa
     setIsSharing(true);
     await onShare(tema.id);
     setIsSharing(false);
+  };
+
+  const handleChangeEstado = async (e: React.MouseEvent, nuevoEstado: 'activo' | 'cerrado' | 'archivado') => {
+    e.stopPropagation();
+    if (isChangingState) return;
+
+    setIsChangingState(true);
+    try {
+      const response = await apiCall(`/api/temas/${tema.id}/estado`, {
+        method: 'PUT',
+        body: JSON.stringify({ estado: nuevoEstado })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (onTemaUpdate) {
+          onTemaUpdate(tema.id, { estado: nuevoEstado });
+        }
+        setShowOptions(false);
+      } else {
+        console.error('Error al cambiar estado del tema');
+      }
+    } catch (error) {
+      console.error('Error al cambiar estado del tema:', error);
+    } finally {
+      setIsChangingState(false);
+    }
   };
 
   const getEstadoColor = (estado: string) => {
@@ -245,6 +280,59 @@ export default function TemaCard({ tema, onLike, onShare, onTemaUpdate }: TemaCa
                 <Share2 className={`w-3 h-3 sm:w-4 sm:h-4 ${isSharing ? 'animate-pulse' : ''}`} />
                 <span className="font-semibold">{tema.compartido_contador}</span>
               </button>
+
+              {/* Menú de opciones para el creador */}
+              {user && user.id === tema.creador.id && (
+                <div className="relative">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowOptions(!showOptions);
+                    }}
+                    className="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200"
+                  >
+                    <MoreVertical className="w-4 h-4" />
+                  </button>
+
+                  {showOptions && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="absolute right-0 top-full mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 min-w-[160px] z-10"
+                    >
+                      {tema.estado === 'activo' ? (
+                        <>
+                          <button
+                            onClick={(e) => handleChangeEstado(e, 'cerrado')}
+                            disabled={isChangingState}
+                            className="w-full px-4 py-2 text-left text-sm text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors flex items-center gap-2"
+                          >
+                            <Lock className="w-4 h-4" />
+                            Cerrar tema
+                          </button>
+                          <button
+                            onClick={(e) => handleChangeEstado(e, 'archivado')}
+                            disabled={isChangingState}
+                            className="w-full px-4 py-2 text-left text-sm text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
+                          >
+                            <Archive className="w-4 h-4" />
+                            Archivar tema
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          onClick={(e) => handleChangeEstado(e, 'activo')}
+                          disabled={isChangingState}
+                          className="w-full px-4 py-2 text-left text-sm text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors flex items-center gap-2"
+                        >
+                          <Power className="w-4 h-4" />
+                          Reactivar tema
+                        </button>
+                      )}
+                    </motion.div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>

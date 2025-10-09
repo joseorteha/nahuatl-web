@@ -531,4 +531,88 @@ router.post('/:id/share', authenticateToken, async (req, res) => {
   }
 });
 
+// PUT /api/temas/:id/estado - Cambiar estado del tema (solo creador)
+router.put('/:id/estado', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { estado } = req.body;
+    const userId = req.user.id;
+
+    // Validar estado
+    const estadosValidos = ['activo', 'cerrado', 'archivado'];
+    if (!estado || !estadosValidos.includes(estado)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Estado inválido. Debe ser: activo, cerrado o archivado'
+      });
+    }
+
+    // Verificar que el tema existe y que el usuario es el creador
+    const { data: tema, error: temaError } = await supabase
+      .from('temas_conversacion')
+      .select('creador_id, estado, titulo')
+      .eq('id', id)
+      .single();
+
+    if (temaError || !tema) {
+      return res.status(404).json({
+        success: false,
+        error: 'Tema no encontrado'
+      });
+    }
+
+    // Verificar que el usuario es el creador del tema
+    if (tema.creador_id !== userId) {
+      return res.status(403).json({
+        success: false,
+        error: 'Solo el creador del tema puede cambiar su estado'
+      });
+    }
+
+    // No permitir cambios si ya está en el mismo estado
+    if (tema.estado === estado) {
+      return res.status(400).json({
+        success: false,
+        error: `El tema ya está en estado: ${estado}`
+      });
+    }
+
+    // Actualizar el estado del tema
+    const { data: temaActualizado, error: updateError } = await supabase
+      .from('temas_conversacion')
+      .update({ 
+        estado,
+        fecha_actualizacion: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (updateError) {
+      console.error('Error actualizando estado del tema:', updateError);
+      return res.status(500).json({
+        success: false,
+        error: 'Error al actualizar el estado del tema'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: `Tema ${estado === 'cerrado' ? 'cerrado' : estado === 'archivado' ? 'archivado' : 'reactivado'} exitosamente`,
+      data: {
+        id: temaActualizado.id,
+        estado: temaActualizado.estado,
+        titulo: temaActualizado.titulo
+      }
+    });
+
+  } catch (error) {
+    console.error('Error in PUT /api/temas/:id/estado:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Error interno del servidor' 
+    });
+  }
+});
+
 module.exports = router;
