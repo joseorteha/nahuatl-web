@@ -304,6 +304,131 @@ export default function LandingPage() {
           </motion.div>
         </motion.section>
 
+        {/* Teacher Recruitment Banner */}
+        <motion.section 
+          className="py-16 bg-gradient-to-r from-cyan-600 via-blue-600 to-cyan-600 dark:from-cyan-700 dark:via-blue-700 dark:to-cyan-700 relative overflow-hidden"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+        >
+          {/* Background Elements */}
+          <div className="absolute inset-0">
+            <div className="absolute top-0 left-0 w-full h-full bg-[linear-gradient(45deg,rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(-45deg,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[size:32px_32px]"></div>
+            <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-blue-300/20 rounded-full blur-2xl"></div>
+          </div>
+
+          <div className="container-wide px-6 sm:px-8 relative z-10">
+            <div className="text-center max-w-4xl mx-auto">
+              {/* Badge */}
+              <motion.div 
+                className="inline-flex items-center bg-white/20 backdrop-blur-sm border border-white/30 text-white px-6 py-2 rounded-full text-sm font-medium mb-6"
+                initial={{ scale: 0.8, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+                viewport={{ once: true }}
+              >
+                <Users className="mr-2" size={16} />
+                ¡Únete a nuestra comunidad!
+              </motion.div>
+
+              {/* Main Title */}
+              <motion.h2 
+                className="text-3xl lg:text-5xl font-bold text-white mb-6 leading-tight"
+                initial={{ y: 20, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.6 }}
+                viewport={{ once: true }}
+              >
+                ¿Quieres ser <span className="text-yellow-300">Maestro</span> de Náhuatl?
+              </motion.h2>
+
+              {/* Description */}
+              <motion.p 
+                className="text-lg lg:text-xl text-white/90 mb-8 leading-relaxed max-w-3xl mx-auto"
+                initial={{ y: 20, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.4, duration: 0.6 }}
+                viewport={{ once: true }}
+              >
+                Comparte tu conocimiento y ayuda a preservar nuestra lengua ancestral. 
+                Como maestro podrás crear lecciones, gestionar contenido y formar parte 
+                de la comunidad que está revolucionando la enseñanza del náhuatl.
+              </motion.p>
+
+              {/* Benefits */}
+              <motion.div 
+                className="grid md:grid-cols-3 gap-6 mb-8 max-w-4xl mx-auto"
+                initial={{ y: 30, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.5, duration: 0.6 }}
+                viewport={{ once: true }}
+              >
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                  <BookOpen className="text-yellow-300 mb-2" size={24} />
+                  <h4 className="text-white font-semibold mb-1">Crea Lecciones</h4>
+                  <p className="text-white/80 text-sm">Diseña contenido educativo interactivo</p>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                  <Users className="text-yellow-300 mb-2" size={24} />
+                  <h4 className="text-white font-semibold mb-1">Comunidad</h4>
+                  <p className="text-white/80 text-sm">Conecta con otros educadores apasionados</p>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                  <Star className="text-yellow-300 mb-2" size={24} />
+                  <h4 className="text-white font-semibold mb-1">Impacto Cultural</h4>
+                  <p className="text-white/80 text-sm">Contribuye a preservar nuestra herencia</p>
+                </div>
+              </motion.div>
+
+              {/* CTA Buttons */}
+              <motion.div 
+                className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+                initial={{ y: 30, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.6, duration: 0.6 }}
+                viewport={{ once: true }}
+              >
+                <motion.a
+                  href="/solicitar-maestro"
+                  className="inline-flex items-center justify-center bg-white text-cyan-600 font-semibold py-4 px-8 rounded-xl text-base hover:bg-gray-50 transition-all duration-300 shadow-lg hover:shadow-xl group"
+                  whileHover={{ 
+                    scale: 1.05,
+                    boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1)"
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Feather className="mr-3" size={20} />
+                  Solicitar ser Maestro
+                  <ArrowRight className="ml-2" size={20} />
+                </motion.a>
+                
+                <motion.a
+                  href="/nosotros"
+                  className="inline-flex items-center justify-center bg-transparent text-white font-medium py-4 px-8 rounded-xl text-base border-2 border-white/30 hover:border-white/50 transition-all duration-300 hover:bg-white/5"
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Users className="mr-3" size={20} />
+                  Conoce el proyecto
+                </motion.a>
+              </motion.div>
+
+              {/* Additional info */}
+              <motion.p 
+                className="text-white/70 text-sm mt-6"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ delay: 0.8, duration: 0.6 }}
+                viewport={{ once: true }}
+              >
+                💡 Envía tu solicitud a través del formulario de feedback y nos pondremos en contacto contigo
+              </motion.p>
+            </div>
+          </div>
+        </motion.section>
+
         {/* Features Section - 3 colores principales: Blanco, Cian, Azul */}
         <section id="features" className="py-20 bg-white dark:bg-slate-950 transition-colors duration-500">
           <div className="container-wide px-6 sm:px-8">
