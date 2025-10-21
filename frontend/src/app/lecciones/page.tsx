@@ -17,45 +17,69 @@ import {
 } from 'lucide-react';
 import ConditionalHeader from '@/components/navigation/ConditionalHeader';
 
-interface Palabra {
-  nahuatl: string;
-  espanol: string;
-  pronunciacion: string;
-  ejemplo: string;
-}
-
-interface Ejercicio {
-  tipo: string;
-  pregunta: string;
-  opciones: string[];
-  respuesta_correcta: string;
-  explicacion: string;
-}
-
 interface Leccion {
   id: string;
   titulo: string;
   descripcion: string;
-  nivel: string;
-  duracion: string;
   categoria: string;
-  palabras: Palabra[];
-  ejercicios: Ejercicio[];
+  nivel: 'principiante' | 'intermedio' | 'avanzado';
+  contenido_texto: string;
+  contenido_nahuatl?: string;
+  objetivos_aprendizaje: string[];
+  palabras_clave: string[];
+  duracion_estimada: number;
+  estado: 'borrador' | 'publicada' | 'archivada';
+  estudiantes_completados: number;
+  puntuacion_promedio: number;
+  fecha_creacion: string;
+  fecha_publicacion?: string;
+  profesor_id: string;
+  perfiles?: {
+    nombre_completo: string;
+  };
+  quiz_preguntas?: QuizPregunta[];
+  recursos_externos?: RecursoExterno[];
+}
+
+interface QuizPregunta {
+  id: string;
+  pregunta: string;
+  tipo: 'multiple_choice' | 'verdadero_falso' | 'completar_texto';
+  opciones: string[];
+  respuesta_correcta: string;
+  explicacion?: string;
+  orden: number;
+}
+
+interface RecursoExterno {
+  id: string;
+  tipo: 'video_youtube' | 'imagen_drive' | 'audio_externo' | 'enlace_web';
+  titulo: string;
+  descripcion?: string;
+  url: string;
+  es_opcional: boolean;
+  orden: number;
 }
 
 interface LeccionesData {
-  lecciones: Leccion[];
+  data: Leccion[];
+  totalCount: number;
+  page: number;
+  limit: number;
 }
 
 export default function LeccionesPage() {
   const [lecciones, setLecciones] = useState<Leccion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedLeccion, setSelectedLeccion] = useState<Leccion | null>(null);
-  const [currentEjercicio, setCurrentEjercicio] = useState(0);
+  const [currentPregunta, setCurrentPregunta] = useState(0);
   const [respuestaSeleccionada, setRespuestaSeleccionada] = useState<string>('');
   const [mostrarResultado, setMostrarResultado] = useState(false);
   const [puntuacion, setPuntuacion] = useState(0);
-  const [ejerciciosCompletados, setEjerciciosCompletados] = useState<boolean[]>([]);
+  const [preguntasCompletados, setPreguntasCompletados] = useState<boolean[]>([]);
+  const [filtroCategoria, setFiltroCategoria] = useState<string>('todas');
+  const [filtroNivel, setFiltroNivel] = useState<string>('todos');
+  const [busqueda, setBusqueda] = useState<string>('');
 
   useEffect(() => {
     fetchLecciones();
@@ -64,17 +88,35 @@ export default function LeccionesPage() {
   const fetchLecciones = async () => {
     try {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-      const response = await fetch(`${API_URL}/api/lecciones`);
-      const data: LeccionesData = await response.json();
-      console.log('Datos recibidos:', data);
+      const response = await fetch(`${API_URL}/api/lecciones?limit=50`);
+      
+      if (!response.ok) {
+        throw new Error('Error al cargar lecciones');
+      }
+      
+      const data = await response.json();
+      console.log('📚 Lecciones públicas recibidas:', data);
       setLecciones(data.lecciones || []);
     } catch (error) {
-      console.error('Error al cargar lecciones:', error);
+      console.error('❌ Error al cargar lecciones:', error);
       setLecciones([]);
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Filtrar lecciones
+  const leccionesFiltradas = lecciones.filter(leccion => {
+    const coincideCategoria = filtroCategoria === 'todas' || leccion.categoria === filtroCategoria;
+    const coincideNivel = filtroNivel === 'todos' || leccion.nivel === filtroNivel;
+    const coincideBusqueda = leccion.titulo.toLowerCase().includes(busqueda.toLowerCase()) ||
+                            leccion.descripcion.toLowerCase().includes(busqueda.toLowerCase());
+    
+    return coincideCategoria && coincideNivel && coincideBusqueda;
+  });
+
+  const categorias = ['numeros', 'colores', 'familia', 'naturaleza', 'gramatica', 'cultura', 'vocabulario'];
+  const niveles = ['principiante', 'intermedio', 'avanzado'];
 
   const getNivelColor = (nivel: string) => {
     switch (nivel) {
@@ -96,34 +138,34 @@ export default function LeccionesPage() {
 
   const handleLeccionSelect = (leccion: Leccion) => {
     setSelectedLeccion(leccion);
-    setCurrentEjercicio(0);
+    setCurrentPregunta(0);
     setRespuestaSeleccionada('');
     setMostrarResultado(false);
     setPuntuacion(0);
-    setEjerciciosCompletados(new Array(leccion.ejercicios.length).fill(false));
+    setPreguntasCompletados(new Array(leccion.quiz_preguntas?.length || 0).fill(false));
   };
 
   const handleRespuestaSubmit = () => {
     if (!selectedLeccion) return;
     
-    const ejercicio = selectedLeccion.ejercicios[currentEjercicio];
-    const esCorrecta = respuestaSeleccionada === ejercicio.respuesta_correcta;
+    const pregunta = selectedLeccion.quiz_preguntas?.[currentPregunta];
+    const esCorrecta = respuestaSeleccionada === pregunta?.respuesta_correcta;
     
     if (esCorrecta) {
       setPuntuacion(prev => prev + 1);
     }
     
-    const nuevosCompletados = [...ejerciciosCompletados];
-    nuevosCompletados[currentEjercicio] = esCorrecta;
-    setEjerciciosCompletados(nuevosCompletados);
+    const nuevosCompletados = [...preguntasCompletados];
+    nuevosCompletados[currentPregunta] = esCorrecta;
+    setPreguntasCompletados(nuevosCompletados);
     setMostrarResultado(true);
   };
 
-  const handleSiguienteEjercicio = () => {
+  const handleSiguientePregunta = () => {
     if (!selectedLeccion) return;
     
-    if (currentEjercicio < selectedLeccion.ejercicios.length - 1) {
-      setCurrentEjercicio(prev => prev + 1);
+    if (currentPregunta < (selectedLeccion.quiz_preguntas?.length || 0) - 1) {
+      setCurrentPregunta(prev => prev + 1);
       setRespuestaSeleccionada('');
       setMostrarResultado(false);
     } else {
@@ -136,7 +178,7 @@ export default function LeccionesPage() {
       <>
         <Head>
           <title>Lecciones Interactivas - Nawatlahtol</title>
-          <meta name="description" content="Aprende náhuatl con lecciones interactivas y ejercicios estructurados. Desde principiante hasta avanzado." />
+          <meta name="description" content="Aprende náhuatl con lecciones interactivas y preguntas estructurados. Desde principiante hasta avanzado." />
         </Head>
         <ConditionalHeader />
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800 flex items-center justify-center">
@@ -154,8 +196,9 @@ export default function LeccionesPage() {
   }
 
   if (selectedLeccion) {
-    const ejercicio = selectedLeccion.ejercicios[currentEjercicio];
-    const progreso = ((currentEjercicio + 1) / selectedLeccion.ejercicios.length) * 100;
+    const tieneQuiz = selectedLeccion.quiz_preguntas && selectedLeccion.quiz_preguntas.length > 0;
+    const pregunta = tieneQuiz ? selectedLeccion.quiz_preguntas![currentPregunta] : null;
+    const progreso = tieneQuiz ? ((currentPregunta + 1) / selectedLeccion.quiz_preguntas!.length) * 100 : 100;
     
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
@@ -183,104 +226,177 @@ export default function LeccionesPage() {
                 <div className="text-right">
                   <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                     <Clock className="h-4 w-4" />
-                    {selectedLeccion.duracion}
+                    {selectedLeccion.duracion_estimada} min
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-                    <Trophy className="h-4 w-4" />
-                    {puntuacion}/{selectedLeccion.ejercicios.length}
-                  </div>
+                  {tieneQuiz && (
+                    <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                      <Trophy className="h-4 w-4" />
+                      {puntuacion}/{selectedLeccion.quiz_preguntas!.length}
+                    </div>
+                  )}
                 </div>
               </div>
               
-              <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
-                <div 
-                  className="bg-gradient-to-r from-cyan-500 to-blue-500 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${progreso}%` }}
-                ></div>
-              </div>
-              <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">
-                Ejercicio {currentEjercicio + 1} de {selectedLeccion.ejercicios.length}
-              </p>
+              {tieneQuiz && (
+                <>
+                  <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+                    <div 
+                      className="bg-gradient-to-r from-cyan-500 to-blue-500 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${progreso}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">
+                    Pregunta {currentPregunta + 1} de {selectedLeccion.quiz_preguntas!.length}
+                  </p>
+                </>
+              )}
             </div>
           </div>
 
+          {/* Contenido de la lección */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-2xl p-8 shadow-lg border border-white/20 dark:border-slate-700/50"
+            className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-2xl p-8 shadow-lg border border-white/20 dark:border-slate-700/50 mb-6"
           >
-            <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-6">
-              {ejercicio.pregunta}
-            </h2>
-            
-            <div className="space-y-3 mb-6">
-              {ejercicio.opciones.map((opcion, index) => (
-                <button
-                  key={index}
-                  onClick={() => !mostrarResultado && setRespuestaSeleccionada(opcion)}
-                  className={`w-full p-4 rounded-xl border-2 transition-all duration-200 text-left ${
-                    respuestaSeleccionada === opcion
-                      ? 'border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20'
-                      : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
-                  } ${
-                    mostrarResultado
-                      ? opcion === ejercicio.respuesta_correcta
-                        ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
-                        : respuestaSeleccionada === opcion
-                        ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
-                        : ''
-                      : ''
-                  }`}
-                  disabled={mostrarResultado}
-                >
-                  <div className="flex items-center gap-3">
-                    {mostrarResultado && (
-                      <>
-                        {opcion === ejercicio.respuesta_correcta ? (
-                          <CheckCircle className="h-5 w-5 text-green-500" />
-                        ) : respuestaSeleccionada === opcion ? (
-                          <XCircle className="h-5 w-5 text-red-500" />
-                        ) : null}
-                      </>
-                    )}
-                    <span className="text-slate-900 dark:text-slate-100">{opcion}</span>
-                  </div>
-                </button>
-              ))}
-            </div>
-
-            {mostrarResultado && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-4 mb-6"
-              >
-                <p className="text-slate-700 dark:text-slate-300">
-                  <strong>Explicación:</strong> {ejercicio.explicacion}
-                </p>
-              </motion.div>
-            )}
-
-            <div className="flex justify-between">
-              {!mostrarResultado ? (
-                <button
-                  onClick={handleRespuestaSubmit}
-                  disabled={!respuestaSeleccionada}
-                  className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl font-medium hover:from-cyan-600 hover:to-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-                >
-                  Verificar respuesta
-                </button>
-              ) : (
-                <button
-                  onClick={handleSiguienteEjercicio}
-                  className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl font-medium hover:from-green-600 hover:to-emerald-600 transition-all duration-200 flex items-center gap-2"
-                >
-                  {currentEjercicio < selectedLeccion.ejercicios.length - 1 ? 'Siguiente' : 'Completar lección'}
-                  <ArrowRight className="h-4 w-4" />
-                </button>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">📖 Contenido</h2>
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{selectedLeccion.contenido_texto}</p>
+              {selectedLeccion.contenido_nahuatl && (
+                <div className="mt-6 p-4 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg border-l-4 border-cyan-500">
+                  <h3 className="text-lg font-semibold text-cyan-900 dark:text-cyan-100 mb-2">🗣️ En Náhuatl:</h3>
+                  <p className="text-cyan-800 dark:text-cyan-200 whitespace-pre-wrap">{selectedLeccion.contenido_nahuatl}</p>
+                </div>
               )}
             </div>
+
+            {/* Objetivos de aprendizaje */}
+            {selectedLeccion.objetivos_aprendizaje && selectedLeccion.objetivos_aprendizaje.length > 0 && (
+              <div className="mt-6">
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-3">🎯 Objetivos de Aprendizaje:</h3>
+                <ul className="list-disc list-inside space-y-2">
+                  {selectedLeccion.objetivos_aprendizaje.map((objetivo, idx) => (
+                    <li key={idx} className="text-slate-700 dark:text-slate-300">{objetivo}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Palabras clave */}
+            {selectedLeccion.palabras_clave && selectedLeccion.palabras_clave.length > 0 && (
+              <div className="mt-6">
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-3">🔑 Palabras Clave:</h3>
+                <div className="flex flex-wrap gap-2">
+                  {selectedLeccion.palabras_clave.map((palabra, idx) => (
+                    <span key={idx} className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm">
+                      {palabra}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </motion.div>
+
+          {/* Quiz (si existe) */}
+          {tieneQuiz && pregunta && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-2xl p-8 shadow-lg border border-white/20 dark:border-slate-700/50"
+            >
+              <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-6">
+                {pregunta.pregunta}
+              </h2>
+              
+              <div className="space-y-3 mb-6">
+                {pregunta.opciones && Array.isArray(pregunta.opciones) && pregunta.opciones.map((opcion, index) => (
+                  <button
+                    key={index}
+                    onClick={() => !mostrarResultado && setRespuestaSeleccionada(opcion)}
+                    className={`w-full p-4 rounded-xl border-2 transition-all duration-200 text-left ${
+                      respuestaSeleccionada === opcion
+                        ? 'border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20'
+                        : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                    } ${
+                      mostrarResultado
+                        ? opcion === pregunta.respuesta_correcta
+                          ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
+                          : respuestaSeleccionada === opcion
+                          ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
+                          : ''
+                        : ''
+                    }`}
+                    disabled={mostrarResultado}
+                  >
+                    <div className="flex items-center gap-3">
+                      {mostrarResultado && (
+                        <>
+                          {opcion === pregunta.respuesta_correcta ? (
+                            <CheckCircle className="h-5 w-5 text-green-500" />
+                          ) : respuestaSeleccionada === opcion ? (
+                            <XCircle className="h-5 w-5 text-red-500" />
+                          ) : null}
+                        </>
+                      )}
+                      <span className="text-slate-900 dark:text-slate-100">{opcion}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              {mostrarResultado && pregunta.explicacion && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-4 mb-6"
+                >
+                  <p className="text-slate-700 dark:text-slate-300">
+                    <strong>Explicación:</strong> {pregunta.explicacion}
+                  </p>
+                </motion.div>
+              )}
+
+              <div className="flex justify-between">
+                {!mostrarResultado ? (
+                  <button
+                    onClick={handleRespuestaSubmit}
+                    disabled={!respuestaSeleccionada}
+                    className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl font-medium hover:from-cyan-600 hover:to-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                  >
+                    Verificar respuesta
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleSiguientePregunta}
+                    className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl font-medium hover:from-green-600 hover:to-emerald-600 transition-all duration-200 flex items-center gap-2"
+                  >
+                    {currentPregunta < selectedLeccion.quiz_preguntas!.length - 1 ? 'Siguiente' : 'Completar lección'}
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Botón de completar si no hay quiz */}
+          {!tieneQuiz && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex justify-center"
+            >
+              <button
+                onClick={() => {
+                  alert('¡Felicidades! Has completado la lección.');
+                  setSelectedLeccion(null);
+                }}
+                className="px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl font-medium hover:from-green-600 hover:to-emerald-600 transition-all duration-200 flex items-center gap-2 text-lg"
+              >
+                <CheckCircle className="h-6 w-6" />
+                Marcar como Completada
+              </button>
+            </motion.div>
+          )}
         </div>
       </div>
     );
@@ -290,8 +406,8 @@ export default function LeccionesPage() {
     <>
       <Head>
         <title>Lecciones Interactivas - Nawatlahtol</title>
-        <meta name="description" content="Aprende náhuatl con lecciones interactivas y ejercicios estructurados. Desde principiante hasta avanzado." />
-        <meta name="keywords" content="lecciones náhuatl, aprender náhuatl, ejercicios náhuatl, curso náhuatl" />
+        <meta name="description" content="Aprende náhuatl con lecciones interactivas y preguntas estructurados. Desde principiante hasta avanzado." />
+        <meta name="keywords" content="lecciones náhuatl, aprender náhuatl, preguntas náhuatl, curso náhuatl" />
       </Head>
       
       <ConditionalHeader />
@@ -339,7 +455,7 @@ export default function LeccionesPage() {
               <motion.p
                 className="text-lg lg:text-xl text-slate-600 dark:text-slate-400 leading-relaxed mb-12 max-w-3xl mx-auto"
               >
-                Domina la lengua de los <span className="font-medium text-cyan-600 dark:text-cyan-400">Mexihcah</span> con ejercicios estructurados, 
+                Domina la lengua de los <span className="font-medium text-cyan-600 dark:text-cyan-400">Mexihcah</span> con preguntas estructurados, 
                 desde conceptos básicos hasta expresiones avanzadas.
               </motion.p>
 
@@ -351,13 +467,13 @@ export default function LeccionesPage() {
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-semibold text-blue-600 dark:text-blue-400 mb-1">
-                    {lecciones.reduce((total, leccion) => total + leccion.ejercicios.length, 0)}
+                    {lecciones.reduce((total, leccion) => total + (leccion.quiz_preguntas?.length || 0), 0)}
                   </div>
-                  <div className="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wide">Ejercicios</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wide">preguntas</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-semibold text-cyan-600 dark:text-cyan-400 mb-1">
-                    {lecciones.reduce((total, leccion) => total + leccion.palabras.length, 0)}
+                    {lecciones.reduce((total, leccion) => total + (leccion.palabras_clave?.length || 0), 0)}
                   </div>
                   <div className="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wide">Palabras</div>
                 </div>
@@ -407,7 +523,7 @@ export default function LeccionesPage() {
                     }}
                     whileTap={{ scale: 0.95 }}
                     className="group cursor-pointer"
-                    onClick={() => handleLeccionSelect(leccion)}
+                    onClick={() => window.location.href = `/lecciones/${leccion.id}`}
                   >
                     <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md rounded-2xl p-8 border border-slate-200/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl transition-all duration-300 h-full relative overflow-hidden">
                       {/* Efecto de brillo */}
@@ -441,15 +557,15 @@ export default function LeccionesPage() {
                       <div className="grid grid-cols-2 gap-4 mb-6">
                         <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
                           <Clock className="h-4 w-4" />
-                          {leccion.duracion}
+                          {leccion.duracion_estimada}
                         </div>
                         <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
                           <BookOpen className="h-4 w-4" />
-                          {leccion.palabras.length} palabras
+                          {leccion.palabras_clave?.length || 0} palabras
                         </div>
                         <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
                           <Target className="h-4 w-4" />
-                          {leccion.ejercicios.length} ejercicios
+                          {leccion.quiz_preguntas?.length || 0} preguntas
                         </div>
                         <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
                           <Trophy className="h-4 w-4" />
