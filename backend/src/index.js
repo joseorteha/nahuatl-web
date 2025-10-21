@@ -24,12 +24,19 @@ const temasStatsRoutes = require('./routes/temas-stats');
 const experienciaSocialRoutes = require('./routes/experiencia-social');
 const usuariosRoutes = require('./routes/usuarios');
 const dashboardRoutes = require('./routes/dashboard');
-const leccionesRoutes = require('./routes/lecciones');
+// const leccionesRoutes = require('./routes/lecciones'); // ❌ DESHABILITADO - Sistema viejo JSON
 const profileRoutes = require('./routes/profileRoutes');
 const logrosRoutes = require('./routes/logrosRoutes');
 const pushNotificationRoutes = require('./routes/pushNotificationRoutes');
 const healthRoutes = require('./routes/healthRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
+
+// ===== NUEVAS RUTAS: SISTEMA DE LECCIONES =====
+const solicitudesMaestrosRoutes = require('./routes/solicitudesMaestrosRoutes');
+const leccionesNuevasRoutes = require('./routes/leccionesRoutes'); // ✅ NUEVO SISTEMA BD
+const progresoRoutes = require('./routes/progresoRoutes'); // ✅ SISTEMA DE INSCRIPCIÓN Y PROGRESO
+const cursosRoutes = require('./routes/cursosRoutes'); // ✅ SISTEMA DE CURSOS
+const modulosRoutes = require('./routes/modulosRoutes'); // ✅ SISTEMA DE MÓDULOS
 
 // Crear aplicación Express
 const app = express();
@@ -173,7 +180,10 @@ app.get('/', (req, res) => {
       social: '/api/social/*',
       profile: '/api/profile/*',
       logros: '/api/logros/*',
-      push: '/api/push/*'
+      push: '/api/push/*',
+      // ===== SISTEMA DE LECCIONES v2.0 =====
+      solicitudes_maestros: '/api/solicitudes-maestros/*',
+      lecciones: '/api/lecciones/*' // ✅ NUEVO SISTEMA CON BD
     },
     docs: 'https://github.com/joseorteha/nahuatl-web/blob/main/backend/README.md'
   });
@@ -193,11 +203,18 @@ app.use('/api/temas-stats', temasStatsRoutes);
 app.use('/api/experiencia-social', experienciaSocialRoutes);
 app.use('/api/usuarios', usuariosRoutes);
 app.use('/api/dashboard', dashboardRoutes);
-app.use('/api/lecciones', leccionesRoutes);
+// app.use('/api/lecciones', leccionesRoutes); // ❌ DESHABILITADO - Sistema viejo JSON
 app.use('/api/profile', profileRoutes);
 app.use('/api/logros', logrosRoutes);
 app.use('/api/push', pushNotificationRoutes);
 app.use('/api/notifications', notificationRoutes);
+
+// ===== NUEVAS RUTAS: SISTEMA DE LECCIONES =====
+app.use('/api/solicitudes-maestros', solicitudesMaestrosRoutes);
+app.use('/api/lecciones', leccionesNuevasRoutes); // ✅ NUEVO SISTEMA BD
+app.use('/api/progreso', progresoRoutes); // ✅ SISTEMA DE INSCRIPCIÓN Y PROGRESO
+app.use('/api/cursos', cursosRoutes); // ✅ SISTEMA DE CURSOS
+app.use('/api/modulos', modulosRoutes); // ✅ SISTEMA DE MÓDULOS
 app.use('/health', healthRoutes);
 
 // ===== MANEJO DE ERRORES =====
