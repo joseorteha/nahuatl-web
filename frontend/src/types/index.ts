@@ -11,7 +11,7 @@ export interface UserProfile {
   fecha_actualizacion: string;
   es_beta_tester: boolean;
   contador_temas: number;
-  rol: 'usuario' | 'moderador' | 'admin';
+  rol: 'usuario' | 'moderador' | 'admin' | 'profesor';
   biografia?: string;
   ubicacion?: string;
   sitio_web?: string;
