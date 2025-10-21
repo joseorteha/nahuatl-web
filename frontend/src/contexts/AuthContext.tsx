@@ -7,7 +7,7 @@ interface User {
   email: string;
   username?: string;
   nombre_completo: string;
-  rol: 'usuario' | 'moderador' | 'admin';
+  rol: 'usuario' | 'moderador' | 'admin' | 'profesor';
   fecha_creacion: string;
   fecha_actualizacion: string;
   url_avatar?: string;

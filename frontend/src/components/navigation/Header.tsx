@@ -182,20 +182,19 @@ export default function Header() {
                 alt="Nawatlahtol Logo" 
                 width={48} 
                 height={48} 
-                className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 object-contain group-hover:scale-105 transition-all duration-300"
+                className="w-10 h-10 sm:w-12 sm:h-12 object-contain group-hover:scale-105 transition-all duration-300"
                 priority
               />
             </div>
-            <div className="flex flex-col">
+            <div className="hidden sm:flex flex-col">
               <div className="flex items-center gap-2">
-                <span className="text-lg sm:text-xl lg:text-2xl font-bold bg-gradient-to-r from-cyan-600 via-blue-600 to-sky-600 dark:from-cyan-400 dark:via-blue-400 dark:to-sky-400 bg-clip-text text-transparent group-hover:from-cyan-700 group-hover:via-blue-700 group-hover:to-sky-700 transition-all duration-300">
-                  NAWATLAHTOL
+                <span className="text-base sm:text-lg lg:text-xl font-bold text-slate-900 dark:text-slate-100 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors duration-300">
+                  Nawatlahtol
                 </span>
-                <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-sm">
+                <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-medium bg-cyan-500 text-white">
                   BETA
                 </span>
               </div>
-
             </div>
           </Link>
 
@@ -267,17 +266,14 @@ export default function Header() {
                 {/* Desktop user menu - Responsive */}
                 <div className="hidden lg:block">
                   <Menu as="div" className="relative">
-                    <Menu.Button className="group flex items-center gap-2 xl:gap-3 p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-300 border border-transparent hover:border-cyan-200/50 dark:hover:border-cyan-700/50">
+                    <Menu.Button className="group flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200 border border-slate-200 dark:border-slate-700">
                       {renderAvatar(user.url_avatar, 32)}
-                      <div className="text-left hidden xl:block">
-                        <div className="text-sm font-semibold text-slate-900 dark:text-slate-100 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors duration-300">
+                      <div className="text-left">
+                        <div className="text-sm font-medium text-slate-900 dark:text-slate-100">
                           {user.nombre_completo || 'Usuario'}
                         </div>
-                        <div className="text-xs text-slate-500 dark:text-slate-400">
-                          @{user.username || 'usuario'}
-                        </div>
                       </div>
-                      <ChevronDown size={16} className="text-slate-400 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors duration-300" />
+                      <ChevronDown size={16} className="text-slate-400" />
                     </Menu.Button>
                     <Transition
                       as={Fragment}
@@ -288,35 +284,33 @@ export default function Header() {
                       leaveFrom="transform opacity-100 scale-100 translate-y-0"
                       leaveTo="transform opacity-0 scale-95 translate-y-2"
                     >
-                      <Menu.Items className="absolute right-0 mt-3 w-72 origin-top-right bg-white dark:bg-slate-800 divide-y divide-slate-100 dark:divide-slate-700 rounded-2xl shadow-2xl ring-1 ring-black/5 dark:ring-white/10 focus:outline-none border border-slate-200 dark:border-slate-700 overflow-hidden">
-                        <div className="px-1 py-2">
-                          <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-700">
-                            <div className="flex items-center gap-3">
-                              {renderAvatar(user.url_avatar, 48)}
-                              <div>
-                                <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{user.nombre_completo || user.email || 'Usuario'}</p>
-                                <p className="text-xs text-slate-500 dark:text-slate-400">{user.email}</p>
-                              </div>
+                      <Menu.Items className="absolute right-0 mt-2 w-64 origin-top-right bg-white dark:bg-slate-800 rounded-xl shadow-lg ring-1 ring-black/5 dark:ring-white/10 focus:outline-none border border-slate-200 dark:border-slate-700 overflow-hidden">
+                        <div className="p-3 border-b border-slate-200 dark:border-slate-700">
+                          <div className="flex items-center gap-3">
+                            {renderAvatar(user.url_avatar, 40)}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">{user.nombre_completo || 'Usuario'}</p>
+                              <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{user.email}</p>
                             </div>
                           </div>
+                        </div>
+                        <div className="p-2">
                           <Menu.Item>
                             {({ active }) => (
-                              <Link href="/profile" className={`${active ? 'bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400' : 'text-slate-700 dark:text-slate-300'} group flex rounded-xl items-center w-full px-4 py-3 text-sm transition-all duration-200`}>
-                                <UserIcon className="mr-3 h-5 w-5" />
-                                Mi Perfil
+                              <Link href="/profile" className={`${active ? 'bg-slate-100 dark:bg-slate-700' : ''} flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-700 dark:text-slate-300 transition-colors`}>
+                                <UserIcon size={18} />
+                                <span>Mi Perfil</span>
                               </Link>
                             )}
                           </Menu.Item>
-                        </div>
-                        <div className="px-1 py-2">
                           <Menu.Item>
                             {({ active }) => (
                               <button 
                                 onClick={handleLogout} 
-                                className={`${active ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400' : 'text-slate-700 dark:text-slate-300'} group flex rounded-xl items-center w-full px-4 py-3 text-sm transition-all duration-200`}
+                                className={`${active ? 'bg-red-50 dark:bg-red-900/20' : ''} flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-red-600 dark:text-red-400 transition-colors`}
                               >
-                                <LogOut className="mr-3 h-5 w-5" />
-                                Cerrar Sesión
+                                <LogOut size={18} />
+                                <span>Cerrar Sesión</span>
                               </button>
                             )}
                           </Menu.Item>
@@ -337,10 +331,10 @@ export default function Header() {
             ) : (
               <Link 
                 href="/login" 
-                className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white px-3 sm:px-4 py-2 rounded-lg font-semibold hover:from-cyan-700 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-xs sm:text-sm"
+                className="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 text-sm"
               >
                 <span className="hidden sm:inline">Iniciar Sesión</span>
-                <span className="sm:hidden">Login</span>
+                <span className="sm:hidden">Entrar</span>
               </Link>
             )}
           </div>
