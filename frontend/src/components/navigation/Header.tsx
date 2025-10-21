@@ -19,7 +19,8 @@ import {
   Sparkles,
   ChevronDown,
   Home,
-  Shield
+  Shield,
+  GraduationCap
 } from 'lucide-react';
 import { ThemeToggle } from '../shared/ThemeToggle';
 import { useAuth } from '@/contexts/AuthContext';
@@ -98,11 +99,27 @@ export default function Header() {
       color: 'text-blue-600 dark:text-blue-400',
       hoverColor: 'hover:text-blue-600 dark:hover:text-blue-400',
       bgColor: 'hover:bg-blue-50 dark:hover:bg-blue-900/20'
+    },
+    {
+      name: 'Cursos',
+      href: '/cursos',
+      icon: GraduationCap,
+      color: 'text-green-600 dark:text-green-400',
+      hoverColor: 'hover:text-green-600 dark:hover:text-green-400',
+      bgColor: 'hover:bg-green-50 dark:hover:bg-green-900/20'
     }
   ];
 
   // Navegación de usuario (solo para logueados)
   const userNavLinks = [
+    {
+      name: 'Lecciones',
+      href: '/lecciones',
+      icon: BookOpen,
+      color: 'text-green-600 dark:text-green-400',
+      hoverColor: 'hover:text-green-600 dark:hover:text-green-400',
+      bgColor: 'hover:bg-green-50 dark:hover:bg-green-900/20'
+    },
     {
       name: 'Contribuir',
       href: '/contribuir',
@@ -118,6 +135,14 @@ export default function Header() {
       color: 'text-cyan-600 dark:text-cyan-400',
       hoverColor: 'hover:text-cyan-600 dark:hover:text-cyan-400',
       bgColor: 'hover:bg-cyan-50 dark:hover:bg-cyan-900/20'
+    },
+    {
+      name: 'Ser Maestro',
+      href: '/solicitar-maestro',
+      icon: GraduationCap,
+      color: 'text-indigo-600 dark:text-indigo-400',
+      hoverColor: 'hover:text-indigo-600 dark:hover:text-indigo-400',
+      bgColor: 'hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
     }
   ];
 
@@ -133,15 +158,17 @@ export default function Header() {
     }
   ];
 
-  // Lecciones (ahora disponible)
-  const leccionesLink = {
-    name: 'Lecciones',
-    href: '/lecciones',
-    icon: HelpCircle,
-    color: 'text-green-600 dark:text-green-400',
-    hoverColor: 'hover:text-green-600 dark:hover:text-green-400',
-    bgColor: 'hover:bg-green-50 dark:hover:bg-green-900/20'
-  };
+  // Navegación de profesor (solo para profesores)
+  const profesorNavLinks = [
+    {
+      name: 'Panel Profesor',
+      href: '/profesor',
+      icon: Shield,
+      color: 'text-purple-600 dark:text-purple-400',
+      hoverColor: 'hover:text-purple-600 dark:hover:text-purple-400',
+      bgColor: 'hover:bg-purple-50 dark:hover:bg-purple-900/20'
+    }
+  ];
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-200/60 dark:border-slate-700/60 shadow-lg">
@@ -168,9 +195,7 @@ export default function Header() {
                   BETA
                 </span>
               </div>
-              <span className="text-xs text-cyan-600 dark:text-cyan-400 font-medium tracking-wide hidden sm:block">
-                TLAHTOLNEMILIZTLI
-              </span>
+
             </div>
           </Link>
 
@@ -203,6 +228,18 @@ export default function Header() {
               </Link>
             ))}
 
+            {/* Navegación de profesor */}
+            {user?.rol === 'profesor' && profesorNavLinks.map((link) => (
+              <Link 
+                key={link.name}
+                href={link.href} 
+                className={`group flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${link.color} ${link.hoverColor} ${link.bgColor} border border-transparent hover:border-purple-200/50 dark:hover:border-purple-700/50`}
+              >
+                <link.icon size={16} className="group-hover:scale-110 transition-transform duration-300" />
+                <span>{link.name}</span>
+              </Link>
+            ))}
+
             {/* Navegación de admin */}
             {user?.rol === 'admin' && adminNavLinks.map((link) => (
               <Link 
@@ -214,15 +251,6 @@ export default function Header() {
                 <span>{link.name}</span>
               </Link>
             ))}
-
-            {/* Lecciones */}
-            <Link 
-              href={leccionesLink.href} 
-              className={`group flex items-center gap-2 px-3 xl:px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${leccionesLink.color} ${leccionesLink.hoverColor} ${leccionesLink.bgColor} border border-transparent hover:border-green-200/50 dark:hover:border-green-700/50`}
-            >
-              <leccionesLink.icon size={16} className="group-hover:scale-110 transition-transform duration-300" />
-              <span>{leccionesLink.name}</span>
-            </Link>
           </nav>
 
           {/* User menu / Auth - Responsive */}
@@ -388,6 +416,26 @@ export default function Header() {
                   </div>
                 </div>
 
+                {/* Sección Profesor */}
+                {user?.rol === 'profesor' && (
+                  <div>
+                    <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 sm:mb-3">PROFESOR</h3>
+                    <div className="space-y-1">
+                      {profesorNavLinks.map((link) => (
+                        <Link 
+                          key={link.name}
+                          href={link.href} 
+                          className={`flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-slate-700 dark:text-slate-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:text-purple-600 dark:hover:text-purple-400 transition-all duration-300 rounded-xl`}
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <link.icon size={18} className="sm:w-5 sm:h-5" />
+                          <span className="font-medium text-sm sm:text-base">{link.name}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {/* Sección Admin */}
                 {user?.rol === 'admin' && (
                   <div>
@@ -407,21 +455,6 @@ export default function Header() {
                     </div>
                   </div>
                 )}
-
-                {/* Lecciones */}
-                <div>
-                  <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 sm:mb-3">APRENDER</h3>
-                  <div className="space-y-1">
-                    <Link 
-                      href={leccionesLink.href} 
-                      className={`flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-slate-700 dark:text-slate-300 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400 transition-all duration-300 rounded-xl`}
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <leccionesLink.icon size={18} className="sm:w-5 sm:h-5" />
-                      <span className="font-medium text-sm sm:text-base">{leccionesLink.name}</span>
-                    </Link>
-                  </div>
-                </div>
               </div>
 
               {/* Logout button - Responsive */}
