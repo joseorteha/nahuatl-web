@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Info, HelpCircle, Menu, X, LogIn } from 'lucide-react';
+import { Info, HelpCircle, Menu, X, LogIn, BookOpen, Users } from 'lucide-react';
 import { useState } from 'react';
 import { ThemeToggle, ThemeToggleMobile } from '../shared/ThemeToggle';
 
