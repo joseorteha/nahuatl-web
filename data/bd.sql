@@ -1,6 +1,28 @@
 -- WARNING: This schema is for context only and is not meant to be run.
 -- Table order and constraints may not be valid for execution.
 
+CREATE TABLE public.calificaciones_cursos (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  usuario_id uuid NOT NULL,
+  curso_id uuid NOT NULL,
+  calificacion integer NOT NULL CHECK (calificacion >= 1 AND calificacion <= 5),
+  comentario text,
+  fecha_calificacion timestamp with time zone DEFAULT now(),
+  CONSTRAINT calificaciones_cursos_pkey PRIMARY KEY (id),
+  CONSTRAINT calificaciones_cursos_usuario_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id),
+  CONSTRAINT calificaciones_cursos_curso_fkey FOREIGN KEY (curso_id) REFERENCES public.cursos(id)
+);
+CREATE TABLE public.calificaciones_lecciones (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  usuario_id uuid NOT NULL,
+  leccion_id uuid NOT NULL,
+  calificacion integer NOT NULL CHECK (calificacion >= 1 AND calificacion <= 5),
+  comentario text,
+  fecha_calificacion timestamp with time zone DEFAULT now(),
+  CONSTRAINT calificaciones_lecciones_pkey PRIMARY KEY (id),
+  CONSTRAINT calificaciones_usuario_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id),
+  CONSTRAINT calificaciones_leccion_fkey FOREIGN KEY (leccion_id) REFERENCES public.lecciones(id)
+);
 CREATE TABLE public.contribuciones_diccionario (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   usuario_id uuid NOT NULL,
@@ -29,6 +51,30 @@ CREATE TABLE public.contribuciones_diccionario (
   CONSTRAINT contribuciones_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id),
   CONSTRAINT contribuciones_admin_revisor_fkey FOREIGN KEY (admin_revisor_id) REFERENCES public.perfiles(id)
 );
+CREATE TABLE public.cursos (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  titulo text NOT NULL,
+  descripcion text,
+  imagen_portada text,
+  nivel text DEFAULT 'principiante'::text CHECK (nivel = ANY (ARRAY['principiante'::text, 'intermedio'::text, 'avanzado'::text])),
+  categoria text NOT NULL,
+  duracion_total_minutos integer DEFAULT 0,
+  profesor_id uuid NOT NULL,
+  estado text DEFAULT 'borrador'::text CHECK (estado = ANY (ARRAY['borrador'::text, 'publicado'::text, 'archivado'::text])),
+  estudiantes_inscritos integer DEFAULT 0,
+  puntuacion_promedio numeric DEFAULT 0.00,
+  objetivos_curso ARRAY,
+  requisitos_previos ARRAY,
+  palabras_clave ARRAY,
+  orden_visualizacion integer DEFAULT 1,
+  es_destacado boolean DEFAULT false,
+  es_gratuito boolean DEFAULT true,
+  fecha_creacion timestamp with time zone DEFAULT now(),
+  fecha_publicacion timestamp with time zone,
+  fecha_actualizacion timestamp with time zone DEFAULT now(),
+  CONSTRAINT cursos_pkey PRIMARY KEY (id),
+  CONSTRAINT cursos_profesor_fkey FOREIGN KEY (profesor_id) REFERENCES public.perfiles(id)
+);
 CREATE TABLE public.diccionario (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   word text NOT NULL,
@@ -47,6 +93,16 @@ CREATE TABLE public.diccionario (
   usuario_id uuid,
   CONSTRAINT diccionario_pkey PRIMARY KEY (id),
   CONSTRAINT diccionario_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id)
+);
+CREATE TABLE public.especialidades_maestros (
+  id integer NOT NULL DEFAULT nextval('especialidades_maestros_id_seq'::regclass),
+  nombre text NOT NULL UNIQUE,
+  descripcion text,
+  icono text,
+  activa boolean DEFAULT true,
+  orden_display integer DEFAULT 1,
+  fecha_creacion timestamp with time zone DEFAULT now(),
+  CONSTRAINT especialidades_maestros_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.hashtags (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -68,6 +124,47 @@ CREATE TABLE public.historial_puntos (
   fecha_creacion timestamp with time zone DEFAULT now(),
   CONSTRAINT historial_puntos_pkey PRIMARY KEY (id),
   CONSTRAINT historial_puntos_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id)
+);
+CREATE TABLE public.inscripciones_cursos (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  usuario_id uuid NOT NULL,
+  curso_id uuid NOT NULL,
+  estado text DEFAULT 'activo'::text CHECK (estado = ANY (ARRAY['activo'::text, 'completado'::text, 'abandonado'::text])),
+  progreso_porcentaje numeric DEFAULT 0.00,
+  temas_completados integer DEFAULT 0,
+  tiempo_total_minutos integer DEFAULT 0,
+  fecha_inscripcion timestamp with time zone DEFAULT now(),
+  fecha_ultimo_acceso timestamp with time zone,
+  fecha_completado timestamp with time zone,
+  CONSTRAINT inscripciones_cursos_pkey PRIMARY KEY (id),
+  CONSTRAINT inscripciones_usuario_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id),
+  CONSTRAINT inscripciones_curso_fkey FOREIGN KEY (curso_id) REFERENCES public.cursos(id)
+);
+CREATE TABLE public.lecciones (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  titulo text NOT NULL,
+  descripcion text,
+  categoria text NOT NULL,
+  nivel text DEFAULT 'principiante'::text CHECK (nivel = ANY (ARRAY['principiante'::text, 'intermedio'::text, 'avanzado'::text])),
+  contenido_texto text NOT NULL,
+  contenido_nahuatl text,
+  objetivos_aprendizaje ARRAY,
+  palabras_clave ARRAY,
+  duracion_estimada integer DEFAULT 15,
+  orden_leccion integer DEFAULT 1,
+  profesor_id uuid NOT NULL,
+  estado text DEFAULT 'borrador'::text CHECK (estado = ANY (ARRAY['borrador'::text, 'publicada'::text, 'archivada'::text])),
+  estudiantes_completados integer DEFAULT 0,
+  puntuacion_promedio numeric DEFAULT 0.00,
+  fecha_creacion timestamp with time zone DEFAULT now(),
+  fecha_publicacion timestamp with time zone,
+  fecha_actualizacion timestamp with time zone DEFAULT now(),
+  modulo_id uuid,
+  orden_tema integer DEFAULT 1,
+  es_obligatorio boolean DEFAULT true,
+  CONSTRAINT lecciones_pkey PRIMARY KEY (id),
+  CONSTRAINT lecciones_profesor_fkey FOREIGN KEY (profesor_id) REFERENCES public.perfiles(id),
+  CONSTRAINT lecciones_modulo_fkey FOREIGN KEY (modulo_id) REFERENCES public.modulos(id)
 );
 CREATE TABLE public.logros (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -124,14 +221,28 @@ CREATE TABLE public.mensajes_contacto (
   fecha_respondido timestamp with time zone,
   CONSTRAINT mensajes_contacto_pkey PRIMARY KEY (id)
 );
+CREATE TABLE public.modulos (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  curso_id uuid NOT NULL,
+  titulo text NOT NULL,
+  descripcion text,
+  orden_modulo integer NOT NULL DEFAULT 1,
+  duracion_total_minutos integer DEFAULT 0,
+  numero_temas integer DEFAULT 0,
+  objetivos_modulo ARRAY,
+  fecha_creacion timestamp with time zone DEFAULT now(),
+  fecha_actualizacion timestamp with time zone DEFAULT now(),
+  CONSTRAINT modulos_pkey PRIMARY KEY (id),
+  CONSTRAINT modulos_curso_fkey FOREIGN KEY (curso_id) REFERENCES public.cursos(id)
+);
 CREATE TABLE public.notificaciones (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   usuario_id uuid NOT NULL,
-  tipo_notificacion text NOT NULL CHECK (tipo_notificacion = ANY (ARRAY['like_recibido'::text, 'respuesta_recibida'::text, 'tema_compartido'::text, 'ranking_actualizado'::text, 'mencion'::text, 'nuevo_seguidor'::text, 'logro_obtenido'::text, 'puntos_ganados'::text, 'contribucion_aprobada'::text, 'contribucion_rechazada'::text, 'contribucion_publicada'::text, 'tema_nuevo_categoria'::text, 'mensaje_contacto'::text, 'solicitud_union'::text])),
+  tipo_notificacion text NOT NULL CHECK (tipo_notificacion = ANY (ARRAY['like_recibido'::text, 'respuesta_recibida'::text, 'tema_compartido'::text, 'ranking_actualizado'::text, 'mencion'::text, 'nuevo_seguidor'::text, 'logro_obtenido'::text, 'puntos_ganados'::text, 'contribucion_aprobada'::text, 'contribucion_rechazada'::text, 'contribucion_publicada'::text, 'tema_nuevo_categoria'::text, 'mensaje_contacto'::text, 'solicitud_union'::text, 'solicitud_maestro_aprobada'::text, 'solicitud_maestro_rechazada'::text, 'nueva_leccion_disponible'::text, 'leccion_completada'::text, 'quiz_aprobado'::text])),
   titulo text NOT NULL,
   mensaje text NOT NULL,
   relacionado_id uuid,
-  relacionado_tipo text CHECK (relacionado_tipo = ANY (ARRAY['tema'::text, 'respuesta'::text, 'usuario'::text, 'logro'::text, 'contribucion'::text, 'mensaje_contacto'::text, 'solicitud_union'::text])),
+  relacionado_tipo text CHECK (relacionado_tipo = ANY (ARRAY['tema'::text, 'respuesta'::text, 'usuario'::text, 'logro'::text, 'contribucion'::text, 'mensaje_contacto'::text, 'solicitud_union'::text, 'solicitud_maestro'::text])),
   fecha_creacion timestamp with time zone DEFAULT now(),
   leida boolean DEFAULT false,
   fecha_leida timestamp with time zone,
@@ -158,7 +269,7 @@ CREATE TABLE public.perfiles (
   es_beta_tester boolean DEFAULT false,
   contador_temas integer DEFAULT 0,
   password text,
-  rol text DEFAULT 'usuario'::text CHECK (rol = ANY (ARRAY['usuario'::text, 'moderador'::text, 'admin'::text])),
+  rol text DEFAULT 'usuario'::text CHECK (rol = ANY (ARRAY['usuario'::text, 'moderador'::text, 'admin'::text, 'profesor'::text])),
   biografia text,
   ubicacion text,
   sitio_web text,
@@ -170,6 +281,25 @@ CREATE TABLE public.perfiles (
   notificaciones_push boolean DEFAULT true,
   CONSTRAINT perfiles_pkey PRIMARY KEY (id)
 );
+CREATE TABLE public.progreso_lecciones (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  usuario_id uuid NOT NULL,
+  leccion_id uuid NOT NULL,
+  estado_leccion text DEFAULT 'no_iniciada'::text CHECK (estado_leccion = ANY (ARRAY['no_iniciada'::text, 'en_progreso'::text, 'completada'::text])),
+  puntuacion_quiz integer DEFAULT 0,
+  total_preguntas_quiz integer DEFAULT 0,
+  tiempo_total_minutos integer DEFAULT 0,
+  intentos_quiz integer DEFAULT 0,
+  fecha_inicio timestamp with time zone,
+  fecha_completada timestamp with time zone,
+  fecha_ultima_actividad timestamp with time zone DEFAULT now(),
+  notas_estudiante text,
+  inscripcion_curso_id uuid,
+  CONSTRAINT progreso_lecciones_pkey PRIMARY KEY (id),
+  CONSTRAINT progreso_lecciones_usuario_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id),
+  CONSTRAINT progreso_lecciones_leccion_fkey FOREIGN KEY (leccion_id) REFERENCES public.lecciones(id),
+  CONSTRAINT progreso_inscripcion_fkey FOREIGN KEY (inscripcion_curso_id) REFERENCES public.inscripciones_cursos(id)
+);
 CREATE TABLE public.push_subscriptions (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   user_id uuid NOT NULL UNIQUE,
@@ -180,6 +310,20 @@ CREATE TABLE public.push_subscriptions (
   updated_at timestamp with time zone DEFAULT now(),
   CONSTRAINT push_subscriptions_pkey PRIMARY KEY (id),
   CONSTRAINT push_subscriptions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.perfiles(id)
+);
+CREATE TABLE public.quiz_preguntas (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  leccion_id uuid NOT NULL,
+  pregunta text NOT NULL,
+  tipo_pregunta text DEFAULT 'multiple_choice'::text CHECK (tipo_pregunta = ANY (ARRAY['multiple_choice'::text, 'verdadero_falso'::text, 'completar_texto'::text, 'ordenar_palabras'::text])),
+  opciones jsonb,
+  respuesta_correcta text NOT NULL,
+  explicacion text,
+  puntos integer DEFAULT 1,
+  orden_pregunta integer DEFAULT 1,
+  fecha_creacion timestamp with time zone DEFAULT now(),
+  CONSTRAINT quiz_preguntas_pkey PRIMARY KEY (id),
+  CONSTRAINT quiz_preguntas_leccion_fkey FOREIGN KEY (leccion_id) REFERENCES public.lecciones(id)
 );
 CREATE TABLE public.ranking_social (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -216,6 +360,20 @@ CREATE TABLE public.recompensas_usuario (
   CONSTRAINT recompensas_usuario_pkey PRIMARY KEY (id),
   CONSTRAINT recompensas_usuario_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id)
 );
+CREATE TABLE public.recursos_externos (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  leccion_id uuid NOT NULL,
+  tipo_recurso text NOT NULL CHECK (tipo_recurso = ANY (ARRAY['video_youtube'::text, 'imagen_drive'::text, 'audio_externo'::text, 'enlace_web'::text])),
+  titulo text NOT NULL,
+  descripcion text,
+  url text NOT NULL,
+  orden_visualizacion integer DEFAULT 1,
+  es_opcional boolean DEFAULT false,
+  duracion_segundos integer,
+  fecha_creacion timestamp with time zone DEFAULT now(),
+  CONSTRAINT recursos_externos_pkey PRIMARY KEY (id),
+  CONSTRAINT recursos_externos_leccion_fkey FOREIGN KEY (leccion_id) REFERENCES public.lecciones(id)
+);
 CREATE TABLE public.respuestas_contacto (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   mensaje_contacto_id uuid NOT NULL,
@@ -237,6 +395,29 @@ CREATE TABLE public.seguimientos_usuarios (
   CONSTRAINT seguimientos_usuarios_pkey PRIMARY KEY (id),
   CONSTRAINT seguimientos_seguidor_fkey FOREIGN KEY (seguidor_id) REFERENCES public.perfiles(id),
   CONSTRAINT seguimientos_seguido_fkey FOREIGN KEY (seguido_id) REFERENCES public.perfiles(id)
+);
+CREATE TABLE public.solicitudes_maestros (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  usuario_id uuid,
+  especialidad text NOT NULL,
+  experiencia text NOT NULL,
+  motivacion text NOT NULL,
+  propuesta_contenido text NOT NULL,
+  habilidades_especiales text,
+  disponibilidad_horas text,
+  estado text DEFAULT 'pendiente'::text CHECK (estado = ANY (ARRAY['pendiente'::text, 'aprobada'::text, 'rechazada'::text])),
+  comentarios_admin text,
+  admin_revisor_id uuid,
+  fecha_solicitud timestamp with time zone DEFAULT now(),
+  fecha_revision timestamp with time zone,
+  fecha_aprobacion timestamp with time zone,
+  email text,
+  nombre_completo text,
+  especialidad_id integer,
+  CONSTRAINT solicitudes_maestros_pkey PRIMARY KEY (id),
+  CONSTRAINT solicitudes_maestros_usuario_fkey FOREIGN KEY (usuario_id) REFERENCES public.perfiles(id),
+  CONSTRAINT solicitudes_maestros_admin_fkey FOREIGN KEY (admin_revisor_id) REFERENCES public.perfiles(id),
+  CONSTRAINT solicitudes_maestros_especialidad_id_fkey FOREIGN KEY (especialidad_id) REFERENCES public.especialidades_maestros(id)
 );
 CREATE TABLE public.solicitudes_union (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
