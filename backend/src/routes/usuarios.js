@@ -305,4 +305,58 @@ router.get('/:id/seguimiento', authenticateToken, async (req, res) => {
   }
 });
 
+// GET /api/usuarios/profile - Obtener perfil del usuario actual autenticado
+router.get('/profile', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // Obtener datos del usuario
+    const { data: usuario, error } = await supabase
+      .from('perfiles')
+      .select(`
+        id,
+        nombre_completo,
+        email,
+        username,
+        url_avatar,
+        fecha_creacion,
+        fecha_actualizacion,
+        es_beta_tester,
+        contador_temas,
+        rol,
+        biografia,
+        ubicacion,
+        sitio_web,
+        verificado,
+        privacidad_perfil,
+        mostrar_puntos,
+        mostrar_nivel,
+        notificaciones_email,
+        notificaciones_push
+      `)
+      .eq('id', userId)
+      .single();
+
+    if (error || !usuario) {
+      console.error('Error obteniendo perfil:', error);
+      return res.status(404).json({
+        success: false,
+        error: 'Usuario no encontrado'
+      });
+    }
+
+    res.json({
+      success: true,
+      user: usuario
+    });
+
+  } catch (error) {
+    console.error('Error in GET /api/usuarios/profile:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error interno del servidor'
+    });
+  }
+});
+
 module.exports = router;
