@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -49,7 +49,8 @@ interface EstadisticasProfesor {
   lecciones_recientes: Leccion[];
 }
 
-export default function PanelProfesorPage() {
+// Componente interno que usa useSearchParams
+function PanelProfesorContent() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -643,5 +644,18 @@ export default function PanelProfesorPage() {
         isLoading={isDeleting}
       />
     </>
+  );
+}
+
+// Componente principal con Suspense
+export default function PanelProfesorPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800 flex items-center justify-center">
+        <div className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <PanelProfesorContent />
+    </Suspense>
   );
 }
